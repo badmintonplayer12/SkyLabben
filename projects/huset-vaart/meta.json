@@ -32,8 +32,7 @@
     {
       "id": "6-stue",
       "name": "6-Stue",
-      "path": "6-stue",
-      "hidden": true
+      "path": "6-stue"
     },
     {
       "id": "7-kjokken",
@@ -43,8 +42,7 @@
     {
       "id": "8-bad",
       "name": "8-Bad",
-      "path": "8-bad",
-      "hidden": true
+      "path": "8-bad"
     },
     {
       "id": "9-peis",

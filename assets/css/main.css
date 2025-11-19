@@ -705,6 +705,11 @@ button {
   
   .viewer__bottom {
     padding: var(--spacing-lg);
+    gap: var(--spacing-lg);
+  }
+  
+  .viewer__progress {
+    margin: 0 var(--spacing-md);
   }
 }
 
