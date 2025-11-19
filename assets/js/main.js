@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Hovedkoordinator for LEGO Instruksjonsvisning-applikasjonen
  * 
  * Dette er applikasjonens entry point som koordinerer routing, state og views.
@@ -13,17 +13,16 @@ import { hasSeenOnboarding, showOnboarding } from './onboarding.js';
 
 /**
  * Initialiserer applikasjonen
- * Kalles Ã©n gang nÃ¥r siden laster
+ * Kalles �n gang n�r siden laster
  */
 export function init() {
-  // Initialiser router
   initRouter((route) => {
     handleRoute(route);
   });
 }
 
 /**
- * HÃ¥ndterer ruteendringer
+ * H�ndterer ruteendringer
  * @param {Route} route - Route-objekt fra router
  */
 async function handleRoute(route) {
@@ -38,8 +37,8 @@ async function handleRoute(route) {
   if (route.type === 'root') {
     const clearStatus = showStatus(root, {
       type: 'loading',
-      title: 'Laster prosjekter …',
-      message: 'Henter LEGO-modellene dine. Bare et lite øyeblikk!'
+      title: 'Laster prosjekter �',
+      message: 'Henter LEGO-modellene dine. Bare et lite �yeblikk!'
     });
     try {
       const projects = await loadProjects();
@@ -51,9 +50,7 @@ async function handleRoute(route) {
       root.appendChild(grid);
 
       if (!hasSeenOnboarding()) {
-        showOnboarding(root, () => {
-          // Onboarding avsluttet, ingen ekstra handling nødvendig
-        });
+        showOnboarding(root, () => {});
       }
     } catch (error) {
       console.error('Kunne ikke laste prosjekter:', error);
@@ -62,16 +59,16 @@ async function handleRoute(route) {
       root.appendChild(createStatusElement({
         type: 'error',
         title: 'Oi! Kunne ikke laste prosjekter',
-        message: 'Sjekk nettforbindelsen eller prøv igjen om et øyeblikk.',
+        message: 'Sjekk nettforbindelsen eller pr�v igjen om et �yeblikk.',
         details: error?.message,
-        actionLabel: 'Prøv igjen',
+        actionLabel: 'Pr�v igjen',
         onAction: () => handleRoute(route)
       }));
     }
   } else if (route.type === 'project') {
     const clearStatus = showStatus(root, {
       type: 'loading',
-      title: 'Laster instruksjonene …',
+      title: 'Laster instruksjonene �',
       message: 'Vi finner frem byggetrinnene dine.'
     });
     try {
@@ -137,13 +134,13 @@ async function handleRoute(route) {
       });
       root.appendChild(viewer);
     } catch (error) {
-      console.error(Kunne ikke laste prosjekt :, error);
+      console.error(`Kunne ikke laste prosjekt ${route.path}:`, error);
       clearStatus();
       root.innerHTML = '';
       root.appendChild(createStatusElement({
         type: 'error',
         title: 'Fant ikke instruksjonene',
-        message: 'Sjekk at prosjektet finnes, eller gå tilbake og velg et annet.',
+        message: 'Sjekk at prosjektet finnes, eller g� tilbake og velg et annet.',
         details: error?.message,
         actionLabel: 'Tilbake til galleri',
         onAction: () => updateHash({ type: 'root' })
@@ -164,11 +161,11 @@ function showStatus(root, options) {
 
 function createStatusElement({ type = 'info', title, message, details, actionLabel, onAction }) {
   const wrapper = document.createElement('div');
-  wrapper.className = pp-status app-status--;
+  wrapper.className = `app-status app-status--${type}`;
 
   const icon = document.createElement('div');
   icon.className = 'app-status__icon';
-  icon.textContent = type === 'error' ? '⚠️' : '🧱';
+  icon.textContent = type === 'error' ? '??' : '??';
 
   const titleEl = document.createElement('div');
   titleEl.className = 'app-status__title';
@@ -199,10 +196,10 @@ function createStatusElement({ type = 'info', title, message, details, actionLab
   }
 
   return wrapper;
-}// Initialiser applikasjonen nÃ¥r DOM er klar
+}
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
   init();
 }
-
