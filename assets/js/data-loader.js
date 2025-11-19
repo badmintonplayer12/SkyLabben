@@ -5,9 +5,9 @@
  */
 
 const resolvedBase = window.__APP_BASE_URL__ || window.location.href.split('#')[0];
-const APP_BASE_URL = new URL('.', resolvedBase).href; // peker til katalogen som index.html ligger i
-const PROJECTS_JSON_URL = new URL('./projects.json', APP_BASE_URL).href;
-const BASE_URL = new URL('./projects/', APP_BASE_URL).href;
+const APP_BASE_URL = new URL('./', resolvedBase).href; // bevarer repo-mappen selv uten trailing slash
+const PROJECTS_JSON_URL = new URL('projects.json', APP_BASE_URL).href;
+const BASE_URL = new URL('projects/', APP_BASE_URL).href;
 const CACHE_VERSION = '1.0'; // Øk dette når cache-struktur endres
 const META_CACHE_KEY = 'legoInstructions.metaCache';
 const PROJECTS_CACHE_KEY = 'legoInstructions.projectsCache';
