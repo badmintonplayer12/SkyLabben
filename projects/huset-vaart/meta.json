@@ -32,7 +32,8 @@
     {
       "id": "6-stue",
       "name": "6-Stue",
-      "path": "6-stue"
+      "path": "6-stue",
+      "hidden": true
     },
     {
       "id": "7-kjokken",
@@ -42,12 +43,14 @@
     {
       "id": "8-bad",
       "name": "8-Bad",
-      "path": "8-bad"
+      "path": "8-bad",
+      "hidden": true
     },
     {
       "id": "9-peis",
       "name": "9-Peis",
-      "path": "9-peis"
+      "path": "9-peis",
+      "hidden": true
     },
     {
       "id": "10-simon-sitt-rom",

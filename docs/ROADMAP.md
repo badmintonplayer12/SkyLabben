@@ -297,7 +297,7 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for LE
   - **🌐 TEST I NETTLESER**: Test sync ved nettverksgjenoppretting
 
 ### 4.4 Installerbar app
-- [ ] **4.4.1** Installasjonsprompt
+- [x] **4.4.1** Installasjonsprompt
   - **Mål**: Vis "Installer app"-prompt når kriterier er oppfylt
   - **🌐 TEST I NETTLESER**: Test installasjonsprompt i nettleser
 - [ ] **4.4.2** App-ikon på hjemmeskjerm
