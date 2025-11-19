@@ -23,14 +23,16 @@ Nettsiden er bygget med ren HTML, CSS og JavaScript, og kan hostes hvor som hels
 - **Posisjonslagring**: Automatisk lagring av hvor du var (prosjekt + steg) i localStorage
 - **Responsivt design**: Fungerer på mobil, nettbrett og PC
 - **Ingen scroll**: Instruksjonsbildet tilpasses skjermen uten scrolling
+- **Søk, filtrering og favoritter**: Søk etter prosjekter, filtrer på kategori eller vis kun favoritter
 - **Tastaturnavigasjon**: Piltaster for neste/forrige steg, Escape for å gå tilbake
 - **Touch gestures**: Swipe venstre/høyre på bildet for å navigere mellom steg
+- **Innstillingsmeny og fullskjerm**: En kompakt meny samler lyd-av/på, stegvis QR-kode, nullstill progresjon og en fullskjerm-knapp slik at hovednavigasjonen får mer plass.
 
 ### Planlagte funksjoner
 
-- QR-kode-generering for å dele spesifikke steg
-- Loading-indikatorer og preloading av bilder
-- Caching-strategier for bedre ytelse
+- Eksport av instruksjonene til PDF/utskrift
+- Ytterligere caching/offline-støtte via Service Worker
+- Installèrbar PWA-versjon
 
 ## Brukeropplevelse for barn 5–7 år
 
@@ -350,4 +352,3 @@ Skjermbilder av grensesnittet vil bli lagt til når UI-en er implementert.
 ## Lisens
 
 Privat prosjekt – ingen redistribusjon.
-

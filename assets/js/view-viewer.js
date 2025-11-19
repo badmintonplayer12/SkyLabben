@@ -7,6 +7,7 @@
 import { getImageUrl, getAudioUrl, loadProjectMeta } from './data-loader.js';
 import { getLastStepFor, resetProgressFor } from './state.js';
 import { playNavigationSound, isAudioEnabled, setAudioEnabled } from './audio-feedback.js';
+import { generateQRCodeForStep } from './qr-code.js';
 
 /**
  * Renderer instruksjonsviewer
@@ -41,6 +42,55 @@ export function renderViewer(state, callbacks) {
   const visibleChildren = (state.currentProjectMeta?.children || [])
     .filter(c => !c.hidden)
     .sort((a, b) => compareByLeadingNumber(a.name || a.id, b.name || b.id));
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+      return;
+    }
+    if (container.requestFullscreen) {
+      container.requestFullscreen().catch(() => {});
+    }
+  };
+  const openQrModal = async () => {
+    const modal = document.createElement('div');
+    modal.className = 'qr-modal';
+    
+    const modalContent = document.createElement('div');
+    modalContent.className = 'qr-modal__content';
+    
+    const modalHeader = document.createElement('div');
+    modalHeader.className = 'qr-modal__header';
+    modalHeader.textContent = 'QR-kode';
+    
+    const qrContainer = document.createElement('div');
+    qrContainer.className = 'qr-modal__container';
+    
+    const closeButton = document.createElement('button');
+    closeButton.className = 'qr-modal__close';
+    closeButton.innerHTML = '<span class="viewer__icon" aria-hidden="true">✕</span>';
+    closeButton.setAttribute('aria-label', 'Lukk');
+    closeButton.title = 'Lukk';
+    closeButton.addEventListener('click', () => {
+      modal.remove();
+    });
+    
+    const baseUrl = window.location.origin;
+    await generateQRCodeForStep(baseUrl, state.currentPath, state.currentStepIndex, qrContainer);
+    
+    modalContent.appendChild(modalHeader);
+    modalContent.appendChild(qrContainer);
+    modalContent.appendChild(closeButton);
+    modal.appendChild(modalContent);
+    container.appendChild(modal);
+    
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
+  };
   
   // Legg til scrollable-stiler hvis det er children å vise
   if (steps.length === 0 && visibleChildren.length > 0) {
@@ -53,6 +103,7 @@ export function renderViewer(state, callbacks) {
   // Bottom bar: Har fast høyde slik at hovedbildet alltid kan bruke resten av høyden
   const bottomBar = document.createElement('div');
   bottomBar.className = 'viewer__bottom';
+  const settingsMenu = createSettingsMenu();
   
   // Opp-knapp (ikon: hus for hjem/opp)
   const upButton = document.createElement('button');
@@ -118,7 +169,7 @@ export function renderViewer(state, callbacks) {
     if (visibleChildren.length > 0) {
       // Vis children-liste
       const childrenGrid = document.createElement('div');
-      childrenGrid.className = 'project-grid';
+      childrenGrid.className = 'project-grid project-grid--inline';
       
       visibleChildren.forEach(child => {
         const tile = document.createElement('div');
@@ -275,25 +326,22 @@ export function renderViewer(state, callbacks) {
     imageContainer.appendChild(img);
   }
   
-  // Audio toggle-knapp (kun hvis det er steg)
+  let audioMenuItem = null;
   if (steps.length > 0) {
-    const audioToggleButton = document.createElement('button');
-    audioToggleButton.className = 'viewer__button viewer__button--audio';
-    audioToggleButton.innerHTML = `<span class="viewer__icon" aria-hidden="true">${isAudioEnabled() ? '🔊' : '🔇'}</span>`;
-    audioToggleButton.setAttribute('aria-label', isAudioEnabled() ? 'Skru av lyd' : 'Skru på lyd');
-    audioToggleButton.title = isAudioEnabled() ? 'Skru av lyd' : 'Skru på lyd';
-    audioToggleButton.addEventListener('click', () => {
-      const newState = !isAudioEnabled();
-      setAudioEnabled(newState);
-      audioToggleButton.innerHTML = `<span class="viewer__icon" aria-hidden="true">${newState ? '🔊' : '🔇'}</span>`;
-      audioToggleButton.setAttribute('aria-label', newState ? 'Skru av lyd' : 'Skru på lyd');
-      audioToggleButton.title = newState ? 'Skru av lyd' : 'Skru på lyd';
+    audioMenuItem = settingsMenu.addItem({
+      getIcon: () => (isAudioEnabled() ? '🔊' : '🔇'),
+      getLabel: () => (isAudioEnabled() ? 'Skru av lyd' : 'Skru på lyd'),
+      onClick: () => {
+        const newState = !isAudioEnabled();
+        setAudioEnabled(newState);
+        audioMenuItem.refresh();
+      }
     });
-    bottomBar.appendChild(audioToggleButton);
   }
   
   // Audio-knapp for steg-vis lydhint (hvis audioSteps finnes)
   const audioSteps = state.currentProjectMeta?.audioSteps || [];
+  let currentAudio = null; // Lagre referanse til nåværende audio for å kunne stoppe den
   if (steps.length > 0 && audioSteps.length > 0 && state.currentStepIndex < audioSteps.length) {
     const audioStep = audioSteps[state.currentStepIndex];
     if (audioStep) {
@@ -303,9 +351,23 @@ export function renderViewer(state, callbacks) {
       audioButton.setAttribute('aria-label', 'Spill av lydhint for dette steg');
       audioButton.title = 'Spill av lydhint';
       audioButton.addEventListener('click', () => {
-        const audio = new Audio(getAudioUrl(state.currentPath, audioStep));
-        audio.play().catch((error) => {
+        // Stopp forrige audio hvis den spiller
+        if (currentAudio) {
+          currentAudio.pause();
+          currentAudio.currentTime = 0;
+          currentAudio = null;
+        }
+        
+        currentAudio = new Audio(getAudioUrl(state.currentPath, audioStep));
+        
+        // Rydd opp når audio er ferdig
+        currentAudio.addEventListener('ended', () => {
+          currentAudio = null;
+        });
+        
+        currentAudio.play().catch((error) => {
           console.warn('Kunne ikke spille lyd:', error);
+          currentAudio = null;
           // Vis brukervennlig melding hvis lyd ikke kan spilles
           const errorMsg = document.createElement('div');
           errorMsg.className = 'viewer__empty-message';
@@ -329,81 +391,58 @@ export function renderViewer(state, callbacks) {
     }
   }
   
-  // QR-kode-knapp (kun hvis det er steg) - for voksne
   if (steps.length > 0) {
-    const qrButton = document.createElement('button');
-    qrButton.className = 'viewer__button viewer__button--qr';
-    qrButton.innerHTML = '<span class="viewer__icon" aria-hidden="true">📱</span>';
-    qrButton.setAttribute('aria-label', 'Vis QR-kode');
-    qrButton.title = 'Vis QR-kode';
-    qrButton.addEventListener('click', async () => {
-      // Vis QR-kode-modal
-      const modal = document.createElement('div');
-      modal.className = 'qr-modal';
-      
-      const modalContent = document.createElement('div');
-      modalContent.className = 'qr-modal__content';
-      
-      const modalHeader = document.createElement('div');
-      modalHeader.className = 'qr-modal__header';
-      modalHeader.textContent = 'QR-kode';
-      
-      const qrContainer = document.createElement('div');
-      qrContainer.className = 'qr-modal__container';
-      
-      const closeButton = document.createElement('button');
-      closeButton.className = 'qr-modal__close';
-      closeButton.innerHTML = '<span class="viewer__icon" aria-hidden="true">✕</span>';
-      closeButton.setAttribute('aria-label', 'Lukk');
-      closeButton.title = 'Lukk';
-      closeButton.addEventListener('click', () => {
-        modal.remove();
-      });
-      
-      // Generer QR-kode for nåværende steg
-      const baseUrl = window.location.origin;
-      await generateQRCodeForStep(baseUrl, state.currentPath, state.currentStepIndex, qrContainer);
-      
-      modalContent.appendChild(modalHeader);
-      modalContent.appendChild(qrContainer);
-      modalContent.appendChild(closeButton);
-      modal.appendChild(modalContent);
-      container.appendChild(modal);
-      
-      // Lukk ved klikk utenfor
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          modal.remove();
-        }
-      });
+    settingsMenu.addItem({
+      icon: '📱',
+      label: 'Vis QR-kode',
+      onClick: () => {
+        openQrModal();
+      }
     });
-    bottomBar.appendChild(qrButton);
   }
   
-  // Nullstill-knapp (kun hvis det er steg)
   if (steps.length > 0) {
-    const resetButton = document.createElement('button');
-    resetButton.className = 'viewer__button viewer__button--reset';
-    resetButton.textContent = '🔄';
-    resetButton.setAttribute('aria-label', 'Nullstill progresjon');
-    resetButton.title = 'Nullstill progresjon';
-    resetButton.addEventListener('click', () => {
-      if (confirm('Vil du nullstille progresjonen for dette prosjektet?')) {
-        resetProgressFor(state.currentPath);
-        // Naviger til første steg
-        if (callbacks.onStepChange) {
-          callbacks.onStepChange(0);
+    settingsMenu.addItem({
+      icon: '🔄',
+      label: 'Nullstill progresjon',
+      onClick: () => {
+        if (confirm('Vil du nullstille progresjonen for dette prosjektet?')) {
+          resetProgressFor(state.currentPath);
+          if (callbacks.onStepChange) {
+            callbacks.onStepChange(0);
+          }
         }
       }
     });
-    bottomBar.appendChild(resetButton);
   }
+  
+  const fullscreenItem = settingsMenu.addItem({
+    getIcon: () => (document.fullscreenElement ? '🡼' : '⛶'),
+    getLabel: () => (document.fullscreenElement ? 'Avslutt fullskjerm' : 'Fullskjerm'),
+    onClick: () => {
+      toggleFullscreen();
+    }
+  });
+  const fullscreenHandlerKey = '__viewerFullscreenChange';
+  if (document[fullscreenHandlerKey]) {
+    document.removeEventListener('fullscreenchange', document[fullscreenHandlerKey]);
+  }
+  const handleFullscreenChange = () => {
+    fullscreenItem.refresh();
+  };
+  document.addEventListener('fullscreenchange', handleFullscreenChange);
+  document[fullscreenHandlerKey] = handleFullscreenChange;
   
   bottomBar.appendChild(upButton);
   bottomBar.appendChild(prevButton);
   bottomBar.appendChild(progressBar);
   bottomBar.appendChild(nextButton);
   bottomBar.appendChild(stepIndicator);
+  if (settingsMenu.hasItems()) {
+    bottomBar.appendChild(settingsMenu.wrapper);
+  } else {
+    settingsMenu.cleanup();
+  }
   
   container.appendChild(header);
   container.appendChild(imageContainer);
@@ -522,6 +561,130 @@ export function showCelebration(container) {
   setTimeout(() => {
     celebration.remove();
   }, 2500);
+}
+
+function createSettingsMenu() {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'viewer__settings';
+  
+  const toggleButton = document.createElement('button');
+  toggleButton.type = 'button';
+  toggleButton.className = 'viewer__button viewer__button--settings';
+  toggleButton.innerHTML = '<span class="viewer__icon" aria-hidden="true">⚙️</span>';
+  toggleButton.setAttribute('aria-label', 'Vis flere innstillinger');
+  toggleButton.title = 'Flere innstillinger';
+  toggleButton.disabled = true;
+  toggleButton.setAttribute('aria-expanded', 'false');
+  toggleButton.setAttribute('aria-haspopup', 'true');
+  
+  const menu = document.createElement('div');
+  menu.className = 'viewer__settings-menu';
+  menu.setAttribute('role', 'menu');
+  menu.setAttribute('aria-hidden', 'true');
+  
+  wrapper.appendChild(toggleButton);
+  wrapper.appendChild(menu);
+  
+  const menuItems = [];
+  let isOpen = false;
+  
+  const closeMenu = () => {
+    if (!isOpen) {
+      return;
+    }
+    isOpen = false;
+    wrapper.classList.remove('viewer__settings--open');
+    toggleButton.setAttribute('aria-expanded', 'false');
+    menu.setAttribute('aria-hidden', 'true');
+    document.removeEventListener('pointerdown', handleOutsidePointer);
+    document.removeEventListener('keydown', handleEscape);
+  };
+  
+  const openMenu = () => {
+    if (isOpen || menuItems.length === 0) {
+      return;
+    }
+    isOpen = true;
+    wrapper.classList.add('viewer__settings--open');
+    toggleButton.setAttribute('aria-expanded', 'true');
+    menu.setAttribute('aria-hidden', 'false');
+    document.addEventListener('pointerdown', handleOutsidePointer);
+    document.addEventListener('keydown', handleEscape);
+  };
+  
+  const handleOutsidePointer = (event) => {
+    if (!wrapper.contains(event.target)) {
+      closeMenu();
+    }
+  };
+  
+  const handleEscape = (event) => {
+    if (event.key === 'Escape') {
+      closeMenu();
+      toggleButton.focus();
+    }
+  };
+  
+  const handleToggle = (event) => {
+    event.preventDefault();
+    if (isOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  };
+  
+  toggleButton.addEventListener('click', handleToggle);
+  
+  return {
+    wrapper,
+    hasItems: () => menuItems.length > 0,
+    addItem: ({ icon, label, onClick, getIcon, getLabel }) => {
+      if (typeof onClick !== 'function') {
+        throw new Error('settingsMenu.addItem krever en onClick-funksjon');
+      }
+      
+      const itemButton = document.createElement('button');
+      itemButton.type = 'button';
+      itemButton.className = 'viewer__settings-item';
+      itemButton.setAttribute('role', 'menuitem');
+      
+      const iconElement = document.createElement('span');
+      iconElement.className = 'viewer__settings-item-icon';
+      
+      const labelElement = document.createElement('span');
+      labelElement.className = 'viewer__settings-item-label';
+      
+      itemButton.appendChild(iconElement);
+      itemButton.appendChild(labelElement);
+      
+      const applyContent = () => {
+        const resolvedIcon = typeof getIcon === 'function' ? getIcon() : icon;
+        const resolvedLabel = typeof getLabel === 'function' ? getLabel() : label;
+        iconElement.textContent = resolvedIcon || '';
+        labelElement.textContent = resolvedLabel || '';
+      };
+      
+      applyContent();
+      
+      itemButton.addEventListener('click', () => {
+        onClick();
+        closeMenu();
+      });
+      
+      menu.appendChild(itemButton);
+      menuItems.push({ refresh: applyContent, element: itemButton });
+      toggleButton.disabled = false;
+      
+      return {
+        refresh: () => applyContent()
+      };
+    },
+    cleanup: () => {
+      closeMenu();
+      toggleButton.removeEventListener('click', handleToggle);
+    }
+  };
 }
 
 function compareByLeadingNumber(a, b) {

@@ -6,7 +6,7 @@ Dette dokumentet beskriver i detalj JSON-formatene som brukes i LEGO Instruksjon
 
 Prosjektet bruker to hovedtyper JSON-filer:
 - **`meta.json`**: Metadata for hvert prosjekt/underprosjekt
-- **`projects.json`**: Liste over toppnivå-prosjekter
+- **`projects.json`**: Liste over toppnivÃ¥-prosjekter
 
 ## meta.json
 
@@ -32,49 +32,56 @@ Prosjektet bruker to hovedtyper JSON-filer:
 
 ### Felter
 
-#### `id` (påkrevd)
+#### `id` (pÃ¥krevd)
 - **Type**: String
 - **Beskrivelse**: Unik identifikator for prosjektet/underprosjektet
 - **Eksempler**: `"castle-main"`, `"castle-tower"`, `"mitt-prosjekt"`
 - **Regler**:
-  - Må være unik innenfor samme nivå
-  - Anbefales å bruke kebab-case (små bokstaver med bindestrek)
+  - MÃ¥ vÃ¦re unik innenfor samme nivÃ¥
+  - Anbefales Ã¥ bruke kebab-case (smÃ¥ bokstaver med bindestrek)
   - Ikke bruk mellomrom eller spesialtegn
 
-#### `name` (påkrevd)
+#### `name` (pÃ¥krevd)
 - **Type**: String
 - **Beskrivelse**: Visningsnavn som vises i brukergrensesnittet
-- **Eksempler**: `"Stor borg"`, `"Tårn"`, `"Mitt Prosjekt"`
+- **Eksempler**: `"Stor borg"`, `"TÃ¥rn"`, `"Mitt Prosjekt"`
 - **Regler**:
-  - Kan inneholde mellomrom og norske tegn (æ, ø, å)
+  - Kan inneholde mellomrom og norske tegn (Ã¦, Ã¸, Ã¥)
   - Dette er det navnet brukeren ser
 
 #### `coverImage` (valgfritt)
 - **Type**: String
-- **Beskrivelse**: Filnavn på cover-bildet som brukes i prosjektgalleriet
+- **Beskrivelse**: Filnavn pÃ¥ cover-bildet som brukes i prosjektgalleriet
 - **Eksempler**: `"cover.png"`, `"1_cover.png"`
 - **Regler**:
-  - Hvis ikke spesifisert eller bildet ikke finnes, brukes det første bildet (laveste nummer) som runtime fallback
-  - Må være et filnavn som finnes i samme mappe
-  - Anbefales å bruke `"cover.png"` for konsistens
-  - **Generering**: `cover.png` genereres automatisk fra siste bilde (høyeste nummer) ved bruk av `update-cover-images.js` scriptet
+  - Hvis ikke spesifisert eller bildet ikke finnes, brukes det fÃ¸rste bildet (laveste nummer) som runtime fallback
+  - MÃ¥ vÃ¦re et filnavn som finnes i samme mappe
+  - Anbefales Ã¥ bruke `"cover.png"` for konsistens
+  - **Generering**: `cover.png` genereres automatisk fra siste bilde (hÃ¸yeste nummer) ved bruk av `update-cover-images.js` scriptet
 
-#### `steps` (påkrevd)
+#### `category` (valgfritt)
+- **Type**: String
+- **Beskrivelse**: Kategori/etikett for filtrering i prosjektgalleriet
+- **Eksempler**: "Star Wars", "Hjemmeprosjekt", "Demo"
+- **Regler**:
+  - Valgfri tekst som vises under prosjektnavnet
+  - Bruk konsistente navn for Ã¥ gruppere prosjekter
+#### `steps` (pÃ¥krevd)
 - **Type**: Array of strings
-- **Beskrivelse**: Liste over alle steg-bildene i riktig rekkefølge
+- **Beskrivelse**: Liste over alle steg-bildene i riktig rekkefÃ¸lge
 - **Eksempler**: 
   ```json
   ["1_1x.png", "2_1x.png", "3_1x.png"]
   ```
 - **Regler**:
-  - Må være en array
-  - Kan være tom array `[]` hvis prosjektet ikke har steg-bilder (f.eks. kun underprosjekter)
+  - MÃ¥ vÃ¦re en array
+  - Kan vÃ¦re tom array `[]` hvis prosjektet ikke har steg-bilder (f.eks. kun underprosjekter)
   - Hvis tom: viewer viser "Ingen steg tilgjengelig" og deaktiverer navigasjonskontroller
-  - Filnavnene må matche faktiske filer i mappen
-  - Rekkefølgen i arrayet bestemmer visningsrekkefølgen
-  - Bildene sorteres automatisk basert på nummeret i filnavnet (se README.md)
+  - Filnavnene mÃ¥ matche faktiske filer i mappen
+  - RekkefÃ¸lgen i arrayet bestemmer visningsrekkefÃ¸lgen
+  - Bildene sorteres automatisk basert pÃ¥ nummeret i filnavnet (se README.md)
 
-#### `children` (påkrevd)
+#### `children` (pÃ¥krevd)
 - **Type**: Array of objects
 - **Beskrivelse**: Liste over underprosjekter
 - **Eksempler**: 
@@ -82,7 +89,7 @@ Prosjektet bruker to hovedtyper JSON-filer:
   [
     {
       "id": "castle-tower",
-      "name": "Tårn",
+      "name": "TÃ¥rn",
       "path": "subproject-tower"
     },
     {
@@ -93,8 +100,8 @@ Prosjektet bruker to hovedtyper JSON-filer:
   ]
   ```
 - **Regler**:
-  - Må være en array, selv om den er tom (`[]`)
-  - Hvert objekt må ha `id`, `name` og `path`
+  - MÃ¥ vÃ¦re en array, selv om den er tom (`[]`)
+  - Hvert objekt mÃ¥ ha `id`, `name` og `path`
   - `path` er relativ sti til undermappen (se nedenfor)
 
 #### `audioSteps` (valgfritt)
@@ -105,32 +112,32 @@ Prosjektet bruker to hovedtyper JSON-filer:
   "audioSteps": ["audio/1.mp3", "audio/2.mp3", "audio/3.mp3"]
   ```
 - **Regler**:
-  - Lengden bør samsvare med `steps`. Manglende elementer betyr “ingen lyd”.
-  - Filene må ligge i samme mappe eller en `audio/`-undermappe slik at URL bygges som `/projects/{path}/{audioSteps[i]}`
-  - Filformat bør være `.mp3` eller `.ogg` for bred støtte
+  - Lengden bÃ¸r samsvare med `steps`. Manglende elementer betyr â€œingen lydâ€.
+  - Filene mÃ¥ ligge i samme mappe eller en `audio/`-undermappe slik at URL bygges som `/projects/{path}/{audioSteps[i]}`
+  - Filformat bÃ¸r vÃ¦re `.mp3` eller `.ogg` for bred stÃ¸tte
 
-#### `children[].id` (påkrevd)
+#### `children[].id` (pÃ¥krevd)
 - **Type**: String
 - **Beskrivelse**: Unik identifikator for underprosjektet
-- **Regler**: Samme regler som toppnivå `id`
+- **Regler**: Samme regler som toppnivÃ¥ `id`
 
-#### `children[].name` (påkrevd)
+#### `children[].name` (pÃ¥krevd)
 - **Type**: String
 - **Beskrivelse**: Visningsnavn for underprosjektet
-- **Regler**: Samme regler som toppnivå `name`
+- **Regler**: Samme regler som toppnivÃ¥ `name`
 
-#### `children[].path` (påkrevd)
+#### `children[].path` (pÃ¥krevd)
 - **Type**: String
 - **Beskrivelse**: Relativ sti til undermappen fra hovedprosjektmappen
 - **Eksempler**: 
   - Hvis undermappen heter `taarn/` og ligger i `/projects/castle-main/taarn/`, settes `path` til `"taarn"`
   - Hvis undermappen heter `subproject-tower/`, settes `path` til `"subproject-tower"`
 - **Regler**:
-  - Må være navnet på undermappen (uten trailing slash)
-  - Må matche faktisk mappestruktur
+  - MÃ¥ vÃ¦re navnet pÃ¥ undermappen (uten trailing slash)
+  - MÃ¥ matche faktisk mappestruktur
   - Relativ fra hovedprosjektmappen, ikke absolutt sti
-  - Brukes til å bygge full sti: `/projects/{hovedprosjekt-path}/{path}/meta.json`
-  - **Viktig**: Mappenavnet skal være web-vennlig (kebab-case, ingen mellomrom/spesialtegn)
+  - Brukes til Ã¥ bygge full sti: `/projects/{hovedprosjekt-path}/{path}/meta.json`
+  - **Viktig**: Mappenavnet skal vÃ¦re web-vennlig (kebab-case, ingen mellomrom/spesialtegn)
 
 #### `children[].hidden` (valgfritt)
 - **Type**: Boolean
@@ -140,7 +147,7 @@ Prosjektet bruker to hovedtyper JSON-filer:
   - Hvis ikke spesifisert eller `false`, vises underprosjektet normalt
   - Hvis `true`, skjules det fra children-listen i viewer
   - Skjulte underprosjekter er fortsatt tilgjengelige via direkte URL
-  - Brukes for å skjule uferdige eller private underprosjekter
+  - Brukes for Ã¥ skjule uferdige eller private underprosjekter
 
 ### Eksempler
 
@@ -149,7 +156,7 @@ Prosjektet bruker to hovedtyper JSON-filer:
 ```json
 {
   "id": "castle-tower",
-  "name": "Tårn",
+  "name": "TÃ¥rn",
   "coverImage": "cover.png",
   "steps": [
     "1_1x.png",
@@ -175,7 +182,7 @@ Prosjektet bruker to hovedtyper JSON-filer:
   "children": [
     {
       "id": "castle-tower",
-      "name": "Tårn",
+      "name": "TÃ¥rn",
       "path": "subproject-tower"
     },
     {
@@ -190,12 +197,12 @@ Prosjektet bruker to hovedtyper JSON-filer:
 
 #### Prosjekt med egne bilder og underprosjekter
 
-Et prosjekt kan ha både egne steg-bilder og underprosjekter:
+Et prosjekt kan ha bÃ¥de egne steg-bilder og underprosjekter:
 
 ```json
   {
     "id": "house-main",
-    "name": "Huset Vårt",
+    "name": "Huset VÃ¥rt",
     "coverImage": "cover.png",
     "steps": [
       "174_1x.png",
@@ -222,7 +229,7 @@ Et prosjekt kan ha både egne steg-bilder og underprosjekter:
 
 ## projects.json
 
-`projects.json` ligger i rotmappen og lister alle toppnivå-prosjekter.
+`projects.json` ligger i rotmappen og lister alle toppnivÃ¥-prosjekter.
 
 ### Struktur
 
@@ -238,30 +245,30 @@ Et prosjekt kan ha både egne steg-bilder og underprosjekter:
 
 ### Felter
 
-#### `id` (påkrevd)
+#### `id` (pÃ¥krevd)
 - **Type**: String
 - **Beskrivelse**: Unik identifikator for prosjektet
 - **Regler**: Samme regler som `meta.json` `id`
-- **Viktig**: Må matche `id` i prosjektets `meta.json`
+- **Viktig**: MÃ¥ matche `id` i prosjektets `meta.json`
 
-#### `name` (påkrevd)
+#### `name` (pÃ¥krevd)
 - **Type**: String
 - **Beskrivelse**: Visningsnavn for prosjektet
 - **Regler**: Samme regler som `meta.json` `name`
-- **Viktig**: Må matche `name` i prosjektets `meta.json` (anbefalt, men ikke påkrevd)
+- **Viktig**: MÃ¥ matche `name` i prosjektets `meta.json` (anbefalt, men ikke pÃ¥krevd)
 
-#### `path` (påkrevd)
+#### `path` (pÃ¥krevd)
 - **Type**: String
 - **Beskrivelse**: Relativ sti til prosjektmappen fra `/projects/`
 - **Eksempler**: 
   - Hvis prosjektet ligger i `/projects/castle-main/`, settes `path` til `"castle-main"`
   - Hvis prosjektet ligger i `/projects/mitt-prosjekt/`, settes `path` til `"mitt-prosjekt"`
 - **Regler**:
-  - Må være navnet på prosjektmappen (uten trailing slash)
-  - Må matche faktisk mappestruktur
+  - MÃ¥ vÃ¦re navnet pÃ¥ prosjektmappen (uten trailing slash)
+  - MÃ¥ matche faktisk mappestruktur
   - Relativ fra `/projects/`, ikke absolutt sti
-  - Brukes til å bygge full sti: `/projects/{path}/meta.json`
-  - **Viktig**: Mappenavnet skal være web-vennlig (se nedenfor)
+  - Brukes til Ã¥ bygge full sti: `/projects/{path}/meta.json`
+  - **Viktig**: Mappenavnet skal vÃ¦re web-vennlig (se nedenfor)
 
 #### `hidden` (valgfritt)
 - **Type**: Boolean
@@ -271,7 +278,14 @@ Et prosjekt kan ha både egne steg-bilder og underprosjekter:
   - Hvis ikke spesifisert eller `false`, vises prosjektet normalt i galleri
   - Hvis `true`, skjules det fra prosjektgalleri
   - Skjulte prosjekter er fortsatt tilgjengelige via direkte URL
-  - Brukes for å skjule uferdige eller private prosjekter
+  - Brukes for Ã¥ skjule uferdige eller private prosjekter
+#### `category` (valgfritt)
+- **Type**: String
+- **Beskrivelse**: Kategori/etikett brukt til filtrering og visning i galleriet
+- **Eksempler**: "Star Wars", "Hjemmeprosjekt", "Demo"
+- **Regler**:
+  - Samme verdi som i prosjektets `meta.json` (hvis satt)
+  - Valgfritt – hvis utelatt grupperes prosjektet under "Uten kategori"
 
 ### Eksempel
 
@@ -295,7 +309,7 @@ Et prosjekt kan ha både egne steg-bilder og underprosjekter:
   },
   {
     "id": "house-main",
-    "name": "Huset Vårt",
+    "name": "Huset VÃ¥rt",
     "path": "huset-vaart"
   }
 ]
@@ -305,7 +319,7 @@ Et prosjekt kan ha både egne steg-bilder og underprosjekter:
 
 ### Hvordan stier bygges
 
-1. **Toppnivå-prosjekt**:
+1. **ToppnivÃ¥-prosjekt**:
    - Fra `projects.json`: `path = "castle-main"`
    - Full sti: `/projects/castle-main/meta.json`
 
@@ -319,7 +333,7 @@ Et prosjekt kan ha både egne steg-bilder og underprosjekter:
    - Bilde: `1_1x.png`
    - Full URL: `/projects/castle-main/1_1x.png`
 
-### Eksempel på komplett hierarki
+### Eksempel pÃ¥ komplett hierarki
 
 ```
 /projects/
@@ -342,31 +356,31 @@ projects.json:
 
 ## Validering
 
-### Påkrevde felt
+### PÃ¥krevde felt
 
-Alle følgende felt er påkrevd og må være tilstede:
+Alle fÃ¸lgende felt er pÃ¥krevd og mÃ¥ vÃ¦re tilstede:
 
 **meta.json**:
 - `id`
 - `name`
-- `steps` (kan være tom array)
-- `children` (kan være tom array)
+- `steps` (kan vÃ¦re tom array)
+- `children` (kan vÃ¦re tom array)
 
 **projects.json**:
-- Hvert objekt må ha `id`, `name`, og `path`
+- Hvert objekt mÃ¥ ha `id`, `name`, og `path`
 
 ### Valideringsregler
 
-1. **Unike ID-er**: `id` må være unik innenfor samme nivå
-2. **Matchende stier**: `path` i `projects.json` og `children` må matche faktiske mapper
-3. **Eksisterende filer**: Alle filnavn i `steps` og `coverImage` må referere til faktiske filer
-4. **Gyldig JSON**: Alle filer må være gyldig JSON
-5. **Array-typer**: `steps` og `children` må være arrays, selv om de er tomme
+1. **Unike ID-er**: `id` mÃ¥ vÃ¦re unik innenfor samme nivÃ¥
+2. **Matchende stier**: `path` i `projects.json` og `children` mÃ¥ matche faktiske mapper
+3. **Eksisterende filer**: Alle filnavn i `steps` og `coverImage` mÃ¥ referere til faktiske filer
+4. **Gyldig JSON**: Alle filer mÃ¥ vÃ¦re gyldig JSON
+5. **Array-typer**: `steps` og `children` mÃ¥ vÃ¦re arrays, selv om de er tomme
 
-### Feilhåndtering
+### FeilhÃ¥ndtering
 
 Hvis en `meta.json` eller `projects.json` er ugyldig:
-- Applikasjonen vil prøve å håndtere feilen gracefully
+- Applikasjonen vil prÃ¸ve Ã¥ hÃ¥ndtere feilen gracefully
 - Feilmeldinger vises i konsollen
 - Manglende prosjekter vil ikke vises i galleriet
 
@@ -376,29 +390,29 @@ Hvis en `meta.json` eller `projects.json` er ugyldig:
 
 - **ID-er**: Bruk kebab-case (`castle-main`, `spiserom`)
 - **Navn**: Bruk lesbare navn med mellomrom (`"Stor borg"`, `"Alma sitt Rom"`)
-- **Paths**: Bruk samme navn som mappen (må være web-vennlig, se nedenfor)
-- **Mappenavn**: Må være web-vennlig (se nedenfor)
+- **Paths**: Bruk samme navn som mappen (mÃ¥ vÃ¦re web-vennlig, se nedenfor)
+- **Mappenavn**: MÃ¥ vÃ¦re web-vennlig (se nedenfor)
 
 ### Web-vennlige mappenavn
 
-**Krav til mappenavn** (gjelder både hovedprosjekter og underprosjekter):
-- Bruk kebab-case: små bokstaver med bindestrek (`huset-vaart`, `alma-sitt-rom`)
+**Krav til mappenavn** (gjelder bÃ¥de hovedprosjekter og underprosjekter):
+- Bruk kebab-case: smÃ¥ bokstaver med bindestrek (`huset-vaart`, `alma-sitt-rom`)
 - Ikke bruk mellomrom eller spesialtegn
-- Konverter norske tegn: `æ` → `ae`, `ø` → `o`, `å` → `aa`
+- Konverter norske tegn: `Ã¦` â†’ `ae`, `Ã¸` â†’ `o`, `Ã¥` â†’ `aa`
 - Eksempler:
-  - `"Huset Vårt"` → mappe: `huset-vaart`
-  - `"Alma sitt Rom"` → mappe: `alma-sitt-rom`
-  - `"1-Spiserom"` → mappe: `1-spiserom` (tall er OK)
+  - `"Huset VÃ¥rt"` â†’ mappe: `huset-vaart`
+  - `"Alma sitt Rom"` â†’ mappe: `alma-sitt-rom`
+  - `"1-Spiserom"` â†’ mappe: `1-spiserom` (tall er OK)
 
 **Hvorfor?**
 - URL-er blir rene og lesbare (`#/p/huset-vaart` i stedet for `#/p/Huset%20V%C3%A5rt`)
-- Fungerer konsistent på alle servere og nettlesere
-- Enklere å håndtere i kode og filstier
+- Fungerer konsistent pÃ¥ alle servere og nettlesere
+- Enklere Ã¥ hÃ¥ndtere i kode og filstier
 
 **Visningsnavn (`name`-feltet)**:
-- Kan fortsatt ha mellomrom og norske tegn (`"Huset Vårt"`, `"Alma sitt Rom"`)
+- Kan fortsatt ha mellomrom og norske tegn (`"Huset VÃ¥rt"`, `"Alma sitt Rom"`)
 - Dette er det navnet brukeren ser i UI
-- Skal være lesbart og forståelig for brukeren
+- Skal vÃ¦re lesbart og forstÃ¥elig for brukeren
 
 ### Organisering
 
@@ -408,11 +422,11 @@ Hvis en `meta.json` eller `projects.json` er ugyldig:
 
 ### Vedlikehold
 
-- Oppdater `projects.json` når nye prosjekter legges til
-- Sørg for at alle `path`-referanser er korrekte
+- Oppdater `projects.json` nÃ¥r nye prosjekter legges til
+- SÃ¸rg for at alle `path`-referanser er korrekte
 - Test at alle bilder eksisterer etter endringer
 
-## Eksempel på komplett oppsett
+## Eksempel pÃ¥ komplett oppsett
 
 ### Filstruktur
 
@@ -469,7 +483,7 @@ projects.json
   "children": [
     {
       "id": "tower",
-      "name": "Tårn",
+      "name": "TÃ¥rn",
       "path": "tower"
     }
   ]
@@ -481,7 +495,7 @@ projects.json
 ```json
 {
   "id": "tower",
-  "name": "Tårn",
+  "name": "TÃ¥rn",
   "coverImage": "cover.png",
   "steps": [
     "1_1x.png",

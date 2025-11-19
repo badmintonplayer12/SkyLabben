@@ -35,6 +35,16 @@ function toWebFriendly(name) {
     .replace(/^-|-$/g, ''); // Fjern ledende/trailing bindestreker
 }
 
+function readMeta(dirPath) {
+  const metaPath = path.join(dirPath, 'meta.json');
+  if (!fs.existsSync(metaPath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+  } catch (error) {
+    return null;
+  }
+}
+
 function compareByLeadingNumber(a, b) {
   const extract = (value) => {
     const match = value.match(/^(\d+)/);
@@ -87,10 +97,13 @@ function getChildrenDirs(dirPath) {
     .map(item => {
       const originalName = item.name;
       const webFriendlyName = toWebFriendly(originalName);
+      const childMeta = readMeta(path.join(dirPath, originalName));
       return {
         originalName,
+        originalDisplayName: childMeta?.name || originalName,
         webFriendlyName,
-        path: webFriendlyName
+        path: webFriendlyName,
+        category: childMeta?.category
       };
     })
     .sort((a, b) => compareByLeadingNumber(a.originalName, b.originalName));
@@ -102,22 +115,28 @@ function getChildrenDirs(dirPath) {
  * @returns {Object} meta.json objekt
  */
 function generateMetaJson(projectInfo) {
-  const { id, name, dirPath, isChild = false, parentPath = null } = projectInfo;
+  const { id, name, dirPath, isChild = false, childrenList = null, category } = projectInfo;
   
   const images = getImageFiles(dirPath);
-  const children = isChild ? [] : getChildrenDirs(dirPath).map(child => ({
+  const children = isChild ? [] : (childrenList || getChildrenDirs(dirPath)).map(child => ({
     id: child.webFriendlyName,
-    name: child.originalName,
+    name: child.originalDisplayName || child.originalName,
     path: child.webFriendlyName
   }));
   
-  return {
+  const meta = {
     id,
     name,
     coverImage: fs.existsSync(path.join(dirPath, 'cover.png')) ? 'cover.png' : undefined,
     steps: images,
     children
   };
+
+  if (category) {
+    meta.category = category;
+  }
+
+  return meta;
 }
 
 /**
@@ -127,18 +146,13 @@ function generateMetaJson(projectInfo) {
  * @returns {string} Originalt navn
  */
 function getOriginalName(dirPath, fallbackName) {
-  const metaPath = path.join(dirPath, 'meta.json');
-  if (fs.existsSync(metaPath)) {
-    try {
-      const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
-      if (meta.name) {
-        return meta.name;
-      }
-    } catch (error) {
-      // Ignorer feil, bruk fallback
-    }
-  }
-  return fallbackName;
+  const meta = readMeta(dirPath);
+  return meta?.name || fallbackName;
+}
+
+function getCategory(dirPath) {
+  const meta = readMeta(dirPath);
+  return meta?.category;
 }
 
 /**
@@ -158,11 +172,14 @@ function scanProject(projectDir) {
   // Hent originalt navn fra eksisterende meta.json eller bruk mappenavn
   const originalDisplayName = getOriginalName(originalPath, projectDir);
   
+  const category = getCategory(originalPath);
+
   // Scan children
   const children = getChildrenDirs(originalPath).map(child => {
     const childPath = path.join(originalPath, child.originalName);
     const childImages = getImageFiles(childPath);
     const childOriginalName = getOriginalName(childPath, child.originalName);
+    const childCategory = getCategory(childPath);
     
     return {
       originalName: child.originalName,
@@ -170,7 +187,8 @@ function scanProject(projectDir) {
       webFriendlyName: child.webFriendlyName,
       needsRename: child.originalName !== child.webFriendlyName,
       path: child.webFriendlyName,
-      imageCount: childImages.length
+      imageCount: childImages.length,
+      category: childCategory
     };
   });
   
@@ -184,7 +202,8 @@ function scanProject(projectDir) {
     path: webFriendlyName,
     imageCount: images.length,
     hasCover: fs.existsSync(path.join(originalPath, 'cover.png')),
-    children
+    children,
+    category
   };
 }
 
@@ -256,7 +275,9 @@ function main() {
       id: project.webFriendlyName,
       name: project.originalDisplayName,
       dirPath: projectPath,
-      isChild: false
+      isChild: false,
+      childrenList: project.children,
+      category: project.category
     });
     
     const metaPath = path.join(projectPath, 'meta.json');
@@ -270,7 +291,8 @@ function main() {
     projectsJson.push({
       id: project.webFriendlyName,
       name: project.originalDisplayName,
-      path: project.webFriendlyName
+      path: project.webFriendlyName,
+      category: project.category
     });
     
     // Generer meta.json for children
@@ -281,7 +303,8 @@ function main() {
         name: child.originalDisplayName,
         dirPath: childPath,
         isChild: true,
-        parentPath: project.webFriendlyName
+        parentPath: project.webFriendlyName,
+        category: child.category
       });
       
       const childMetaPath = path.join(childPath, 'meta.json');

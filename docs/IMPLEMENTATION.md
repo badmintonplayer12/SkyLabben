@@ -447,15 +447,17 @@ export function extractStepNumber(filename) {
 
 **Rolle**: Prosjektgalleri-view
 
-- **Onboarding**: Ved første besøk skal viewet kunne tegne et lett gjennomskinnelig overlay (maskot/piler) som peker på første tile med tekstfri “trykk her”-indikasjon. Overlegget forsvinner straks barnet trykker, og en flaggverdi lagres i localStorage slik at overlayet ikke vises hver gang.
-- **Underprosjekter inline**: Hvis et prosjekt har `children` og “barnemodus”-flagget (lagret i state/localStorage) er aktivt, kan viewet vise child-tiles direkte under hovedtile i stedet for å navigere opp/ned. Klikk på child kaller fortsatt `onProjectClick` med full path.
+  - **Onboarding**: Ved første besøk skal viewet kunne tegne et lett gjennomskinnelig overlay (maskot/piler) som peker på første tile med tekstfri “trykk her”-indikasjon. Overlegget forsvinner straks barnet trykker, og en flaggverdi lagres i localStorage slik at overlayet ikke vises hver gang.
+  - **Underprosjekter inline**: Hvis et prosjekt har `children` og “barnemodus”-flagget (lagret i state/localStorage) er aktivt, kan viewet vise child-tiles direkte under hovedtile i stedet for å navigere opp/ned. Klikk på child kaller fortsatt `onProjectClick` med full path.
+  - **Søk og filtrering**: Viser søkefelt og kategoriknapper (basert på `category`-feltet) samt en egen knapp for å vise kun favoritter.
+  - **Favoritter**: Hvert prosjekt har en stjerneknapp som toggler favorittstatus i `favorites.js`/localStorage. Favorittfilteret bruker denne listen.
 
 **Eksporterte funksjoner**:
 
 ```javascript
 /**
  * Renderer prosjektgalleri
- * @param {Array<{id: string, name: string, path: string}>} projects - Liste over prosjekter
+   * @param {Array<{id: string, name: string, path: string, category?: string}>} projects - Liste over prosjekter
  * @param {function(string): void} onProjectClick - Callback når prosjekt klikkes (tar path)
  * @returns {HTMLElement} Container-element med galleri
  * 
@@ -528,6 +530,13 @@ export function renderProjectGrid(projects, onProjectClick) {
 - **Loading-indikator**: Mens nytt bilde lastes skal `.viewer__main` vise en LEGO-kloss-/spinner-animajson, og knapper deaktiveres til bildet er klart.
 - **Fullføringsbelønning**: Når `currentStepIndex === steps.length - 1` og barnet går videre, vis en gratulasjonsstate (konfetti-animajson + badge) og kall `callbacks.onProjectCompleted?.(state.currentPath)` slik at hovedlogikk kan markere prosjektet som ferdig.
 - **Underprosjektfallback**: Dersom et prosjekt mangler `steps` men har `children`, renderer viewer en child-liste med samme ikonografi som galleriet i stedet for en tom melding.
+- **Sekundære kontroller via innstillingsmeny**:
+  - `viewer__bottom` har en egen knapp (`.viewer__settings`) som åpner en liten meny over verktøylinjen.
+  - Menyen inneholder globale handlinger som ikke brukes i hvert steg: skru av/på navigasjonslyd, vis QR-kode, fullskjerm og nullstill progresjonen.
+  - `createSettingsMenu()` i `view-viewer.js` kapsler logikken: den returnerer `{ wrapper, hasItems, addItem, cleanup }`. `addItem` tar `icon`, `label`, `onClick` + valgfrie `getIcon/getLabel` for dynamisk tekst, og returnerer et objekt med `refresh()` som kan kalles når tilstanden endres (f.eks. for lyd/fullskjerm).
+  - Menyen må kunne lukkes med Escape, etter valg og ved klikk utenfor, og knappen skal være deaktivert dersom ingen elementer ble registrert.
+  - Steg-spesifikke lydhint (`audioSteps`) forblir en egen knapp fordi den bare vises når prosjektet har lydfiler for gjeldende steg.
+  - Fullskjerm-aksjonen bruker `container.requestFullscreen()` / `document.exitFullscreen()` og oppdaterer ikon/label via `fullscreenchange`.
 
 - **Layoutkrav**:
   - `.viewer__main` skal fylle all ledig høyde (`flex: 1`) og la bildet skaleres med `object-fit: contain` slik at det alltid er maks mulig størrelse uten scroll.
@@ -866,4 +875,3 @@ console.log('Container:', container);
 4. **Håndter feil gracefully**: Applikasjonen skal ikke krasje
 5. **Test inkrementelt**: Test hver del før du går videre
 6. **Hold moduler løst koblet**: Moduler skal ikke være for avhengige av hverandre
-

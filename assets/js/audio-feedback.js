@@ -6,6 +6,35 @@
 
 const STORAGE_KEY = 'legoInstructions.audioEnabled';
 
+// Singleton AudioContext - gjenbrukes for alle lydspillinger
+let audioContext = null;
+
+/**
+ * Henter eller oppretter AudioContext
+ * @returns {AudioContext|null} AudioContext eller null hvis ikke støttet
+ */
+function getAudioContext() {
+  // Opprett AudioContext kun én gang
+  if (!audioContext) {
+    try {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      console.warn('Kunne ikke opprette AudioContext:', e);
+      return null;
+    }
+  }
+  
+  // Viktig for mobile enheter: Resume AudioContext hvis den er suspended
+  // Dette skjer ofte på iOS/Android når siden ikke er aktiv
+  if (audioContext.state === 'suspended') {
+    audioContext.resume().catch(e => {
+      console.warn('Kunne ikke resume AudioContext:', e);
+    });
+  }
+  
+  return audioContext;
+}
+
 /**
  * Sjekker om lyd er aktivert
  * @returns {boolean} true hvis lyd er aktivert, false ellers
@@ -38,25 +67,28 @@ export function setAudioEnabled(enabled) {
 export function playClickSound() {
   if (!isAudioEnabled()) return;
   
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  
   try {
-    // Bruk Web Audio API for å generere en kort klikk-lyd
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
+    // Bruk eksisterende AudioContext for å generere en kort klikk-lyd
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
     
     oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+    gainNode.connect(ctx.destination);
     
     oscillator.frequency.value = 800; // Høy tone for klikk
     oscillator.type = 'sine';
     
-    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+    const now = ctx.currentTime;
+    gainNode.gain.setValueAtTime(0.1, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
     
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.1);
+    oscillator.start(now);
+    oscillator.stop(now + 0.1);
   } catch (e) {
-    // Fallback hvis Web Audio API ikke støttes
+    // Fallback hvis Web Audio API ikke støttes eller feiler
     console.warn('Kunne ikke spille klikk-lyd:', e);
   }
 }

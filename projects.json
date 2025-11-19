@@ -2,11 +2,13 @@
   {
     "id": "huset-vaart",
     "name": "Huset Vårt",
-    "path": "huset-vaart"
+    "path": "huset-vaart",
+    "category": "Hjemmeprosjekt"
   },
   {
     "id": "test-prosjekt",
     "name": "Test Prosjekt",
-    "path": "test-prosjekt"
+    "path": "test-prosjekt",
+    "category": "Demo"
   }
 ]
