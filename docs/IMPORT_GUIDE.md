@@ -2,7 +2,11 @@
 
 Denne guiden hjelper deg med å konvertere eksisterende prosjekter med mellomrom og spesialtegn til web-vennlig format.
 
-**Anbefalt**: Bruk automatisk script (`scripts/convert-to-web-friendly.js`) for trygg konvertering. Se seksjon "Automatisk konvertering med Node.js-script" nedenfor.
+**Anbefalt**: Bruk automatiske scripts for trygg konvertering:
+- `scripts/convert-to-web-friendly.js` - Konverterer mapper til web-vennlig format
+- `scripts/update-cover-images.js` - Genererer/oppdaterer cover-bilder
+
+Se seksjoner "Automatisk konvertering med Node.js-script" og "Cover-bilder" nedenfor.
 
 ## Hvorfor web-vennlige mapper?
 
@@ -291,7 +295,7 @@ For hvert underprosjekt:
 ```
 /projects/huset-vaart/
   meta.json
-  cover.png (hvis finnes)
+  cover.png (genereres automatisk av `update-cover-images.js` hvis mangler)
   1-spiserom/
     meta.json
     1_1x.png
@@ -356,6 +360,35 @@ For hvert underprosjekt:
 ]
 ```
 
+## Cover-bilder
+
+### Automatisk generering av cover-bilder
+
+Etter å ha konvertert prosjekter, anbefales det å kjøre `update-cover-images.js` for å sikre at alle prosjekter har `cover.png`:
+
+```bash
+# Oppdater manglende cover-bilder
+node scripts/update-cover-images.js
+
+# Eller med dry-run for å se hva som vil skje
+node scripts/update-cover-images.js --dry-run
+```
+
+**Hva scriptet gjør:**
+- Finner siste bilde i hvert prosjekt (sortert etter nummer)
+- Kopierer det til `cover.png` **kun hvis `cover.png` mangler**
+- **Overskriver IKKE eksisterende `cover.png` filer** (bruk `--force` for å overskrive)
+- Fungerer rekursivt på alle prosjekter og underprosjekter
+
+**Runtime fallback:**
+- Hvis `cover.png` mangler, vil koden automatisk falle tilbake til første bilde (`1_1x.png`)
+- Dette fungerer som backup, men det er bedre å ha faktiske `cover.png` filer for raskere lasting
+
+**Anbefalt workflow:**
+1. Konverter prosjekter med `convert-to-web-friendly.js`
+2. Oppdater cover-bilder med `update-cover-images.js`
+3. Verifiser at alt fungerer
+
 ## Verifisering
 
 Etter konvertering, verifiser:
@@ -365,7 +398,8 @@ Etter konvertering, verifiser:
 3. ✅ `path` i `projects.json` matcher mappenavn
 4. ✅ `path` i children-array matcher undermappenavn
 5. ✅ Alle bilder er på plass i riktige mapper
-6. ✅ Test i nettleser: URL skal være ren (`#/p/huset-vaart`)
+6. ✅ Alle prosjekter har `cover.png` (kjør `update-cover-images.js` hvis mangler)
+7. ✅ Test i nettleser: URL skal være ren (`#/p/huset-vaart`)
 
 ## Troubleshooting
 

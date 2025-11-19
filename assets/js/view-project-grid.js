@@ -4,7 +4,7 @@
  * Renderer grid/liste over prosjekter med cover-bilder og navn.
  */
 
-import { getImageUrl } from './data-loader.js';
+import { getImageUrl, loadProjectMeta } from './data-loader.js';
 
 /**
  * Renderer prosjektgalleri
@@ -32,14 +32,24 @@ export function renderProjectGrid(projects, onProjectClick) {
     img.className = 'project-tile__image';
     img.src = getImageUrl(project.path, 'cover.png');
     img.alt = project.name;
-    img.onerror = () => {
-      // Fallback til første bilde hvis cover.png ikke finnes
-      // Vi prøver "1_1x.png" som fallback
-      img.src = getImageUrl(project.path, '1_1x.png');
-      img.onerror = () => {
-        // Hvis også det feiler, vis placeholder eller tom bilde
+    img.onerror = async () => {
+      // Fallback til siste bilde hvis cover.png ikke finnes
+      try {
+        const meta = await loadProjectMeta(project.path);
+        const steps = meta.steps || [];
+        if (steps.length > 0) {
+          // Bruk siste bilde i steps-arrayet
+          const lastStep = steps[steps.length - 1];
+          img.src = getImageUrl(project.path, lastStep);
+        } else {
+          // Hvis ingen steps, prøv å skjule bildet
+          img.style.display = 'none';
+        }
+      } catch (error) {
+        // Hvis vi ikke kan laste meta.json, skjul bildet
+        console.warn(`Kunne ikke laste meta.json for ${project.path}, skjuler cover-bilde`);
         img.style.display = 'none';
-      };
+      }
     };
     
     // Navn

@@ -54,9 +54,10 @@ Prosjektet bruker to hovedtyper JSON-filer:
 - **Beskrivelse**: Filnavn på cover-bildet som brukes i prosjektgalleriet
 - **Eksempler**: `"cover.png"`, `"1_cover.png"`
 - **Regler**:
-  - Hvis ikke spesifisert eller bildet ikke finnes, brukes det første bildet (laveste nummer)
+  - Hvis ikke spesifisert eller bildet ikke finnes, brukes det første bildet (laveste nummer) som runtime fallback
   - Må være et filnavn som finnes i samme mappe
   - Anbefales å bruke `"cover.png"` for konsistens
+  - **Generering**: `cover.png` genereres automatisk fra siste bilde (høyeste nummer) ved bruk av `update-cover-images.js` scriptet
 
 #### `steps` (påkrevd)
 - **Type**: Array of strings

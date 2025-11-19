@@ -64,4 +64,66 @@ $ node scripts/convert-to-web-friendly.js --dry-run
 - Node.js (ingen eksterne dependencies)
 - Mappen `/projects/` må eksistere
 
+## update-cover-images.js
+
+Script for å oppdatere/generere cover-bilder for alle prosjekter.
+
+### Hva scriptet gjør
+
+1. **Scanner alle prosjekter** i `/projects/` (inkludert underprosjekter)
+2. **For hvert prosjekt**:
+   - Sjekker om `cover.png` eksisterer
+   - Hvis ikke, kopierer siste bilde (sortert etter nummer) til `cover.png`
+   - Med `--force`: Oppdaterer også eksisterende `cover.png`
+
+### Bruk
+
+```bash
+# Oppdater kun manglende cover-bilder (anbefalt)
+node scripts/update-cover-images.js
+
+# Oppdater alle cover-bilder (overskriv eksisterende)
+node scripts/update-cover-images.js --force
+
+# Vis hva som ville blitt gjort uten å gjøre det
+node scripts/update-cover-images.js --dry-run
+```
+
+### Flagger
+
+- `--dry-run`: Viser hva som vil skje uten å gjøre endringer
+- `--force`: Oppdaterer også eksisterende `cover.png` filer
+
+### Anbefalt workflow
+
+1. **Etter å ha lagt til nye prosjekter**: Kjør `update-cover-images.js` for å generere cover-bilder
+2. **Etter import**: Kjør scriptet for å sikre at alle prosjekter har cover-bilder
+3. **Runtime fallback**: Koden har fortsatt fallback til første bilde hvis `cover.png` mangler (som backup)
+
+### Eksempel
+
+```bash
+$ node scripts/update-cover-images.js
+
+Oppdaterer cover-bilder for alle prosjekter...
+
+=== Oppsummering ===
+Oppdatert: 3
+Hoppet over: 7
+Feil: 0
+
+Oppdatert:
+  - huset-vaart: 1_1x.png → cover.png (ny)
+  - 1-spiserom: 1_1x.png → cover.png (ny)
+  - 2-alma-sitt-rom: 1_1x.png → cover.png (ny)
+
+✅ Cover-bilder oppdatert!
+```
+
+### Krav
+
+- Node.js (ingen eksterne dependencies)
+- Mappen `/projects/` må eksistere
+- Prosjekter må ha minst ett bilde
+
 

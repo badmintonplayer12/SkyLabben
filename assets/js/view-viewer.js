@@ -4,7 +4,7 @@
  * Renderer instruksjonsbilde med navigasjonskontroller.
  */
 
-import { getImageUrl } from './data-loader.js';
+import { getImageUrl, loadProjectMeta } from './data-loader.js';
 
 /**
  * Renderer instruksjonsviewer
@@ -37,6 +37,14 @@ export function renderViewer(state, callbacks) {
   // Håndter tom steps-array
   const steps = state.currentProjectMeta?.steps || [];
   const visibleChildren = (state.currentProjectMeta?.children || []).filter(c => !c.hidden);
+  
+  // Legg til scrollable-stiler hvis det er children å vise
+  if (steps.length === 0 && visibleChildren.length > 0) {
+    imageContainer.style.overflowY = 'auto';
+    imageContainer.style.overflowX = 'hidden';
+    imageContainer.style.alignItems = 'flex-start';
+    imageContainer.style.justifyContent = 'flex-start';
+  }
   
   // Bottom bar: Har fast høyde slik at hovedbildet alltid kan bruke resten av høyden
   const bottomBar = document.createElement('div');
@@ -102,11 +110,24 @@ export function renderViewer(state, callbacks) {
         img.className = 'project-tile__image';
         img.src = getImageUrl(`${state.currentPath}/${child.path}`, 'cover.png');
         img.alt = child.name;
-        img.onerror = () => {
-          img.src = getImageUrl(`${state.currentPath}/${child.path}`, '1_1x.png');
-          img.onerror = () => {
+        img.onerror = async () => {
+          // Fallback til siste bilde hvis cover.png ikke finnes
+          try {
+            const childMeta = await loadProjectMeta(`${state.currentPath}/${child.path}`);
+            const steps = childMeta.steps || [];
+            if (steps.length > 0) {
+              // Bruk siste bilde i steps-arrayet
+              const lastStep = steps[steps.length - 1];
+              img.src = getImageUrl(`${state.currentPath}/${child.path}`, lastStep);
+            } else {
+              // Hvis ingen steps, skjul bildet
+              img.style.display = 'none';
+            }
+          } catch (error) {
+            // Hvis vi ikke kan laste meta.json, skjul bildet
+            console.warn(`Kunne ikke laste meta.json for ${state.currentPath}/${child.path}, skjuler cover-bilde`);
             img.style.display = 'none';
-          };
+          }
         };
         
         const name = document.createElement('div');

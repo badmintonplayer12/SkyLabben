@@ -76,7 +76,8 @@ Bilder skal navngis med formatet: `[nummer]*.png`
 Hver prosjektmappe kan ha et spesielt `cover.png`-bilde som brukes som cover i prosjektgalleriet.
 
 - Hvis `cover.png` finnes, brukes den som cover-bilde
-- Hvis `cover.png` ikke finnes, brukes det første bildet (laveste nummer) som cover
+- Hvis `cover.png` ikke finnes, brukes det første bildet (laveste nummer) som runtime fallback
+- **Generering**: `cover.png` genereres automatisk fra siste bilde (høyeste nummer) ved bruk av `scripts/update-cover-images.js`
 
 ### Rekkefølge og sortering
 
@@ -229,7 +230,7 @@ Opprett en `meta.json`-fil i prosjektmappen:
 **Forklaring:**
 - `id`: Unik identifikator for prosjektet
 - `name`: Visningsnavn
-- `coverImage`: Navn på cover-bildet (eller første bilde hvis ikke spesifisert)
+- `coverImage`: Navn på cover-bildet (genereres automatisk fra siste bilde, eller første bilde som runtime fallback hvis ikke spesifisert)
 - `steps`: Array med alle steg-bildene i riktig rekkefølge
 - `children`: Array med underprosjekter (tom hvis ingen)
 

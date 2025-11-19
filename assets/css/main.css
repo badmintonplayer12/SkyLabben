@@ -142,6 +142,14 @@ button {
   padding: var(--spacing-md);
 }
 
+/* Tillat scrolling når det er en children-liste */
+.viewer__main.viewer__main--scrollable {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+}
+
 .viewer__main img {
   max-width: 100%;
   max-height: 100%;
