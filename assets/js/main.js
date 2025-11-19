@@ -6,10 +6,11 @@
 
 import { init as initRouter, parseHash, updateHash, getParentPath } from './router.js';
 import { loadProjects, loadProjectMeta } from './data-loader.js';
-import { getState, updateState, getLastStepFor, setStepFor } from './state.js';
+import { getState, updateState, getLastStepFor, setStepFor, setInstallPromptAvailable } from './state.js';
 import { renderProjectGrid } from './view-project-grid.js';
 import { renderViewer, showCelebration } from './view-viewer.js';
 import { hasSeenOnboarding, showOnboarding } from './onboarding.js';
+import { initInstallPromptListener } from './pwa-install.js';
 
 /**
  * Initialiserer applikasjonen
@@ -21,6 +22,25 @@ export function init() {
   });
 
   registerServiceWorker();
+  initPWAInstall();
+}
+
+/**
+ * Initialiserer PWA install prompt listener
+ */
+function initPWAInstall() {
+  initInstallPromptListener((available) => {
+    // Oppdater state når tilgjengelighet endres
+    setInstallPromptAvailable(available);
+    
+    // Trigger re-render hvis vi er i viewer
+    const state = getState();
+    if (state.currentPath) {
+      // Trigger hash-endring for å re-rendre viewer med ny install-knapp
+      const currentHash = window.location.hash;
+      updateHash(parseHash(currentHash));
+    }
+  });
 }
 
 /**

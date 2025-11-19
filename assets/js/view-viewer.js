@@ -5,9 +5,10 @@
  */
 
 import { getImageUrl, getAudioUrl, loadProjectMeta } from './data-loader.js';
-import { getLastStepFor, resetProgressFor } from './state.js';
+import { getLastStepFor, resetProgressFor, isInstallPromptAvailable } from './state.js';
 import { playNavigationSound, isAudioEnabled, setAudioEnabled } from './audio-feedback.js';
 import { generateQRCodeForStep } from './qr-code.js';
+import { consumePrompt, isStandalone } from './pwa-install.js';
 
 /**
  * Oppretter en innstillingsmeny for viewer
@@ -545,6 +546,42 @@ export function renderViewer(state, callbacks) {
     });
   }
   
+  // Install app-knapp (kun hvis install prompt er tilgjengelig og ikke allerede installert)
+  if (isInstallPromptAvailable() && !isStandalone()) {
+    const installItem = settingsMenu.addItem({
+      icon: '⬇️',
+      label: 'Installer app',
+      onClick: async () => {
+        try {
+          const result = await consumePrompt();
+          if (result.outcome === 'accepted') {
+            // Appen ble installert - vis en liten feiring eller melding
+            const successMsg = document.createElement('div');
+            successMsg.className = 'viewer__empty-message';
+            successMsg.textContent = 'Appen er installert! 🎉';
+            successMsg.style.position = 'fixed';
+            successMsg.style.top = '50%';
+            successMsg.style.left = '50%';
+            successMsg.style.transform = 'translate(-50%, -50%)';
+            successMsg.style.zIndex = '1001';
+            successMsg.style.background = 'var(--color-background)';
+            successMsg.style.padding = 'var(--spacing-lg)';
+            successMsg.style.borderRadius = 'var(--border-radius)';
+            successMsg.style.boxShadow = 'var(--shadow)';
+            container.appendChild(successMsg);
+            setTimeout(() => {
+              successMsg.remove();
+            }, 3000);
+          }
+          // Hvis brukeren avviste, vil beforeinstallprompt kunne fyre igjen senere
+          // Men knappen vil ikke vises før neste gang prompten blir tilgjengelig
+        } catch (error) {
+          console.warn('Kunne ikke vise install prompt:', error);
+        }
+      }
+    });
+  }
+
   const fullscreenItem = settingsMenu.addItem({
     getIcon: () => (document.fullscreenElement ? '🡼' : '⛶'),
     getLabel: () => (document.fullscreenElement ? 'Avslutt fullskjerm' : 'Fullskjerm'),

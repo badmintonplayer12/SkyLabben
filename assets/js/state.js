@@ -12,13 +12,15 @@ const STORAGE_KEY = 'legoInstructions.progress';
  * @property {string|null} currentPath - Nåværende prosjektpath
  * @property {number} currentStepIndex - Nåværende steg-indeks (0-basert)
  * @property {ProjectMeta|null} currentProjectMeta - Nåværende prosjektmetadata
+ * @property {boolean} isInstallPromptAvailable - Om PWA install prompt er tilgjengelig
  */
 
 // Modul-global state
 let appState = {
   currentPath: null,
   currentStepIndex: 0,
-  currentProjectMeta: null
+  currentProjectMeta: null,
+  isInstallPromptAvailable: false
 };
 
 /**
@@ -101,4 +103,20 @@ export function resetProgressFor(path) {
  */
 export function resetAllProgress() {
   saveProgress({});
+}
+
+/**
+ * Setter install prompt tilgjengelighet
+ * @param {boolean} available - Om install prompt er tilgjengelig
+ */
+export function setInstallPromptAvailable(available) {
+  appState.isInstallPromptAvailable = available;
+}
+
+/**
+ * Henter om install prompt er tilgjengelig
+ * @returns {boolean} true hvis install prompt er tilgjengelig
+ */
+export function isInstallPromptAvailable() {
+  return appState.isInstallPromptAvailable;
 }
