@@ -10,6 +10,134 @@ import { playNavigationSound, isAudioEnabled, setAudioEnabled } from './audio-fe
 import { generateQRCodeForStep } from './qr-code.js';
 
 /**
+ * Oppretter en innstillingsmeny for viewer
+ * @returns {Object} Meny-objekt med wrapper, addItem, hasItems og cleanup-metoder
+ */
+function createSettingsMenu() {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'viewer__settings';
+  
+  const toggleButton = document.createElement('button');
+  toggleButton.type = 'button';
+  toggleButton.className = 'viewer__button viewer__button--settings';
+  toggleButton.innerHTML = '<span class="viewer__icon" aria-hidden="true">⚙️</span>';
+  toggleButton.setAttribute('aria-label', 'Vis flere innstillinger');
+  toggleButton.title = 'Flere innstillinger';
+  toggleButton.disabled = true;
+  toggleButton.setAttribute('aria-expanded', 'false');
+  toggleButton.setAttribute('aria-haspopup', 'true');
+  
+  const menu = document.createElement('div');
+  menu.className = 'viewer__settings-menu';
+  menu.setAttribute('role', 'menu');
+  menu.setAttribute('aria-hidden', 'true');
+  
+  wrapper.appendChild(toggleButton);
+  wrapper.appendChild(menu);
+  
+  const menuItems = [];
+  let isOpen = false;
+  
+  const closeMenu = () => {
+    if (!isOpen) {
+      return;
+    }
+    isOpen = false;
+    wrapper.classList.remove('viewer__settings--open');
+    toggleButton.setAttribute('aria-expanded', 'false');
+    menu.setAttribute('aria-hidden', 'true');
+    document.removeEventListener('pointerdown', handleOutsidePointer);
+    document.removeEventListener('keydown', handleEscape);
+  };
+  
+  const openMenu = () => {
+    if (isOpen || menuItems.length === 0) {
+      return;
+    }
+    isOpen = true;
+    wrapper.classList.add('viewer__settings--open');
+    toggleButton.setAttribute('aria-expanded', 'true');
+    menu.setAttribute('aria-hidden', 'false');
+    document.addEventListener('pointerdown', handleOutsidePointer);
+    document.addEventListener('keydown', handleEscape);
+  };
+  
+  const handleOutsidePointer = (event) => {
+    if (!wrapper.contains(event.target)) {
+      closeMenu();
+    }
+  };
+  
+  const handleEscape = (event) => {
+    if (event.key === 'Escape') {
+      closeMenu();
+      toggleButton.focus();
+    }
+  };
+  
+  const handleToggle = (event) => {
+    event.preventDefault();
+    if (isOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  };
+  
+  toggleButton.addEventListener('click', handleToggle);
+  
+  return {
+    wrapper,
+    hasItems: () => menuItems.length > 0,
+    addItem: ({ icon, label, onClick, getIcon, getLabel }) => {
+      if (typeof onClick !== 'function') {
+        throw new Error('settingsMenu.addItem krever en onClick-funksjon');
+      }
+      
+      const itemButton = document.createElement('button');
+      itemButton.type = 'button';
+      itemButton.className = 'viewer__settings-item';
+      itemButton.setAttribute('role', 'menuitem');
+      
+      const iconElement = document.createElement('span');
+      iconElement.className = 'viewer__settings-item-icon';
+      
+      const labelElement = document.createElement('span');
+      labelElement.className = 'viewer__settings-item-label';
+      
+      itemButton.appendChild(iconElement);
+      itemButton.appendChild(labelElement);
+      
+      const applyContent = () => {
+        const resolvedIcon = typeof getIcon === 'function' ? getIcon() : icon;
+        const resolvedLabel = typeof getLabel === 'function' ? getLabel() : label;
+        iconElement.textContent = resolvedIcon || '';
+        labelElement.textContent = resolvedLabel || '';
+      };
+      
+      applyContent();
+      
+      itemButton.addEventListener('click', () => {
+        onClick();
+        closeMenu();
+      });
+      
+      menu.appendChild(itemButton);
+      menuItems.push({ refresh: applyContent, element: itemButton });
+      toggleButton.disabled = false;
+      
+      return {
+        refresh: () => applyContent()
+      };
+    },
+    cleanup: () => {
+      closeMenu();
+      toggleButton.removeEventListener('click', handleToggle);
+    }
+  };
+}
+
+/**
  * Renderer instruksjonsviewer
  * @param {AppState} state - Nåværende applikasjonsstate
  * @param {Object} callbacks - Callback-funksjoner fra main.js
@@ -561,130 +689,6 @@ export function showCelebration(container) {
   setTimeout(() => {
     celebration.remove();
   }, 2500);
-}
-
-function createSettingsMenu() {
-  const wrapper = document.createElement('div');
-  wrapper.className = 'viewer__settings';
-  
-  const toggleButton = document.createElement('button');
-  toggleButton.type = 'button';
-  toggleButton.className = 'viewer__button viewer__button--settings';
-  toggleButton.innerHTML = '<span class="viewer__icon" aria-hidden="true">⚙️</span>';
-  toggleButton.setAttribute('aria-label', 'Vis flere innstillinger');
-  toggleButton.title = 'Flere innstillinger';
-  toggleButton.disabled = true;
-  toggleButton.setAttribute('aria-expanded', 'false');
-  toggleButton.setAttribute('aria-haspopup', 'true');
-  
-  const menu = document.createElement('div');
-  menu.className = 'viewer__settings-menu';
-  menu.setAttribute('role', 'menu');
-  menu.setAttribute('aria-hidden', 'true');
-  
-  wrapper.appendChild(toggleButton);
-  wrapper.appendChild(menu);
-  
-  const menuItems = [];
-  let isOpen = false;
-  
-  const closeMenu = () => {
-    if (!isOpen) {
-      return;
-    }
-    isOpen = false;
-    wrapper.classList.remove('viewer__settings--open');
-    toggleButton.setAttribute('aria-expanded', 'false');
-    menu.setAttribute('aria-hidden', 'true');
-    document.removeEventListener('pointerdown', handleOutsidePointer);
-    document.removeEventListener('keydown', handleEscape);
-  };
-  
-  const openMenu = () => {
-    if (isOpen || menuItems.length === 0) {
-      return;
-    }
-    isOpen = true;
-    wrapper.classList.add('viewer__settings--open');
-    toggleButton.setAttribute('aria-expanded', 'true');
-    menu.setAttribute('aria-hidden', 'false');
-    document.addEventListener('pointerdown', handleOutsidePointer);
-    document.addEventListener('keydown', handleEscape);
-  };
-  
-  const handleOutsidePointer = (event) => {
-    if (!wrapper.contains(event.target)) {
-      closeMenu();
-    }
-  };
-  
-  const handleEscape = (event) => {
-    if (event.key === 'Escape') {
-      closeMenu();
-      toggleButton.focus();
-    }
-  };
-  
-  const handleToggle = (event) => {
-    event.preventDefault();
-    if (isOpen) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
-  };
-  
-  toggleButton.addEventListener('click', handleToggle);
-  
-  return {
-    wrapper,
-    hasItems: () => menuItems.length > 0,
-    addItem: ({ icon, label, onClick, getIcon, getLabel }) => {
-      if (typeof onClick !== 'function') {
-        throw new Error('settingsMenu.addItem krever en onClick-funksjon');
-      }
-      
-      const itemButton = document.createElement('button');
-      itemButton.type = 'button';
-      itemButton.className = 'viewer__settings-item';
-      itemButton.setAttribute('role', 'menuitem');
-      
-      const iconElement = document.createElement('span');
-      iconElement.className = 'viewer__settings-item-icon';
-      
-      const labelElement = document.createElement('span');
-      labelElement.className = 'viewer__settings-item-label';
-      
-      itemButton.appendChild(iconElement);
-      itemButton.appendChild(labelElement);
-      
-      const applyContent = () => {
-        const resolvedIcon = typeof getIcon === 'function' ? getIcon() : icon;
-        const resolvedLabel = typeof getLabel === 'function' ? getLabel() : label;
-        iconElement.textContent = resolvedIcon || '';
-        labelElement.textContent = resolvedLabel || '';
-      };
-      
-      applyContent();
-      
-      itemButton.addEventListener('click', () => {
-        onClick();
-        closeMenu();
-      });
-      
-      menu.appendChild(itemButton);
-      menuItems.push({ refresh: applyContent, element: itemButton });
-      toggleButton.disabled = false;
-      
-      return {
-        refresh: () => applyContent()
-      };
-    },
-    cleanup: () => {
-      closeMenu();
-      toggleButton.removeEventListener('click', handleToggle);
-    }
-  };
 }
 
 function compareByLeadingNumber(a, b) {

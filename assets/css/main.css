@@ -608,6 +608,36 @@ button {
 }
 
 /* Responsive design - Mobile-first */
+/* Skjul step-indikator på smale skjermer i portrettmodus */
+@media (max-width: 480px) and (orientation: portrait) {
+  .viewer__step-indicator {
+    display: none;
+  }
+  
+  /* Reduser padding og gap for bedre plass på smale skjermer */
+  .viewer__bottom {
+    padding: var(--spacing-sm); /* 8px i stedet for 16px */
+    gap: var(--spacing-sm); /* 8px i stedet for 16px */
+  }
+  
+  /* Reduser knappstørrelse litt på smale skjermer, men behold store tap-targets */
+  .viewer__button {
+    min-width: 56px; /* 56px i stedet for 64px på smale skjermer */
+    min-height: 56px;
+  }
+  
+  .viewer__button--settings {
+    min-width: 48px;
+    padding: 4px 4px !important; /* Reduser padding på mobil (4px vertikal og horisontal) */
+  }
+  
+  /* Reduser progresjonslinjens min-width på smale skjermer */
+  .viewer__progress {
+    min-width: 0; /* Tillat at progress kan krympes mer */
+    flex-shrink: 1; /* Tillat at progress kan krympes */
+  }
+}
+
 @media (min-width: 768px) {
   .project-grid__tiles {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
