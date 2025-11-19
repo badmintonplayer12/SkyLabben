@@ -1,6 +1,6 @@
 # Arkitektur
 
-Dette dokumentet beskriver den tekniske arkitekturen til LEGO Instruksjonsvisning-prosjektet.
+Dette dokumentet beskriver den tekniske arkitekturen til SkyLabben.
 
 ## TL;DR - Mental modell
 

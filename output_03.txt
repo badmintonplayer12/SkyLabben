@@ -459,7 +459,7 @@ docs\ARCHITECTURE.md
 File type: .md
 # Arkitektur
 
-Dette dokumentet beskriver den tekniske arkitekturen til LEGO Instruksjonsvisning-prosjektet.
+Dette dokumentet beskriver den tekniske arkitekturen til SkyLabben.
 
 ## TL;DR - Mental modell
 
@@ -969,7 +969,7 @@ docs\CSS_GUIDELINES.md
 File type: .md
 # CSS Guidelines
 
-Dette dokumentet beskriver CSS-struktur, styling-retningslinjer og design-prinsipper for LEGO Instruksjonsvisning-prosjektet.
+Dette dokumentet beskriver CSS-struktur, styling-retningslinjer og design-prinsipper for SkyLabben.
 
 ## Retningslinjer for AI-generert CSS
 
@@ -1760,7 +1760,7 @@ docs\DATA_FORMAT.md
 File type: .md
 # Data Format
 
-Dette dokumentet beskriver i detalj JSON-formatene som brukes i LEGO Instruksjonsvisning-prosjektet.
+Dette dokumentet beskriver i detalj JSON-formatene som brukes i SkyLabben.
 
 ## Oversikt
 
@@ -3129,7 +3129,7 @@ File End
 
 docs\README.md
 File type: .md
-# LEGO Instruksjonsvisning
+# SkyLabben
 
 Et enkelt, statisk nettsted for å vise LEGO-byggeinstruksjoner som PNG-bilder med strukturert navigasjon.
 
@@ -3472,7 +3472,7 @@ docs\ROADMAP.md
 File type: .md
 # Roadmap
 
-Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for LEGO Instruksjonsvisning-prosjektet.
+Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for SkyLabben.
 
 ## Hvordan denne roadmapen skal brukes (for AI)
 

@@ -1,6 +1,6 @@
 # Data Format
 
-Dette dokumentet beskriver i detalj JSON-formatene som brukes i LEGO Instruksjonsvisning-prosjektet.
+Dette dokumentet beskriver i detalj JSON-formatene som brukes i SkyLabben.
 
 ## Oversikt
 

@@ -1,6 +1,6 @@
 # Roadmap
 
-Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for LEGO Instruksjonsvisning-prosjektet.
+Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for SkyLabben.
 
 ## Hvordan denne roadmapen skal brukes (for AI)
 

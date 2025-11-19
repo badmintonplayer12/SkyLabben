@@ -1,7 +1,7 @@
 {
-  "name": "LEGO Instruksjonsviser",
-  "short_name": "LEGO Instruks",
-  "description": "En barnevennlig LEGO-instruksjonsviser med galleri og steg-for-steg bilder.",
+  "name": "SkyLabben",
+  "short_name": "SkyLabben",
+  "description": "SkyLabben – en barnevennlig instruksjonsapp med galleri og steg-for-steg bilder.",
   "lang": "no",
   "start_url": "./#/",
   "scope": "./",

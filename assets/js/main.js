@@ -1,5 +1,5 @@
 ﻿/**
- * Hovedkoordinator for LEGO Instruksjonsvisning-applikasjonen
+ * Hovedkoordinator for SkyLabben-applikasjonen
  * 
  * Dette er applikasjonens entry point som koordinerer routing, state og views.
  */

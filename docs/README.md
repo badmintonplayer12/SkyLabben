@@ -1,4 +1,4 @@
-# LEGO Instruksjonsvisning
+# SkyLabben
 
 Et enkelt, statisk nettsted for å vise LEGO-byggeinstruksjoner som PNG-bilder med strukturert navigasjon.
 

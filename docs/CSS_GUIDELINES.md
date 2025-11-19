@@ -1,6 +1,6 @@
 # CSS Guidelines
 
-Dette dokumentet beskriver CSS-struktur, styling-retningslinjer og design-prinsipper for LEGO Instruksjonsvisning-prosjektet.
+Dette dokumentet beskriver CSS-struktur, styling-retningslinjer og design-prinsipper for SkyLabben.
 
 ## Retningslinjer for AI-generert CSS
 
