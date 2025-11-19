@@ -8,6 +8,7 @@ import { getImageUrl, getAudioUrl, loadProjectMeta } from './data-loader.js';
 import { getLastStepFor, resetProgressFor, isInstallPromptAvailable } from './state.js';
 import { playNavigationSound, isAudioEnabled, setAudioEnabled } from './audio-feedback.js';
 import { generateQRCodeForStep } from './qr-code.js';
+import { shareUrl } from './share.js';
 import { consumePrompt, isStandalone } from './pwa-install.js';
 
 /**
@@ -609,95 +610,30 @@ export function renderViewer(state, callbacks) {
   };
 
   const buildSharePayload = () => {
-    const shareUrl = window.location.href;
+    const url = window.location.href;
     const projectName = state.currentProjectMeta?.name || 'SkyLabben';
     const stepNumber = typeof state.currentStepIndex === 'number' ? state.currentStepIndex + 1 : null;
     const shareText = stepNumber ? `${projectName} – Steg ${stepNumber}` : projectName;
-    return { shareUrl, projectName, shareText };
+    return { url, projectName, shareText };
   };
 
   if (navigator.share) {
     // Web Share API (mobil)
     addShareMenuItem('Del', async () => {
-      try {
-        const { shareUrl, projectName, shareText } = buildSharePayload();
-        await navigator.share({
-          title: projectName,
-          text: shareText,
-          url: shareUrl
-        });
-      } catch (error) {
-        if (error?.name === 'AbortError') {
-          // Bruker avbrøt - ignorer
-          return;
-        }
-        // Hvis Web Share feiler, prøv clipboard som fallback
-        console.warn('Kunne ikke dele med Web Share API:', error);
-        if (navigator.clipboard) {
-          try {
-            const { shareUrl } = buildSharePayload();
-            await navigator.clipboard.writeText(shareUrl);
-            const successMsg = document.createElement('div');
-            successMsg.className = 'viewer__empty-message';
-            successMsg.textContent = 'Lenke kopiert! 📋';
-            successMsg.style.position = 'fixed';
-            successMsg.style.top = '50%';
-            successMsg.style.left = '50%';
-            successMsg.style.transform = 'translate(-50%, -50%)';
-            successMsg.style.zIndex = '1001';
-            successMsg.style.background = 'var(--color-background)';
-            successMsg.style.padding = 'var(--spacing-lg)';
-            successMsg.style.borderRadius = 'var(--border-radius)';
-            successMsg.style.boxShadow = 'var(--shadow)';
-            container.appendChild(successMsg);
-            setTimeout(() => {
-              successMsg.remove();
-            }, 2000);
-          } catch (clipboardError) {
-            console.warn('Kunne ikke kopiere lenke:', clipboardError);
-            const { shareUrl } = buildSharePayload();
-            alert(`Del denne lenken:\n${shareUrl}`);
-          }
-        } else {
-          // Siste fallback: vis URL i prompt
-          const { shareUrl } = buildSharePayload();
-          prompt('Kopier denne lenken:', shareUrl);
-        }
-      }
+      const { url, projectName: title, shareText: text } = buildSharePayload();
+      await shareUrl({ url, title, text, container });
     });
   } else if (navigator.clipboard) {
     // Fallback: kopier lenke til utklippstavlen
     addShareMenuItem('Kopier lenke', async () => {
-      const { shareUrl } = buildSharePayload();
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-
-        const successMsg = document.createElement('div');
-        successMsg.className = 'viewer__empty-message';
-        successMsg.textContent = 'Lenke kopiert! 📋';
-        successMsg.style.position = 'fixed';
-        successMsg.style.top = '50%';
-        successMsg.style.left = '50%';
-        successMsg.style.transform = 'translate(-50%, -50%)';
-        successMsg.style.zIndex = '1001';
-        successMsg.style.background = 'var(--color-background)';
-        successMsg.style.padding = 'var(--spacing-lg)';
-        successMsg.style.borderRadius = 'var(--border-radius)';
-        successMsg.style.boxShadow = 'var(--shadow)';
-        container.appendChild(successMsg);
-        setTimeout(() => {
-          successMsg.remove();
-        }, 2000);
-      } catch (error) {
-        console.warn('Kunne ikke kopiere lenke:', error);
-        alert(`Del denne lenken:\n${shareUrl}`);
-      }
+      const { url } = buildSharePayload();
+      await shareUrl({ url, container });
     });
   } else {
     // Siste fallback: vis URL i prompt
     addShareMenuItem('Del lenke', () => {
-      const { shareUrl } = buildSharePayload();
-      prompt('Kopier denne lenken:', shareUrl);
+      const { url } = buildSharePayload();
+      shareUrl({ url });
     });
   }
   

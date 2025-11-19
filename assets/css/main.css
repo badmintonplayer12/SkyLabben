@@ -127,6 +127,51 @@ button {
   font-size: var(--font-size-large);
 }
 
+.project-grid__footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-lg) var(--spacing-md);
+  margin-top: var(--spacing-xl);
+  border-top: 1px solid var(--color-border);
+}
+
+.project-grid__share {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: var(--font-size-small);
+  color: var(--color-text);
+  transition: all 0.2s;
+  opacity: 0.7;
+}
+
+.project-grid__share:hover {
+  opacity: 1;
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.project-grid__share:active {
+  transform: translateY(0);
+}
+
+.project-grid__share-icon {
+  font-size: var(--font-size-base);
+}
+
+.project-grid__share-text {
+  font-weight: 500;
+}
+
 .project-grid--inline {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));

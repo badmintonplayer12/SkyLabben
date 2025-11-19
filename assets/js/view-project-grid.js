@@ -7,6 +7,7 @@
 import { getImageUrl, loadProjectMeta } from './data-loader.js';
 import { getLastStepFor } from './state.js';
 import { getFavoriteProjects, toggleFavoriteProject } from './favorites.js';
+import { shareUrl } from './share.js';
 
 /**
  * Renderer prosjektgalleri
@@ -225,6 +226,35 @@ export function renderProjectGrid(projects, onProjectClick) {
     button.setAttribute('aria-pressed', String(isFavorite));
     button.textContent = isFavorite ? '?' : '?';
   }
+
+  function createShareButton() {
+    const shareButton = document.createElement('button');
+    shareButton.type = 'button';
+    shareButton.className = 'project-grid__share';
+    shareButton.setAttribute('aria-label', 'Del SkyLabben');
+    shareButton.innerHTML = '<span class="project-grid__share-icon">🔗</span><span class="project-grid__share-text">Del app</span>';
+    
+    shareButton.addEventListener('click', async () => {
+      // Root URL - fjern hash hvis den finnes
+      const baseUrl = window.location.origin + window.location.pathname;
+      const url = baseUrl.endsWith('/') ? baseUrl : baseUrl + '/';
+      await shareUrl({ 
+        url, 
+        title: 'SkyLabben', 
+        text: 'SkyLabben - LEGO-instruksjonsviser',
+        container: document.body
+      });
+    });
+    
+    return shareButton;
+  }
+
+  // Footer med delingsknapp
+  const footer = document.createElement('div');
+  footer.className = 'project-grid__footer';
+  const shareButton = createShareButton();
+  footer.appendChild(shareButton);
+  container.appendChild(footer);
 
   applyFilters();
   return container;
