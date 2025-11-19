@@ -327,6 +327,57 @@ export function renderViewer(state, callbacks) {
     }
   }
   
+  // QR-kode-knapp (kun hvis det er steg) - for voksne
+  if (steps.length > 0) {
+    const qrButton = document.createElement('button');
+    qrButton.className = 'viewer__button viewer__button--qr';
+    qrButton.innerHTML = '<span class="viewer__icon" aria-hidden="true">📱</span>';
+    qrButton.setAttribute('aria-label', 'Vis QR-kode');
+    qrButton.title = 'Vis QR-kode';
+    qrButton.addEventListener('click', async () => {
+      // Vis QR-kode-modal
+      const modal = document.createElement('div');
+      modal.className = 'qr-modal';
+      
+      const modalContent = document.createElement('div');
+      modalContent.className = 'qr-modal__content';
+      
+      const modalHeader = document.createElement('div');
+      modalHeader.className = 'qr-modal__header';
+      modalHeader.textContent = 'QR-kode';
+      
+      const qrContainer = document.createElement('div');
+      qrContainer.className = 'qr-modal__container';
+      
+      const closeButton = document.createElement('button');
+      closeButton.className = 'qr-modal__close';
+      closeButton.innerHTML = '<span class="viewer__icon" aria-hidden="true">✕</span>';
+      closeButton.setAttribute('aria-label', 'Lukk');
+      closeButton.title = 'Lukk';
+      closeButton.addEventListener('click', () => {
+        modal.remove();
+      });
+      
+      // Generer QR-kode for nåværende steg
+      const baseUrl = window.location.origin;
+      await generateQRCodeForStep(baseUrl, state.currentPath, state.currentStepIndex, qrContainer);
+      
+      modalContent.appendChild(modalHeader);
+      modalContent.appendChild(qrContainer);
+      modalContent.appendChild(closeButton);
+      modal.appendChild(modalContent);
+      container.appendChild(modal);
+      
+      // Lukk ved klikk utenfor
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.remove();
+        }
+      });
+    });
+    bottomBar.appendChild(qrButton);
+  }
+  
   // Nullstill-knapp (kun hvis det er steg)
   if (steps.length > 0) {
     const resetButton = document.createElement('button');

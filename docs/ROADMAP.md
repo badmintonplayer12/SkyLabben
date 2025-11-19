@@ -217,16 +217,16 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for LE
 ## Fase 3: Avanserte funksjoner
 
 ### 3.1 QR-kode-generering
-- [ ] **3.1.1** Implementer QR-kode-generering for spesifikke steg
+- [x] **3.1.1** Implementer QR-kode-generering for spesifikke steg
   - **Mål**: Generer QR-kode basert på nåværende URL
   - **🌐 TEST I NETTLESER**: Verifiser at QR-kode genereres og vises korrekt
-- [ ] **3.1.2** QR-kode for prosjekt (starter på første steg)
+- [x] **3.1.2** QR-kode for prosjekt (starter på første steg)
   - **Mål**: QR-kode som peker til prosjektets første steg
   - **🌐 TEST I NETTLESER**: Test at QR-kode for prosjekt peker til riktig URL
-- [ ] **3.1.3** QR-kode for spesifikt steg
+- [x] **3.1.3** QR-kode for spesifikt steg
   - **Mål**: QR-kode som peker til spesifikt steg med step-parameter
   - **🌐 TEST I NETTLESER**: Test at QR-kode for steg peker til riktig URL med step-parameter
-- [ ] **3.1.4** Deling via QR-kode
+- [x] **3.1.4** Deling via QR-kode
   - **Mål**: Mulighet for å dele spesifikke steg via QR-kode
   - **🌐 TEST I NETTLESER**: Test at QR-kode kan skannes og navigerer til riktig sted
 
