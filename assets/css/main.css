@@ -1,0 +1,279 @@
+/* 1. CSS Variables / Design Tokens */
+:root {
+  /* Farger */
+  --color-primary: #0066cc;
+  --color-secondary: #666666;
+  --color-background: #ffffff;
+  --color-text: #333333;
+  --color-border: #e0e0e0;
+  --color-error: #cc0000;
+  --color-success: #00cc00;
+  
+  /* Typografi */
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-size-base: 16px;
+  --font-size-small: 14px;
+  --font-size-large: 18px;
+  --font-size-h1: 24px;
+  --font-size-h2: 20px;
+  --line-height-base: 1.5;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Breakpoints */
+  /* Merk: Breakpoint-variabler brukes som dokumentasjon. Media-queries må fortsatt bruke tall direkte siden CSS-variabler ikke støttes i media queries i alle nettlesere. */
+  --breakpoint-mobile: 375px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1920px;
+  
+  /* Layout */
+  --max-width-container: 1200px;
+  --border-radius: 4px;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 2. Reset / Normalize */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+/* 3. Base styles */
+#app {
+  min-height: 100vh;
+}
+
+/* 4. Layout components */
+
+/* Prosjektgalleri (project-grid) */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+}
+
+.project-tile {
+  aspect-ratio: 1;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  display: flex;
+  flex-direction: column;
+}
+
+.project-tile:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow);
+}
+
+.project-tile__image {
+  width: 100%;
+  height: 80%;
+  object-fit: cover;
+}
+
+.project-tile__name {
+  height: 20%;
+  padding: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-small);
+  background: var(--color-background);
+  text-align: center;
+}
+
+/* 5. View-specific styles */
+
+/* Viewer (instruksjonsvisning) */
+.viewer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.viewer__header {
+  padding: var(--spacing-md);
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-large);
+  font-weight: bold;
+}
+
+.viewer__main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--color-background);
+  padding: var(--spacing-md);
+}
+
+.viewer__main img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.viewer__empty-message {
+  padding: var(--spacing-lg);
+  text-align: center;
+  color: var(--color-secondary);
+  font-size: var(--font-size-large);
+}
+
+.viewer__loading {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  background: var(--color-background);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bounce 1s infinite;
+}
+
+.viewer__loading-icon {
+  width: 64px;
+  height: 64px;
+  font-size: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: spin 1.8s linear infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.viewer__bottom {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-background);
+  border-top: 1px solid var(--color-border);
+  min-height: 64px; /* Store tap-targets for barn */
+}
+
+.viewer__button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  min-height: 48px;
+  min-width: 48px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background: var(--color-background);
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  transition: background 0.2s, color 0.2s;
+}
+
+.viewer__button:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: white;
+}
+
+.viewer__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.viewer__progress {
+  flex: 1;
+  height: 8px;
+  min-height: 48px; /* Store tap-targets for barn */
+  cursor: pointer;
+}
+
+.viewer__step-indicator {
+  font-size: var(--font-size-base);
+  color: var(--color-secondary);
+  min-width: 60px;
+  text-align: center;
+}
+
+/* Responsive design - Mobile-first */
+@media (min-width: 768px) {
+  .project-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+  }
+  
+  .viewer__header {
+    padding: var(--spacing-lg);
+  }
+  
+  .viewer__main {
+    padding: var(--spacing-lg);
+  }
+  
+  .viewer__bottom {
+    padding: var(--spacing-lg);
+  }
+}
+
+@media (min-width: 1920px) {
+  .project-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    max-width: var(--max-width-container);
+    margin: 0 auto;
+  }
+  
+  .viewer__header {
+    padding: var(--spacing-xl);
+  }
+  
+  .viewer__main {
+    padding: var(--spacing-xl);
+  }
+  
+  .viewer__bottom {
+    padding: var(--spacing-xl);
+  }
+}
+
+/* 6. Utilities */
+/* Utility-klasser vil bli lagt til ved behov */
+

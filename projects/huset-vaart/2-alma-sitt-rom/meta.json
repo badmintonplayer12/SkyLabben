@@ -1,0 +1,22 @@
+{
+  "id": "2-alma-sitt-rom",
+  "name": "2-Alma sitt Rom",
+  "coverImage": "cover.png",
+  "steps": [
+    "19_1x.png",
+    "20_1x.png",
+    "21_1x.png",
+    "22_1x.png",
+    "23_1x.png",
+    "24_1x.png",
+    "25_1x.png",
+    "26_1x.png",
+    "27_1x.png",
+    "28_1x.png",
+    "29_1x.png",
+    "30_1x.png",
+    "31_1x.png",
+    "32_1x.png"
+  ],
+  "children": []
+}

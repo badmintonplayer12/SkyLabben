@@ -135,6 +135,7 @@ Dette er ikke en del av `AppState`, men et separat objekt som lagrer siste steg 
 - Viser cover-bilder og navn
 - Håndterer klikk på prosjekter
 - Viser progresjonsindikator (hvis implementert)
+- Kan presentere underprosjekter inline (flatt galleri) før man navigerer videre, slik at barn slipper å forstå “opp ett nivå”
 
 **DOM-struktur**:
 - Container med grid-layout
@@ -146,10 +147,15 @@ Dette er ikke en del av `AppState`, men et separat objekt som lagrer siste steg 
 
 **Ansvar**:
 - Renderer instruksjonsbilde
-- Håndterer navigasjon mellom steg
+- Initierer navigasjons-callbacks (main.js oppdaterer state/URL)
 - Viser progresjonslinje
 - Håndterer "opp"-knapp for hierarkisk navigasjon
-- Oppdaterer URL og state ved navigasjon
+- Håndterer tom steps-array (viser melding og deaktiverer kontroller)
+- Sørger for at bildet fyller mest mulig av viewporten uten scroll og at nettleser-zoom fungerer
+- Eksponerer ikon- og barnevennlige kontroller (store tap-targets, tydelig feedback)
+- Viser vennlig loading-indikator (f.eks. LEGO-kloss-animajson) mens neste bilde lastes
+- Feirer ferdigstillelse (konfetti/lyd) og markerer progresjon når siste steg fullføres
+- Tilbyr lyd/haptikk-bryter og eventuelt steg-vis lydhint når `audioSteps` er definert
 
 **DOM-struktur**:
 - Header (valgfritt)
@@ -176,11 +182,15 @@ Dette er ikke en del av `AppState`, men et separat objekt som lagrer siste steg 
 
 ### Navigasjon i prosjektgalleri
 1. Bruker klikker på prosjekt
-2. `view-project-grid.js` kaller callback som sender path til `main.js`
-3. `main.js` oppdaterer `location.hash` via `updateHash()`
+2. `view-project-grid.js` vurderer om prosjektet har underprosjekter:
+   - I “barnemodus” vises underprosjekter inline med egne tiles (ingen hash-endring før barnet velger et konkret steg)
+   - Hvis barnet velger et tile uten flere children, kalles callback som sender path til `main.js`
+3. `main.js` oppdaterer `location.hash` via `updateHash()` når det faktisk navigeres
 4. Router fanger opp endring
 5. `main.js` håndterer ny rute
 6. Data lastes og viewer renderes
+
+**Onboarding**: Første gangs oppstart kan trigge en visuell “trykk her”-overlegg i `view-project-grid.js` (maskot/piler) som peker på prosjekttiles. Overlegget skal kunne avbrytes umiddelbart og lagre flagg i localStorage slik at det ikke vises hver gang.
 
 ### Navigasjon mellom steg
 1. Bruker klikker pil eller progresjonslinje

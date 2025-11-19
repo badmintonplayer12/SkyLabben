@@ -1,0 +1,3933 @@
+Folder Structure
+--------------------------------------------------
+/
+    temp.ps1
+docs/
+    AI_GUIDE.md
+    Analyse av LEGO instruksjonsvisningssystem.md
+    ARCHITECTURE.md
+    CSS_GUIDELINES.md
+    DATA_FORMAT.md
+    IMPLEMENTATION.md
+    README.md
+    ROADMAP.md
+
+
+File Contents
+--------------------------------------------------
+
+
+temp.ps1
+File type: .ps1
+Get-Content docs/README.md | Select-Object -Index 220..230
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+docs\AI_GUIDE.md
+File type: .md
+# AI Guide - Start her før implementering
+
+Dette dokumentet gir deg en rask oversikt over hvordan du skal jobbe med dette prosjektet. **Les dette først**, deretter følg lenkene til de detaljerte dokumentene.
+
+## 🎯 Hva er dette prosjektet?
+
+Et statisk nettsted for å vise LEGO-byggeinstruksjoner som PNG-bilder. Bygget med ren HTML, CSS og JavaScript, uten dependencies.
+
+**Hovedfunksjoner**:
+- Prosjektgalleri med cover-bilder
+- Hierarkisk navigasjon (prosjekter → underprosjekter → steg)
+- Stegvis visning med pil-knapper og progresjonslinje
+- Automatisk lagring av progresjon i localStorage
+- Responsivt design (mobil, nettbrett, PC)
+
+## 📋 Hvor starter jeg?
+
+### 1. **Les [ROADMAP.md](./ROADMAP.md) først**
+   - Dette er din implementasjonsplan
+   - Følg oppgavene i rekkefølge (1.1 → 1.2 → 1.3 osv.)
+   - **Viktig**: Test i nettleser ved alle steg markert med 🌐
+
+### 2. **For kode-implementering, se [IMPLEMENTATION.md](./IMPLEMENTATION.md)**
+   - Funksjonssignaturer og eksempler
+   - Kode-mønstre og konvensjoner
+   - Error handling og best practices
+
+### 3. **For arkitektur og struktur, se [ARCHITECTURE.md](./ARCHITECTURE.md)**
+   - Modulansvar og dataflyt
+   - Routing og state management
+   - Skalerbarhet og refaktoreringsstrategier
+
+### 4. **For CSS og styling, se [CSS_GUIDELINES.md](./CSS_GUIDELINES.md)**
+   - Design tokens og BEM-navngiving
+   - Responsivt design (mobile-first)
+   - Layout-komponenter og utility classes
+
+### 5. **For dataformater, se [DATA_FORMAT.md](./DATA_FORMAT.md)**
+   - Struktur på `meta.json` og `projects.json`
+   - Validering og best practices
+   - Eksempler på korrekt format
+
+## ⚠️ Kritiske regler (les disse!)
+
+### Klassnavn - MÅ være konsistent
+- **Bruke BEM-mønster**: `.viewer__header`, `.project-tile__image`
+- **IKKE bruke**: `.viewer-header`, `.project-name`
+- Se [CSS_GUIDELINES.md](./CSS_GUIDELINES.md) for alle klassnavn
+
+### Modulansvar - Ikke blande
+- **main.js**: Koordinerer, gjør IKKE DOM-rendering
+- **view-*.js**: Bygger DOM, gjør IKKE datahenting
+- **data-loader.js**: Henter data, gjør IKKE rendering
+- Se [ARCHITECTURE.md](./ARCHITECTURE.md) for detaljer
+
+### URL-bygging - Bruk alltid getImageUrl()
+- **Riktig**: `img.src = getImageUrl(path, imageName)`
+- **Feil**: `img.src = \`/projects/${path}/${imageName}\``
+- Se [IMPLEMENTATION.md](./IMPLEMENTATION.md) for eksempler
+
+### State management - Funksjoner, ikke objekter
+- **Riktig**: `import { getState, updateState } from './state.js'`
+- **Feil**: `state.getState()` eller `state.updateState()`
+- Se [IMPLEMENTATION.md](./IMPLEMENTATION.md) for detaljer
+
+## 🗺️ Dokumentoversikt
+
+| Fil | Bruk når du trenger... |
+|-----|------------------------|
+| **[ROADMAP.md](./ROADMAP.md)** | Implementasjonsplan og oppgaver |
+| **[IMPLEMENTATION.md](./IMPLEMENTATION.md)** | Kodeeksempler og funksjonssignaturer |
+| **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Teknisk arkitektur og modulansvar |
+| **[CSS_GUIDELINES.md](./CSS_GUIDELINES.md)** | Styling, design tokens, BEM-navngiving |
+| **[DATA_FORMAT.md](./DATA_FORMAT.md)** | JSON-strukturer og dataformater |
+| **[README.md](./README.md)** | Brukerinformasjon og prosjektoverview |
+
+## 🚀 Arbeidsflyt
+
+1. **Start med ROADMAP.md**
+   - Velg neste oppgave (f.eks. 1.3.1)
+   - Les "Mål"-linjen for å forstå hva som skal gjøres
+
+2. **Sjekk IMPLEMENTATION.md**
+   - Finn relevant modul (f.eks. router.js)
+   - Se på funksjonssignaturer og eksempler
+   - Følg kode-mønstrene nøyaktig
+
+3. **Implementer koden**
+   - Følg funksjonssignaturene som fasit
+   - Bruk klassnavn fra CSS_GUIDELINES.md
+   - Test i nettleser hvis oppgaven krever det
+
+4. **Oppdater ROADMAP.md**
+   - Marker oppgaven som fullført: `[x]`
+   - Gå videre til neste oppgave
+
+## 🔍 Rask referanse
+
+### Hvor finner jeg...?
+
+**Hvordan sortere bilder?**
+→ [IMPLEMENTATION.md](./IMPLEMENTATION.md) - `extractStepNumber()` funksjon
+
+**Hvordan bygge URL til bilder?**
+→ [IMPLEMENTATION.md](./IMPLEMENTATION.md) - `getImageUrl()` funksjon
+
+**Hvordan beregne forelder-path?**
+→ [IMPLEMENTATION.md](./IMPLEMENTATION.md) - `getParentPath()` funksjon
+
+**Hvilke CSS-klasser skal jeg bruke?**
+→ [CSS_GUIDELINES.md](./CSS_GUIDELINES.md) - Seksjon "BEM-navngiving"
+
+**Hvordan strukturere meta.json?**
+→ [DATA_FORMAT.md](./DATA_FORMAT.md) - Seksjon "meta.json struktur"
+
+**Hvordan skjule prosjekter/children?**
+→ [DATA_FORMAT.md](./DATA_FORMAT.md) - Seksjon "hidden felt" - Bruk `hidden: true` for å skjule fra visning
+
+**Hvordan håndtere state?**
+→ [IMPLEMENTATION.md](./IMPLEMENTATION.md) - Seksjon "state.js"
+
+**Hvordan håndtere routing?**
+→ [IMPLEMENTATION.md](./IMPLEMENTATION.md) - Seksjon "router.js"
+
+## ⚡ Viktige påminnelser
+
+- **Ikke finn opp egne varianter** - Følg eksisterende mønstre
+- **Test i nettleser** - Alle steg med 🌐 må testes
+- **Bruk konsistente klassnavn** - Sjekk CSS_GUIDELINES.md
+- **Ikke blande modulansvar** - main.js koordinerer, views renderer
+- **Bruk getImageUrl()** - Ikke hardkod URL-er
+- **Oppdater ROADMAP.md** - Marker oppgaver som fullført
+
+## 🆘 Hvis du er usikker
+
+1. Sjekk [IMPLEMENTATION.md](./IMPLEMENTATION.md) for kodeeksempler
+2. Sjekk [ARCHITECTURE.md](./ARCHITECTURE.md) for modulansvar
+3. Sjekk [CSS_GUIDELINES.md](./CSS_GUIDELINES.md) for styling
+4. Foreslå 2-3 alternativer i en kommentar, ikke gjett
+
+---
+
+**Start med [ROADMAP.md](./ROADMAP.md) og følg oppgavene i rekkefølge!**
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+docs\Analyse av LEGO instruksjonsvisningssystem.md
+File type: .md
+# Analyse av LEGO instruksjonsvisningssystem
+
+## Hovedformål og bruksflyt
+
+Løsningen er et statisk nettsted som lar brukeren bla gjennom LEGO-byggeinstruksjoner presentert som bilder, på en måte som ligner en fysisk byggeinstruksjonsbok. Systemet organiserer instruksjonene i et hierarki av prosjekter (f.eks. ulike modeller) med mulige underprosjekter (deler av en modell), og stegvis bilder for hvert prosjekt. Hovedformålet er å gjøre det enkelt å følge egne LEGO-instruksjoner trinn for trinn visuelt, uten behov for tekstbeskrivelser.
+
+### Bruksscenario
+
+Når nettsiden åpnes, møtes brukeren av et prosjektgalleri som viser oversikt over alle tilgjengelige prosjekter med et cover-bilde for hver modell. Hvert prosjekt representeres av et bilde (eventuelt et spesielt cover.png) og et prosjektnavn. Brukeren (f.eks. et barn) kan trykke på et prosjekt for å åpne det. Da vil systemet laste inn prosjektets bilder og vise første instruksjonssteg i en bildevisning. Hvis prosjektet inneholder underprosjekter (f.eks. modulære deler), vil et trykk på hovedprosjektet først vise en underside med de tilhørende underprosjektene i stedet for steg-bilder.
+
+### Stegvis navigasjon
+
+Instruksjonsvisningen (viewer) lar brukeren bla fram og tilbake gjennom instruksjonsbildene ved hjelp av tydelige pil-knapper til venstre og høyre. En progresjonslinje nederst indikerer hvor langt man har kommet og kan klikkes eller dras for å hoppe til et bestemt steg. Det vises også en steg-indikator (f.eks. "Steg X av N") som forteller hvilken byggeinstruksjon man ser på av totalt antall. Navigasjonen er utformet slik at man ikke trenger å scrolle; bildet skaleres automatisk til skjermen for å unngå rulling. Dette gir en ren, fokusert opplevelse der brukeren kun blar side for side gjennom instruksjonene.
+
+### Hierarkisk opp/ned-navigasjon
+
+Brukeren kan når som helst gå opp ett nivå i hierarkiet ved å trykke en dedikert "Opp"-knapp. Denne knappen tar brukeren tilbake til forelder-nivået: fra et underprosjekt tilbake til hovedprosjektet, eller fra et hovedprosjekt tilbake til oversiktsgalleriet, avhengig av hvor man er. Slik kan man enkelt bytte mellom prosjekter og underprosjekter. Hele navigasjonsflyten er hash-basert, som betyr at URL-en oppdateres for hver navigasjon (f.eks. `#/p/prosjekt1?step=3` for prosjekt1 steg 4). Dette gjør at man kan bookmarke eller dele en bestemt instruksjonsposisjon, og det sikrer at sideoppfriskning ikke mister posisjonen.
+
+### Automatisk posisjonslagring
+
+Systemet benytter localStorage i nettleseren til å automatisk lagre hvor langt brukeren har kommet i hvert prosjekt. Dersom man lukker siden og kommer tilbake senere, vil applikasjonen huske siste besøkte steg for hvert prosjekt og automatisk fortsette der man slapp (med mindre brukeren manuelt har valgt et annet steg eller startet på nytt). Dette er spesielt nyttig i et hjemmescenario – man kan ta pauser og fortsette byggingen senere uten å miste oversikten. Systemet leser inn lagret progresjon ved oppstart og bruker det dersom URL-en ikke spesifiserer et steg.
+
+### Sammenfattende
+
+Tilbyr systemet en komplett bruksflyt fra galleri til detaljvisning: Velg prosjekt → bla steg-for-steg i bilder → gå opp for å velge nytt prosjekt, med fortløpende lagring av fremdrift. Løsningen fungerer på tvers av enheter (mobil, nettbrett, PC) med responsivt design, slik at både barn og voksne kan bruke den på sin foretrukne enhet hjemme.
+
+## Arkitektur og komponenter
+
+Applikasjonen er bygget som en modulær, komponentbasert single-page løsning ved hjelp av ren HTML, CSS og JavaScript uten rammeverk eller eksterne avhengigheter. Arkitekturen følger et enkelt MVC-lignende prinsipp der datahåndtering, visning og kontroll er separert. Nedenfor er hovedkomponentene i systemet:
+
+### main.js – Hovedkontroller
+
+Dette er inngangspunktet som koordinerer hele applikasjonen. Ved oppstart initialiserer den ruteren og applikasjonsstaten, og den lytter på ruteendringer. main.js sin oppgave er å motta Route-objekter fra ruteren og bestemme hva som skal skje: for root-ruten hentes prosjektlisten og galleri-visningen rendres; for en prosjekt-rute hentes riktig meta-data og viewer-visningen rendres. main.js sørger også for å oppdatere applikasjonsstaten og URL-hashen ved navigasjon (f.eks. når brukeren blar til neste steg). Et viktig prinsipp er at main.js eier all tilstand og URL-manipulasjon, mens grensesnittskomponentene er "dumme" visninger som bare bygger UI og utløser callbacks.
+
+### router.js – Rutingsmodul
+
+Denne modulen håndterer klient-side ruting basert på URL-hash (`window.location.hash`). Den lytter på hashchange-hendelser og parser hashstrengen til et Route-objekt som representerer enten root (galleri) eller et spesifikt prosjekt (med ev. steginformasjon). Eksempel: URL `#/p/project1/sub-a?step=3` parses til `{ type: "project", path: "project1/sub-a", stepIndex: 3 }`. Routeren validerer også at URL-en har gyldig format, og normaliserer den om nødvendig. Når en gyldig rute er tolket, sender router.js dette til main.js sin route-handler. Hash-baseret ruting ble valgt fordi det fungerer sømløst på statiske sider uten behov for serverconfig, og gir unike bokmerker for hver visning.
+
+### state.js – Tilstandshåndtering
+
+Denne modulen holder styr på applikasjonens tilstand i minnet og synkroniserer progresjon med localStorage. AppState-objektet i minnet sporer nåværende prosjekt (path), nåværende stegindeks og prosjektmetadata som er lastet. state.js tilbyr funksjoner som `getState()`, `updateState(...)` for å hente/oppdatere tilstanden på en kontrollert måte, i stedet for at komponentene manipulerer tilstand direkte. I tillegg håndteres et separat progresjonskart (lagret i localStorage) som mapper hver prosjektpath til siste besøkte steg. Funksjoner som `getLastStepFor(path)` og `setStepFor(path, index)` brukes for å lagre/få tak i brukerens sist kjente posisjon per prosjekt. Dette designet gjør at state-håndteringen er sentralisert og konsistent, og sikrer at f.eks. lagring til localStorage skjer automatisk ved steg-endring.
+
+### data-loader.js – Datatilgang
+
+Data-laget består primært av denne modulen, som er ansvarlig for å hente inn JSON-data og bygge bilde-URLer. Den laster `projects.json` som inneholder listen over toppnivå prosjekter til galleriet, samt individuelle `meta.json`-filer for hvert prosjekt eller underprosjekt. Meta-filene inneholder typisk metadata som prosjektets navn, liste over steg-bilder og eventuelle underprosjekter. data-loader.js tilbyr funksjoner som `loadProjects()` og `loadProjectMeta(path)` som returnerer disse dataene (asynkront). Den har også en viktig utility-funksjon `getImageUrl(path, imageName)` for å bygge korrekt filbane til et gitt bilde. I stedet for å hardkode filstier, skal utviklerne bruke `getImageUrl()` hver gang et bilde skal vises, for konsistens. Basen for alle bilde-URLer er `/projects/`-mappen på serveren. Modulen håndterer også feil, f.eks. hvis en JSON-fil mangler, ved å logge feilen og la applikasjonen håndtere det grasiøst (f.eks. utelate manglende prosjekter fra listen).
+
+### view-project-grid.js – Prosjektgalleri-visning
+
+Dette er en ren presentasjonsmodul som genererer DOM-innholdet for galleriet. Den tar inn data om prosjektene (fra projects.json) og bygger en grid med et kort/"tile" for hvert prosjekt. Hvert prosjekt-kort inneholder cover-bildet (enten cover.png hvis det finnes, ellers første steg-bildet som fallback) og prosjektnavn. Kortene er klikkbare; ved klikk vil view-modulen kalle en callback-funksjon (sendt inn fra main.js) med den valgte prosjektstien. main.js mottar dette og oppdaterer hash-ruten for å navigere videre. Slik holder view-modulen seg enkel: den presenterer data og gir brukerinteraksjon (klikk), men kjenner ikke logikken for navigasjon utover å kalle callback. (Det nevnes også at galleriet kan vise en progresjonsindikator per prosjekt om implementert – for eksempel en visuell markør om prosjektet er helt eller delvis gjennomført. Dette var kanskje tenkt som en ekstra funksjon i grensesnittet.)
+
+### view-viewer.js – Instruksjonsvisning
+
+Denne modulen bygger grensesnittet for selve bildevisningen av instruksjoner. Når `renderViewer()` kalles med aktuell state (inkl. prosjektets meta og nåværende steg) og et sett av callback-funksjoner, oppretter modulen et DOM-element som viser det gjeldende instruksjonsbildet og navigasjonskontroller rundt det. UI-strukturen inkluderer typisk en topplinje (f.eks. prosjektets navn eller en hjem/opp-knapp), selve bildeområdet (som skalerer bildet) og en bunnmeny med navigasjonsknapper. Bunnmenyen inneholder venstre/høyre pil for forrige/neste steg, en Opp-knapp for å gå tilbake ett nivå i hierarkiet, en visuell progresjonslinje som fylles opp ettersom man blar fremover, og en stegindikator som viser f.eks. "Steg 3 av 10". Modulen håndterer også spesialtilfeller: hvis steg-listen er tom (ingen bilder), vil den vise en melding (f.eks. "Instruksjoner kommer snart") og deaktivere pil-knapper. Alle interaksjoner (trykk på piler, opp-knapp, klikk på progresjonslinje) resulterer i at modulen anroper de tilhørende callbackene (`onPrevStep`, `onNextStep`, `onStepChange`, `onGoUp` etc.) som main.js har sendt inn. Main.js oppdaterer så state og hash, hvorpå routeren trigger en re-render med oppdatert state. Denne arkitekturen sikrer at view-viewer kun tar seg av det visuelle og ikke har logikk for hvordan navigasjon og state fungerer.
+
+### Teknisk sammendrag
+
+Teknisk er systemet svært lettvekts: alt skjer i brukerens nettleser, uten behov for noen serverlogikk eller database. Designvalg som hash-basert routing, localStorage for progresjon og fravær av rammeverk gjør at løsningen kan hostes hvor som helst (f.eks. GitHub Pages) og lastes raskt. Totalt sett gir den modulære arkitekturen en tydelig separasjon av ansvar som er lett å vedlikeholde og utvide. Nye funksjoner kan legges til ved å introdusere nye moduler eller utvide eksisterende, uten å blande logikk på tvers (f.eks. nye typer visninger skal lages som nye `view-*.js` filer iht. mønsteret). Dette legger et robust grunnlag for videre utvikling.
+
+## Dokumentasjonens nytte og mangler
+
+Dokumentasjonen som er vedlagt er omfattende og tydelig strukturert for å veilede en utvikler – eller i dette tilfellet en AI – gjennom implementeringen av systemet. Det mest positive er at dokumentene ser ut til å være spesielt tilpasset AI-assistert utvikling, med eksplisitte retningslinjer og steg-for-steg instruksjoner:
+
+### Struktur og veiledning
+
+En egen AI Guide oppsummerer prosjektet og peker til relevante underdokumenter for detaljer. Utvikleren instrueres til å starte med ROADMAP.md som inneholder en konkret implementasjonsplan med nummererte oppgaver i rekkefølge. Hver oppgave har et mål og referanser til hvor i dokumentasjonen man finner nødvendig info. For eksempel finnes det en oppgave 1.3.2 "Implementer view-project-grid.js" med klart mål ("rendre prosjektgalleri med cover-bilder og navn"). Slik brytes den totale utviklingen ned i små, håndterbare steg – noe som er ideelt for en AI som jobber iterativt. Roadmap-en oppfordrer også til å teste i nettleser underveis (merket med 🌐), noe som sikrer at AI-en (eller den som overvåker) verifiserer funksjonalitet kontinuerlig.
+
+### Omfattende referanse
+
+Dokumentasjonen dekker alle viktige aspekter i egne filer: arkitektur, implementasjonsdetaljer, CSS-retningslinjer, dataformat og en brukerorientert README. Dette gjør at når AI-en støter på et spesifikt spørsmål ("Hvordan sortere bilder? Hvordan bygge bilde-URL?") finnes det peker til riktig seksjon i dokumentene. For eksempel beskriver IMPLEMENTATION.md nøyaktige funksjonssignaturer (som `getImageUrl(path, imageName)`) og hvordan de skal brukes. Dette forhindrer gjetting og misforståelser. I CSS_GUIDELINES.md defineres klassenavn og BEM-konvensjoner, slik at AI-en vet akkurat hva elementer skal hete i CSS/HTML. Det advares eksplisitt mot å finne på egne varianter: "Bruk eksisterende mønstre, ikke finn opp egne". Slike klare regler hjelper en AI til å unngå typiske feil som inkonsistent navngiving.
+
+### Retningslinjer for AI
+
+Spesielt nyttig er at IMPLEMENTATION.md har en seksjon "Hvordan denne guiden skal brukes (for AI)". Her presiseres det at AI-en skal følge spesifiserte funksjonssignaturer og typedefs som fasit, bruke samme modulansvarsfordeling som beskrevet, og ikke innføre nye mønstre uten å oppdatere dokumentasjonen. Dette er gull verdt for AI-støttet arbeid, da det tvinger AI-en til å holde seg innenfor rammene. Videre oppfordres det til å heller spørre (f.eks. i en kommentar) hvis noe er usikkert, fremfor å gjette seg frem. Slike råd bidrar til at AI-en tar en konservativ og kommuniserende tilnærming.
+
+### Styrker ved dokumentasjonen
+
+Alt i alt gir dokumentasjonen et meget godt rammeverk for å implementere systemet korrekt. Den er skrevet på et relativt enkelt språk (norsk) med tydelige emoji-markeringer for viktige punkter (f.eks. ⚠️ for kritiske regler, 🎯 for prosjektmål). Strukturen med et overordnet README for konseptuell oversikt og underliggende guider for hvert område, gjør at man raskt finner fram. Eksempler på kodedesign (pseudokode og TypeScript-aktige typedefinisjoner) illustrerer hvordan ting er tenkt. Dessuten viser dokumentasjonen at forfatteren har tenkt gjennom skalerbarhet og vedlikehold, ved å inkludere retningslinjer for når og hvordan man bør refaktorere hvis filer blir for store. Dette er nyttig for en AI som kanskje genererer mye kode – det finnes rettesnorer for å holde koden ryddig over tid.
+
+### Manglende eller svake punkter
+
+Til tross for alt det positive er det noen områder dokumentasjonen ikke dekker utførlig, som kan være relevante for en AI-utvikler:
+
+#### Brukeropplevelse og målgruppe
+
+Dokumentasjonen sier lite om designprinsipper for målgruppen (barn 5–7 år). Fokus er på teknisk implementasjon. En AI som kun følger denne dokumentasjonen vil kunne bygge funksjonaliteten korrekt, men kan mangle veiledning på f.eks. hvordan UI bør utformes for små barn (størrelse på knapper, ikoner vs. tekst, fargevalg, osv.). Et eksempel er at prosjektgalleriet viser prosjektnavn i tekst, men det er ikke diskutert om barna faktisk kan lese disse. Her kunne dokumentasjonen med fordel nevnt retningslinjer for barnevennlig design (f.eks. "bruk enkle ikoner og minst mulig tekst"). Uten slik veiledning er det risiko for at AI-en lager et grensesnitt som teknisk fungerer, men som ikke er optimalt for de yngste brukerne.
+
+#### Tilgjengelighet (Accessibility)
+
+Relatert til ovennevnte nevnes ikke universell utforming eller tilrettelegging. For eksempel, alt-tekst på bilder (slik at synshemmede kan få bilder beskrevet) er ikke omtalt – riktignok er dette en byggeinstruksjon med tunge bilder der alt-tekst muligens er mindre relevant, men det kunne vært berørt. Også kontrastkrav for farger, størrelse på trykkflater, osv., er ikke beskrevet. En AI uten slik info kunne oversett viktige detaljer (f.eks. lage for små knapper eller lav kontrast).
+
+#### Testing og feilsøking
+
+Dokumentasjonen oppfordrer til testing underveis, men det finnes ikke mye om enhetstester eller automatisert testing. En AI kunne hatt nytte av noen enkle testtilfeller beskrevet i dokumentene for å verifisere logikken. For eksempel kunne ROADMAP.md inkludert kontrollspørsmål ("Etter steg 1.3.2, skal galleriet vise X prosjekter, ellers feil"). Slik eksplisitt forventningssjekk mangler, men er ikke kritisk.
+
+#### Ytrelse og optimalisering
+
+Førstegangs versjonens dokumentasjon nevner planlagte forbedringer som caching og preloading, men gir ikke konkret veiledning til AI-en om hvordan optimalisere bildeflyt. En AI kunne implementert akkurat det som står, men kanskje ikke tenke på å f.eks. laste neste bilde i bakgrunnen. Enkelte slike optimaliseringer måtte AI-en i dag ha kommet opp med selv (eller fått i oppdrag via roadmap senere).
+
+### Oppsummert
+
+Dokumentasjonen støtter en vellykket teknisk implementering svært godt, men den kunne vært supplert med mer om hvordan systemet skal oppleves av sluttbrukeren. Spesielt siden målgruppen er barnehage-/småskolebarn, ville et avsnitt om pedagogisk design og brukertesting med barn gitt AI-en bedre forutsetning for å ta de riktige designvalgene. Likevel – gitt dokumentets formål (implementasjonsguide) er det forståelig at disse aspektene ikke vies stor plass. En AI-utvikler med tilgang til generell kunnskap om UI/UX for barn bør kombinere den kunnskapen med denne dokumentasjonen for beste resultat.
+
+## Brukergrensesnitt for barn 5–7 år
+
+Systemet er tiltenkt barn i alderen 5–7 år, som ofte ikke kan lese flytende enda og som har begrenset erfaring med komplekse brukergrensesnitt. Dermed må løsningen utformes svært intuitivt og visuelt, slik at barna kan bruke den helt på egen hånd hjemme som forutsatt. Å vurdere dagens UI og funksjonalitet opp mot denne målgruppen avdekker noen potensielle barrierer for selvstendig bruk, samt muligheter for forbedringer.
+
+### Aller først
+
+Barn i alderen 5–7 tenker i stor grad i konkrete bilder og symboler fremfor abstrakt tekst. Ifølge utviklingspsykologi (Piaget) er yngre barn (rundt 3–5 år) i en fase der de forstår verden gjennom ikoner og fysiske handlinger langt mer enn skriftlig språk. De er også mer komfortable med touch-skjermer enn mus/keyboard og har begrenset finmotorikk, noe som krever enkle, store interaktive elementer. Med dette i bakhodet, la oss se på grensesnittet:
+
+### Barrièrer for selvstendig bruk
+
+Nedenfor er identifiserte problemområder for små barn, basert på dagens design, og forslag til hvordan disse kan utbedres:
+
+| Potensiell barrière i UI | Forslag til forbedring |
+|-------------------------|------------------------|
+| **Tekstbaserte elementer**: Flere viktige UI-elementer krever leseferdighet. Eksempelvis vises prosjektnavnene som tekst under hvert cover-bilde i galleriet. I selve instruksjonsvisningen vises en tekst som "Steg X av N" for å indikere posisjon. Også "Opp"-knappen kan være merket med ordet "Opp". Små barn kan ikke lese disse ordene eller tolke tall-/tekstformatet "X av N" uten hjelp. | **Bruk ikoner og tall i stedet for tekst**: Bytt ut eller supplér tekst med lettforståelige symboler. Prosjektene i galleriet kan representeres utelukkende ved cover-bildet – navnet i tekst er ofte overflødig for et barn som uansett gjenkjenner bildet av modellen. For navigasjonsknapper, bruk intuitive ikoner: f.eks. et hus-ikon for hjem/oversikt (i stedet for ordet "Opp"), og piler for neste/forrige. Steg-indikatoren kan vises som tall alene (f.eks. "3/10") eller som en serie punkt/brikker som fylles opp, i stedet for "Steg 3 av 10" skrevet ut. Barn forstår enkle tall og mengder visuelt, selv om de ikke leser ordet "steg". Generelt bør grensesnittet ha mer bilder, mindre tekst – selv tekstetiketter under ikoner har begrenset nytte for en 5-åring. |
+| **Små eller tettpakkede knapper**: Dersom navigasjonsknapper eller klikkbare områder er for små eller for nær hverandre, vil barn slite med å treffe riktig. Dokumentasjonen beskriver f.eks. piler og en progresjonslinje i bunnfeltet, men spesifiserer ikke størrelse. En femåring har mindre presisjonskontroll, og kan lett trykke feil hvis elementene er små eller sitter tett. | **Større trykkflater og avstand**: Design knappene store, fargerike og tydelige. Forskning anbefaler ca 2 cm x 2 cm som minimum størrelse på touch-knapper for små barn (mot ca 1x1 cm for voksne). Piler og andre kontrollknapper bør derfor oppta en relativt stor del av skjermen (f.eks. kunne neste/forrige-pilene dekke hjørnene eller sidene i viewer-vinduet). Sørg også for god luft mellom interaktive elementer, slik at det ikke er tvil om hvor man trykker. For eksempel kan venstre/høyre pil plasseres i hvert sitt hjørne nederst, mens Opp/hjem-knappen ligger i et hjørne øverst – da er de adskilt. Et grensesnitt som YouTube Kids illustrerer dette ved at knappene er mye større og mer spredt enn i vanlig YouTube. |
+| **Avanserte handlinger (drag/scroll)**: Progresjonslinjen kan dras og klikkes for å hoppe til et steg. Denne funksjonen kan være for avansert for 5–6-åringer. Dragging krever motorikk og forståelse av konseptet timeline. Barn kan også utilsiktet komme borti linjen og hoppe langt frem/bak uten å forstå hva som skjedde. | **Enklere navigasjonskontroll**: Behold progresjonslinjen som visuell indikator, men ikke legg opp til at barn må bruke den. Pilene er den primære navigasjonsmetoden og bør presenteres som det enkleste valget. Man kan vurdere å deaktivere dragging av progresjonslinjen i en evt. "barnemodus", eller legge inn en forsinkelse/bekreftelse (f.eks. at man må holde inne et ikon for å aktivere hopp). Alternativt kan et trykk på progresjonslinjen hoppe på en mer forutsigbar måte (f.eks. ett segment frem/tilbake). Dersom hopping skal støttes, kunne man heller implementere en oversikt med små forhåndsvisningsbilder (thumbnails) av stegene som barn kan peke på – det er mer konkret enn å dra en abstrakt slider. |
+| **Manglende tilbakemelding**: Barn trenger umiddelbar respons når de gjør noe, ellers blir de forvirret eller utålmodige. I dagens beskrivelse er det ikke nevnt noen tilbakemelding annet enn at bildet byttes når man trykker pil. For et barn kan det være vanskelig å vite om klikket ble registrert hvis det ikke skjer noe synlig eller hørbart med en gang. | **Umiddelbar visuell/lyd respons**: Gi tydelig feedback ved brukerhandlinger. For eksempel, når barnet trykker Neste-knappen, kan knappen blinke eller animere kort, og kanskje en liten "klikk"-lyd spilles av. Dette forsterker at "nå bladde du frem et steg". På siste steg kan appen spille en liten fanfare eller vise konfetti på skjermen som belønning, slik at barnet forstår at modellen er ferdig bygget og får en følelse av mestring. Slike direkte tilbakemeldinger holder på oppmerksomheten og gjør opplevelsen mer engasjerende for de små. |
+| **Hierarkisk navigasjon og kontekst**: Konseptet med underprosjekter og det å gå "opp et nivå" kan være abstrakt for barn. De kan bli usikre på hvor "Opp"-knappen tar dem (til forskjell fra f.eks. en Home-knapp). Hvis et prosjekt har flere nivåer, forstår barnet at de bytter mellom deler? Det er mulig de trenger hjelp første gang for å skjønne strukturen. | **Klarere navigasjonsikoner og muligens forenkling**: Bruk et hjem-hus ikon for å indikere retur til hovedmenyen, da selv små barn forstår symbolet for hjem. Om det er flere hierarki-nivåer, kan en breadcrumb-lignende visning vurderes (små ikoner som viser hvor man er – f.eks. et lite hus for hovedmeny > et lite ikon av nåværende prosjekt). Det kan også vurderes å begrense hierarkidybden for å unngå forvirring; i praksis vil nok de fleste barna navigere hovedprosjekt ↔ underprosjekt, og sjelden mer enn ett nivå ned. Ensikre også at knappene for å navigere opp/ut er visuelt konsekvente og alltid på samme sted (f.eks. øverst til venstre), så barnet etter hvert skjønner intuitivt hvor de trykker for å komme tilbake. |
+
+Som tabellen over oppsummerer, koker det ned til to hovedprinsipper: gjøre grensesnittet så enkelt og visuelt som mulig, og gi brukeren kontroll uten behov for å lese. Ikoner, farger, lyd og store flater må erstatte tekst, små knapper og avanserte gester. På denne måten fjernes hinderne som kan kreve voksnes hjelp.
+
+I tillegg kan det være lurt å inkludere en kort intro for barna første gang de bruker appen – f.eks. at appen visuelt peker på "trykk her for neste bilde" med en animasjonspil, eller har en egen oppstartsillustrasjon som forteller (gjerne med en stemme eller figur) hvordan man bruker det. Slik in-app veiledning kan hjelpe barn til å bli selvhjulpne raskere.
+
+## Egnethet av struktur og skalerbarhet
+
+Prosjektets struktur og teknologi-valg virker svært godt tilpasset det tiltenkte bruksområdet, og det har også rom for skalerbarhet i flere dimensjoner.
+
+### Passer for hjemmebruk
+
+Løsningen er laget for å kunne kjøres uten spesielle oppsett – alt ligger som statiske filer som kan åpnes i en nettleser. Dette betyr at en familie kan hoste det på en enkel måte (f.eks. via GitHub Pages eller ved å åpne en lokal server) uten å måtte installere programvare eller ha en kraftig enhet. Fraværet av eksterne biblioteker gjør at siden laster raskt selv på eldre nettbrett, noe som er positivt når barn utålmodig vil i gang. At ingen ting trenger serverkommunikasjon under bruk (hele appen kjører i nettleseren) betyr også at man er robust mot nettverksproblemer – en gang lastet, vil siden fortsette å fungere selv om WiFi skulle dette ut. Dette er viktig i et hjemmemiljø hvor man kanskje ikke alltid har stabil nett-tilgang.
+
+### LocalStorage for progresjon
+
+Valget om å lagre fremdrift lokalt hos brukeren er enkelt men smart. For scenarioet (et barn som bygger litt hver dag, eller flere søsken som bytter på), er det nyttig at appen husker hvor man var. LocalStorage gir dette uten noe som helst backend eller innlogging, og fungerer også i offline-situasjoner. En begrensning er at progresjon ikke synkroniseres på tvers av enheter – hvis barnet bytter fra nettbrett til en PC, må de manuelt finne igjen steget. Men i praksis vil nok en bruker holde seg til én primærenhet når de bygger en modell. Lagringen er per browser-profil, så flere barn på samme enhet vil overskrive hverandres progresjon på et gitt prosjekt – men de kan løse det ved å bruke forskjellige prosjekter eller ved å ha forskjellige nettleserprofiler. For hjemmebruk er dette tilstrekkelig; behov for flerbrukerhåndtering anses ikke som kritisk.
+
+### Hierarkisk data og skalering av innhold
+
+Systemet støtter at man kan legge til ganske komplekse prosjektstrukturer med underprosjekter og mange steg. Dataformatet (`projects.json` og `meta.json` per prosjekt) gjør at selv om antallet prosjekter vokser, trenger ikke appen å laste alt samtidig – den laster prosjektlisten først, og detaljer først når man går inn i et prosjekt. Dette er effektivt. Om en familie skulle legge inn f.eks. 50 forskjellige byggeprosjekter, vil galleri-visningen vise 50 cover-bilder (som kan lastes med lazy-loading hvis nødvendig). Klikker man et prosjekt med hundrevis av steg, vil `meta.json` for dette inneholde en liste over bilde-filer, men selve bildene kan lastes ett og ett eller i mindre batcher. Dette betyr at skaleringen i antall prosjekter og steg stort sett håndteres greit med dagens arkitektur. Et potensielt ytelseproblem kan være hvis et enkelt prosjekt inneholder meget mange steg (f.eks. 500+ bilder), da kan det ta litt tid å laste `meta.json` og eventuelt oppdatere UI med progresjonslinje etc. Men siden bildene ikke legges inn i DOM samtidig – bare ett vises av gangen – er minnefotavtrykket lavt. Ytelsesforbedringer som caching og preloading er allerede tenkt på som "Planlagte funksjoner" i dokumentasjonen, noe som vitner om at arkitekturen er ment å kunne utvides for å takle mer innhold og bruk.
+
+### Kodearkitektur og vedlikehold
+
+Strukturmessig er koden delt i moduler med klart avgrenset ansvar, noe som er veldig bra for skalerbarhet i form av å legge til nye funksjoner. For eksempel, om man senere vil legge til en ny visning (si en "søkefunksjon" eller en "delingsside"), kan dette sannsynligvis gjøres ved å lage nye view- og datamoduler uten å forstyrre eksisterende logikk. At routeren er hash-basert gir også mulighet for nye rutetyper enkelt (man kunne f.eks. definere `/#/search?q=hus` for å søke etter prosjekter med "hus"). Mangelen på rammeverk betyr at utviklere har full kontroll, men det krever også disiplin når appen vokser. Heldigvis sørger dokumentasjonens retningslinjer for at man holder seg til et konsistent mønster, og den diskuterer til og med når det er på tide å splitte opp store filer. Dette lover godt for vedlikehold: man har et kompass å navigere etter dersom kompleksiteten øker.
+
+### Skalerbarhet – oppsummering
+
+For det tiltenkte bruksscenariet (lek og bygging hjemme) er løsningen per i dag velbalansert. Den bruker enkle teknologier som er lette å skalere opp i omfang (flere prosjekter, flere brukere) uten kapasitetsproblemer, så lenge det dreier seg om et tosifret antall prosjekter og noen hundre bilder totalt. Skulle prosjektet vokse utover dette – f.eks. en hel nettside der mange brukere laster ned og legger inn sine modeller – ville man kanskje ønske seg et mer robust backend-system for deling. Men det er utenfor scope; her er poenget at for personlig/familiebruk skalerer systemet fint. En mulig utfordring ved stor skala kunne vært organisering av svært mange prosjekter (da ville man trenge kategorier, søk, etc.), men pr. nå er hierarkiet fleksibelt nok til å organisere prosjekter i mapper. Takket være JSON-formatet kan man strukturere ting logisk, og oppdatere filer manuelt for å legge til nye innhold, noe en litt datakyndig voksen kan gjøre.
+
+Kort sagt: Arkitekturen passer formålet og gir en god base for både å bruke systemet hjemme og bygge videre på det over tid.
+
+## Forslag til forbedringer
+
+Basert på analysen over og tanke på beste praksis, kommer her noen konkrete forslag til forbedringer eller tilleggsfunksjonalitet. Disse er delt i to kategorier: tekniske forbedringer (koden og systemet under panseret) og forbedringer i brukeropplevelsen (UI/UX), selv om det er noe overlapp mellom dem.
+
+### Tekniske forbedringer
+
+#### Forhåndslasting av bilder
+
+Implementer lazy loading og prefetching for instruksjonsbilder. Når brukeren er på steg n, kan appen i bakgrunnen laste steg n+1 (og kanskje n+2) proaktivt. Da oppleves bladingen glattere, uten lastetid per bilde. Tilsvarende kan første bilde lastes med én gang et prosjekt åpnes, mens resten av bildene lastes sekvensielt eller i grupper. Dette er foreslått som del av planlagte funksjoner (preloading og caching) og bør prioriteres for bedre ytelse.
+
+#### Indikator ved lasting
+
+Dersom et bilde tar mer enn et øyeblikk å laste (f.eks. ved treg nettforbindelse eller stort bilde), bør UI vise en enkel loading-spinner eller en "Laster..."-ikon. Siden barn er utålmodige, kan en morsom animasjon (for eksempel en LEGO-kloss som spretter) gjøre ventetiden mer tolerabel. Dokumentasjonen nevner loading-indikatorer som en planlagt funksjon, noe vi støtter å implementere.
+
+#### Progressiv Web App (PWA)
+
+Gjør nettstedet om til en PWA slik at det kan installeres som en app på nettbrett/mobil og fungere helt offline. Dette krever et manifest og en service worker for caching. Fordelen er at barna (eller foreldre) kan åpne instruksjonene via en app-ikon, og alle nødvendige filer (HTML, CSS, JS og bilder) kan lagres lokalt for rask gjentatt bruk. Et slikt offline-cache vil komplementere dagens design og er spesielt nyttig hvis man tar med nettbrettet til et sted uten internett. Teknisk er det gjennomførbart siden alt innhold er statisk.
+
+#### Støtte for QR-koder og deling
+
+Allerede planlagt er funksjonalitet for å generere QR-koder for å dele et spesifikt steg. Dette vil være en morsom og nyttig funksjon – f.eks. kan man printe ut en QR-kode og klistre den på en fysisk modell, slik at andre kan skanne den og få opp akkurat det steget i byggingen. Implementasjon av dette vil kreve å bruke en QR-bibliotek (client-side JS) som genererer en kode basert på current URL (hash). Teknisk sett rett frem, og et pluss for brukere. Sørg for at UI for dette er enkelt (kanskje et lite QR-ikon som voksen kan trykke på; man kan vurdere å skjule det i en "voksen-modus" så ikke barnet trykker det ved et uhell).
+
+#### Forbedret feilhandtering og diagnostikk
+
+Inkluder brukerfeedback hvis data mangler. Per i dag håndteres manglende filer ved `console.error` i data-loader. For en sluttbruker (forelder) som har lagt til egne bilder, kunne applikasjonen gi et vennlig hint i UI, f.eks. "Oi, fant ikke filen X.png – sjekk navn og forsøk igjen." Dette krever litt UI arbeid, men kan spare frustrasjon når man utvider med egne prosjekter.
+
+#### Skaleringsfunksjon for bilder
+
+En mulig teknisk/UX hybrid-forbedring: Legg til mulighet for å zoome inn på et bilde. Selv om løsningen unngår scrolling ved å tilpasse bildet skjermen (contain), kan detaljer i LEGO-instruksjoner noen ganger være små. Å la brukeren pinch-zoome (på touch) eller klikke for å forstørre bildet i en modal kan hjelpe ved kompliserte steg. Teknisk sett kan dette gjøres ved å aktivere CSS transform på bildet ved gesture events, eller bare tilby en "Fullskjerm"-knapp som viser bildet i høyere oppløsning. Viktig er å begrense det slik at barnet ikke kommer ut av fatning – f.eks. en tilbakestill zoom knapp/gesture bør finnes.
+
+#### Tilpasning for flere språk
+
+Selv om appen primært er ikonbasert for barna, finnes det noen tekstelementer (f.eks. "Steg X av N", eller eventuelle feilmeldinger). For å gjøre det enklere for foreldre som ikke leser norsk, kan man abstrahere tekst til en språkfil. Da kan man enkelt oversette UI-ord (f.eks. "Opp", "Steg", "av") til engelsk, tysk etc. Dette vil øke anvendeligheten internasjonalt. Tekniske grep for dette er enkle (en JSON for språkstrenger og en funksjon `t(key)` for å hente teksten). Alternativt kan man fjerne behovet for oversettelse ved å som sagt bruke symboler i stedet for ord.
+
+### Forbedringer i brukeropplevelsen
+
+#### Enklere startside for barn
+
+Gjør forsiden (prosjektgalleriet) så enkel som mulig å forstå. For eksempel, fremfor å vise en kompleks layout, kan man presentere hvert prosjekt som et stort, fargerikt ikon/bilde. Kanskje legge til en morsom tittel over, som "Velg hva du vil bygge:" med store bokstaver og evt. en LEGO-mann-figur ved siden (dog tekst er mest for voksne – en talemelding eller animasjon av en figur som peker på første prosjektikon kunne fungere). Poenget er å umiddelbart signalisere hva man skal gjøre: trykke på et bilde for å starte.
+
+#### Visuell fremdrift i galleri
+
+I galleriet kunne hvert prosjektikon indikere fremdrift på en barnevennlig måte, slik at barnet ser hvilke modeller de har bygget ferdig eller hvor de har noe igjen. F.eks. ved å legge en halvtransparent overlay på cover-bildet: en grønn checkmark for ferdig bygget, eller en liten progress-bar under bildet. Dette kan motivere barnet ("den har jeg bygget, den har jeg igjen"). Men utformingen må være intuitiv – kanskje en fylt sirkel eller stjerne som går fra tom til full farge basert på % fullført. (Man må vurdere om barn forstår prosent; en helfarget stjerne kan bety "ferdig".)
+
+#### Tilpasset belønning ved fullføring
+
+Når et prosjekt er 100% fullført (alle steg gjennomgått), kan appen gjøre noe spesielt for barnet. For eksempel: en skjerm som sier "Gratulerer!" med konfetti og en stor gullmedalje-ikon, eller låse opp et digitalt klistremerke/badge i en liten samling. Dette gir mestringsfølelse. Slike belønninger bør være enkle og uten tekst, f.eks. en animert figur som danser eller en fanfare. Dette er støttet av UX-forskning som anbefaler å feire barns prestasjoner for å holde motivasjonen oppe.
+
+#### Lydstøtte og narrativ
+
+Å integrere lyd kan betydelig øke et barns forståelse og engasjement. Dette kan gjøres på flere måter:
+
+- **Lydinstruksjoner**: Ha en knapp (med et høyttaler-ikon) som når den trykkes, leser opp instruksen eller navnet på modellen. For eksempel kunne en stemme si "Bygg huset vårt – steg 3". Dette krever at prosjektnavn og tall kan mapper til tale. Alternativt kan man kun lese tall ("tre av ti") kombinert med en enkel frase ("neste steg"). Selv om LEGO-instruksjoner normalt er språkuavhengige, kan slike hint være fine.
+
+- **Feedback-lyder**: Som nevnt i barrierene: korte, ikke-skremmende lydeffekter ved interaksjon (klikk, blad, tilbake). Sørg for at lydene er milde og gjerne valgfrie (kanskje et lyd-av/på toggle et sted, da noen foreldre foretrekker stille apper).
+
+- **Bakgrunnsmusikk**: Man kan vurdere rolig bakgrunnsmusikk eller lydlandskap for å holde barnets interesse. Men dette må isåfall kunne slås av og ikke være forstyrrende for konsentrasjonen ved bygging.
+
+#### Gesture-baserte kontroller
+
+Barn som bruker nettbrett er ofte vant til gestures (f.eks. swipe). For å gjøre appen mer naturlig kan man implementere at swipe venstre/høyre på instruksjonsbildet også blar til neste/forrige steg (i tillegg til pilknappene). Mange barn prøver intuitivt å sveipe bilder, siden det ligner bildegalleri-adferd. Dette vil gjøre navigeringen enda mer direkte for dem. Man må likevel beholde pilene synlige som affordance, men la begge metoder fungere.
+
+#### Visuell design med tema
+
+Siden dette handler om LEGO, kunne grensesnittet gjenspeile LEGO-tema mer. For eksempel bruke klassiske LEGO-farger (rød, blå, gul, grønn) i bakgrunner og knapper, og kanskje en stilisert LEGO-knopp eller figur som dekor. En idé er å ha en maskot (en minifigur) som viser seg ved viktige hendelser (f.eks. vinker når du åpner en ny instruksjon, eller gir tommel opp ved fullføring). Dette skaper en leken atmosfære som passer målgruppen. Det er viktig å bruke sterke kontrastfarger og tydelige former, fordi barn tiltrekkes av dette og det hjelper dem å fokusere på interaktive elementer.
+
+#### Forenkle hierarki i UI
+
+Hvis underprosjekter er et avansert konsept, kan man i stedet presentere dem litt annerledes. For eksempel, når man åpner et prosjekt med underprosjekter, kunne appen forklare visuelt: vise hovedprosjektet som et stort bilde og underprosjektene som mindre ikoner under, nesten som en meny med bilder. Barnet trykker da direkte på underdelene. Dette i stedet for at de skal navigere opp/ned flere nivåer – alt vises på en side som valg. Dette er en design-endring som kan testes, men tanken er å flattrykke hierarkiet litt mer i grensesnittet, selv om strukturen i data er hierarkisk.
+
+### Oppsummert
+
+Alle UX-forbedringer bør ha stikkordene: enkelt, stort, fargerikt, direkte og morsomt. Ved å iterere på designet med faktiske barn (brukertesting) kan man avdekke hva de forstår og ikke. Kanskje man finner ut at et visst ikon ikke ga mening og bytter det ut med et mer bokstavelig symbol (f.eks. bytte ut et abstrakt pil opp-symbol med et hus-symbol for "til hovedmeny", siden barn skjønner huset bedre). Små justeringer der barnas perspektiv tas med vil gjøre systemet enda mer selvforklarende.
+
+## Forslag til visuell design for målgruppen
+
+Til slutt presenteres et helhetlig forslag til visuell utforming som vil appellere til barn i 5–7 års alderen, samtidig som det ivaretar brukervennlighet på touch-skjermer:
+
+### Farger og tema
+
+Bruk en lys og glad fargepalett med høy kontrast. For eksempel kan bakgrunn være lys blå eller lys grå (nøytral, for ikke å stjele fokus fra instruksjonsbildene), mens interaktive elementer som knapper er i primærfargene rød, gul, grønn eller blå – disse fargene er både i LEGO-klosser og intuitive for barn. Unngå mørke eller grumsete farger. Store flater kan ha en subtil mønster av LEGO-knopper eller klosser for å gi identitet, men ikke så mye at det distraherer.
+
+### Ikoner og symboler
+
+Bytt ut tekstlige labels helt med ikoner som barn kjenner igjen. Hjem-knapp: et hus-ikon. Tilbake/opp: en pil som peker mot venstre (universelt "tilbake"-symbol) plassert øverst på siden. Neste/forrige steg: store, fyldige piler (▶️◀️) på hver side av skjermen. For ekstra tydelighet kan pilene være inne i sirkler eller firkanter i kontrastfarge. Progresjon: vis som en horisontal rekke med små ikoner (f.eks. små firkanter eller stjerner) nederst som fylles når man blar – eller en enkel progress-bar med sterk farge. Unngå kompliserte symboler som ikke gir mening for barn (f.eks. en tannhjul ⚙️ for innstillinger gir lite mening – om innstillinger finnes, bruk en enkel figur eller tekst som voksne får ta seg av i et skjult menyhjørne). Når man vurderer ikoner, test dem: et ikon som gir mening for en voksen (f.eks. et kompass for "utforsk") kan være uforståelig for en 5-åring, så heller bruk noe mer konkret (f.eks. piler i forskjellige retninger kan bedre signalisere "utforsk" enn et kompass). Alle ikoner bør ha tilstrekkelig størrelse og gjerne en tydelig ramme eller bakgrunnsfarge slik at de skiller seg ut fra bildene bak.
+
+### Typografi (minimalt)
+
+Ideelt sett skal appen kunne brukes uten å lese, men enkelte steder kan tekst for voksne dukke opp (f.eks. tittel på siden, eller feilmeldinger). Bruk da en stor, lettlest font som også ser vennlig ut – f.eks. en rund sans-serif font. Unngå lange setninger, hold det til maks et par ord. For barna kan man bruke tall (stegnummer) i stor fontstørrelse hvis nødvendig, og kanskje kombinere tallet med en liten ikon (f.eks. et lite bilde av klosser) for å symbolisere "steg". Tekst kontrast skal følge retningslinjer (mørk tekst på lys bakgrunn eller omvendt) for å være tydelig.
+
+### Layout og interaksjonsflater
+
+Designen må være touch-vennlig. Dette betyr store knapper (minst 7-10mm i faktisk størrelse på enhet, ca 2cm på skjermen for å kompensere for små fingre) med god avstand. Vi foreslår at navigasjonsknappene (pilene) er halvtransparente over bildets venstre/høyre side, hver dekket kanskje 15-20% av bredden – da kan barnet bare trykke et sted på venstre halvdel for tilbake eller høyre halvdel for neste, noe som er enklere enn å måtte treffe en liten pil. (Dette kan kombineres med synlige pil-ikoner som indikasjon.) Opp/hjem-knappen kan ligge trygt oppe i venstre hjørne – typisk er det et område barn av og til kommer borti, men det kan gjøres litt mindre iøynefallende enn pilene så de ikke klikker det ved et uhell hele tiden. Videre bør elementer som progresjonslinjen være høyere enn vanlig (slik at det er lett å trykke på den dersom man skal det) og gjerne reagere også på tap (ikke bare drag).
+
+### Illustrasjoner og figurer
+
+Barn responderer positivt på kjente figurer og små overraskelser. Man kan inkludere en LEGO minifigur maskot som guider brukeren. For eksempel en tegneseriefigur (fra LEGO-universet, eller en generisk byggmester-karakter) som dukker opp på forsiden og kanskje sier hei. Denne figuren kan også vises i en hjelpseksjon, eller holde en pekeboble som viser hva du skal gjøre ("Trykk på et bilde for å starte"). Siden vi ønsker minimal tekst, kan figuren i stedet formidle med gest eller animerte bevegelser – f.eks. peke mot galleriikonene. Slike små innslag gjør appen mer personlig og morsom uten å kreve lesing.
+
+### Animasjoner
+
+Bruk enkle animasjoner for å skape en følelse av liv. Eksempler: Når man blar til neste steg, la bildet fade ut/in eller gli til side som om man blar en side. Dette er intuitive overganger som hjelper barnet å forstå at vi gikk videre, ikke at bildet bare magisk endret seg. Navigasjonsknapper kan pulse (lett forstørre/minske) for å dra oppmerksomhet når de første gang vises, slik at barnet legger merke til dem. Interaktive ikoner kan ha en hover/trykk-effekt (for touch kan det være at de lyser opp kort når trykket registreres). Pass på at animasjonene er korte og ikke hindrer rask bruk – de skal støtte forståelsen, ikke skape venting.
+
+### Lyd og haptikk
+
+Som delvis nevnt tidligere, integrer lyd feedback. For visuell design betyr dette at man må ha ikoner for lyd av/på et sted hvis det er aktuelt (kanskje i et hjørne for foreldre). Men mer sentralt: design med tanke på at det kommer lyd. F.eks. kan en knappikon av en høyttaler plasseres ved siden av step-indikatoren eller som en del av toppfeltet, slik at barnet vet at her kan de få noe opplest eller en hint (om man legger til fortellerstemme). Når det gjelder haptikk: på nettbrett kan trykk trigge en liten vibrasjon som bekreftelse – dette styres av OS, men appen kan be om det på mobile enheter ved user gesture. En liten vibrasjon sammen med en klikklyd gir veldig tydelig signal på en handling. Designmessig trenger man ikke vise noe for haptikk, men man må teste at knappene ikke er for små til at OS-et registrerer det som en knapp for haptisk feedback (derfor store flater).
+
+### Tilpasset barns motorikk
+
+Unngå krav om presisjon. For eksempel, istedenfor en liten scrollbar eller tiny close-knapp, bruk sveip for å lukke modaler eller store "X"-ikoner. Hvis det er noen skjerm med flere valg (for eksempel en dialog), sørg for at de er store og tydelige – eventuelt unngå modale dialoger helt for barn, og heller gjøre handlinger reversible uten bekreftelse (f.eks. i stedet for "Er du sikker på at du vil til hovedmenyen?" kan man heller la dem gå til hovedmeny og så kunne gå tilbake igjen hvis det var feil, siden confirm-dialog med tekst uansett ikke leses av barnet).
+
+### Oppsummering
+
+Ved å følge disse prinsippene vil det resulterende designet være fargerikt, enkelt og engasjerende – akkurat det barn i 5–7-årsalderen trenger. Figurativt sett: Tenk deg at appen ser ut som en side fra en barnebok eller en LEGO Juniors instruksjonsbok, heller enn en teknisk applikasjon. Store ikoner, glade farger, og en tydelig vei for hva man skal gjøre videre til enhver tid. Da vil selv en femåring kunne sette seg ned med nettbrettet og bygge LEGO-modellen sin ved hjelp av denne appen, helt uten hjelp, mens foreldrene kan følge med fra sidelinja og høre barnets begeistring over å selv klare å følge instruksjonene.
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+docs\ARCHITECTURE.md
+File type: .md
+# Arkitektur
+
+Dette dokumentet beskriver den tekniske arkitekturen til LEGO Instruksjonsvisning-prosjektet.
+
+## TL;DR - Mental modell
+
+Applikasjonen består grovt av:
+- **Router** som tolker URL-en
+- **Data-lag** som henter JSON og lagrer progresjon
+- **Views** som bygger DOM-en for galleri og viewer
+- **main.js** som kobler alt sammen
+
+For brukerinformasjon og hvordan du legger til prosjekter, se [README.md](./README.md). Dette dokumentet fokuserer på den tekniske implementasjonen.
+
+## Arkitekturoversikt
+
+Prosjektet er bygget som en modulær, komponentbasert applikasjon med ren JavaScript. Arkitekturen følger en enkel MVC-lignende struktur hvor:
+
+- **Model/Data**: `data-loader.js` og `state.js` håndterer datalagring og state
+- **View**: `view-project-grid.js` og `view-viewer.js` håndterer UI-rendering
+- **Controller**: `main.js` og `router.js` koordinerer navigasjon og state-oppdateringer
+
+### Hovedprinsipper
+
+- **Statisk hosting**: Ingen server-side kode, alt kjøres i nettleseren
+- **Ingen dependencies**: Ren HTML, CSS og JavaScript uten eksterne biblioteker
+- **Modulær struktur**: Hver fil har et klart ansvar
+- **Hash-basert routing**: URL-struktur via hash-fragmenter for enkel hosting
+- **localStorage**: Klient-side lagring av progresjon
+
+## Komponentoversikt
+
+### main.js
+**Rolle**: Hovedkoordinator og applikasjonens entry point
+
+**Ansvar**:
+- Initialiserer router og state
+- Koordinerer mellom routing, data-loading og view-rendering
+- Håndterer applikasjonslivssyklus
+- Kaller riktig view basert på rute
+
+**Viktige funksjoner**:
+- `init()` - Initialiserer applikasjonen
+- `handleRoute(route)` - Håndterer ruteendringer og koordinerer rendering
+
+**Viktig**: main.js gjør **ikke** egen DOM-rendering. Den importerer og kaller `renderProjectGrid()` og `renderViewer()` fra view-modulene.
+
+### router.js
+**Rolle**: Hash-basert routing og URL-parsing
+
+**Ansvar**:
+- Lytter på `hashchange`-events
+- Parser hash-fragmenter til Route-objekter
+- Validerer og normaliserer URL-struktur
+- Triggerer ruteendringer
+
+**Route-typer**:
+
+> **Merk**: Typedefinisjonene under er skrevet i TypeScript-lignende pseudokode for å beskrive struktur, selv om prosjektet bruker vanlig JavaScript.
+
+```javascript
+type Route =
+  | { type: "root" }
+  | { type: "project"; path: string; stepIndex?: number };
+```
+
+**URL-eksempler**:
+- `/#/` → `{ type: "root" }`
+- `/#/p/project1` → `{ type: "project", path: "project1" }`
+- `/#/p/project1?step=3` → `{ type: "project", path: "project1", stepIndex: 3 }`
+
+### state.js
+**Rolle**: Tilstandshåndtering (state management) og localStorage-integrasjon
+
+**Ansvar**:
+- Holder `AppState` i minne
+- Synkroniserer med localStorage
+- Håndterer progresjonslagring per prosjektpath
+- Gir getters/setters for state
+
+**AppState (minne)**:
+
+> **Merk**: Typedefinisjonene under er skrevet i TypeScript-lignende pseudokode for å beskrive struktur, selv om prosjektet bruker vanlig JavaScript.
+
+`AppState` brukes i minne for å beskrive hva som vises nå:
+
+```javascript
+type AppState = {
+  currentPath: string | null;      // f.eks. "project1" eller "project1/subproject-a"
+  currentStepIndex: number;        // 0-basert indeks
+  currentProjectMeta: ProjectMeta | null;
+};
+```
+
+**Progresjonskart (localStorage)**:
+
+Progresjon lagres separat som et kart i localStorage, med struktur:
+
+```javascript
+{
+  "project1": 5,
+  "project1/subproject-a": 2
+}
+```
+
+Dette er ikke en del av `AppState`, men et separat objekt som lagrer siste steg per prosjektpath.
+
+**Viktige funksjoner**:
+- `loadProgress()` - Henter all lagret progresjon
+- `saveProgress(map)` - Lagrer progresjon
+- `getLastStepFor(path)` - Henter siste steg for en path
+- `setStepFor(path, index)` - Setter steg for en path
+
+### data-loader.js
+**Rolle**: Datahenting fra JSON-filer
+
+**Ansvar**:
+- Henter `meta.json` for prosjekter/underprosjekter
+- Henter `projects.json` for toppnivåliste
+- Håndterer async loading
+- Gir feilhåndtering for manglende filer
+
+**Viktige funksjoner**:
+- `loadProjectMeta(path)` - Henter meta.json for en path
+- `loadProjects()` - Henter projects.json
+- `getImageUrl(path, imageName)` - Bygger URL til bilder
+
+**Base URL**: `/projects/`
+
+### view-project-grid.js
+**Rolle**: Prosjektgalleri-view
+
+**Ansvar**:
+- Renderer grid/liste over prosjekter
+- Viser cover-bilder og navn
+- Håndterer klikk på prosjekter
+- Viser progresjonsindikator (hvis implementert)
+- Kan presentere underprosjekter inline (flatt galleri) før man navigerer videre, slik at barn slipper å forstå “opp ett nivå”
+
+**DOM-struktur**:
+- Container med grid-layout
+- Prosjekt-tiles med cover-bilde og navn
+- Event listeners for navigasjon
+
+### view-viewer.js
+**Rolle**: Instruksjonsviewer-view
+
+**Ansvar**:
+- Renderer instruksjonsbilde
+- Initierer navigasjons-callbacks (main.js oppdaterer state/URL)
+- Viser progresjonslinje
+- Håndterer "opp"-knapp for hierarkisk navigasjon
+- Håndterer tom steps-array (viser melding og deaktiverer kontroller)
+- Sørger for at bildet fyller mest mulig av viewporten uten scroll og at nettleser-zoom fungerer
+- Eksponerer ikon- og barnevennlige kontroller (store tap-targets, tydelig feedback)
+- Viser vennlig loading-indikator (f.eks. LEGO-kloss-animajson) mens neste bilde lastes
+- Feirer ferdigstillelse (konfetti/lyd) og markerer progresjon når siste steg fullføres
+- Tilbyr lyd/haptikk-bryter og eventuelt steg-vis lydhint når `audioSteps` er definert
+
+**DOM-struktur**:
+- Header (valgfritt)
+- Image container (flex, fyller plass)
+- Bottom bar med:
+  - Tilbake-knapp
+  - Venstre/høyre-piler
+  - Progresjonslinje
+  - Steg-indikator ("Steg X av N")
+
+**CSS-prinsipper**:
+- Ingen scroll på image container
+- Bildet skal `object-fit: contain` for å tilpasse skjermen
+- Responsivt design for mobil/nettbrett/PC
+
+## Dataflyt
+
+### Applikasjonsstart
+1. `main.js` initialiserer router og state
+2. Router parser initial hash
+3. Basert på rute:
+   - **Root**: `data-loader.js` henter `projects.json` → `view-project-grid.js` renderer
+   - **Project**: `data-loader.js` henter `meta.json` → `state.js` setter state → `view-viewer.js` renderer
+
+### Navigasjon i prosjektgalleri
+1. Bruker klikker på prosjekt
+2. `view-project-grid.js` vurderer om prosjektet har underprosjekter:
+   - I “barnemodus” vises underprosjekter inline med egne tiles (ingen hash-endring før barnet velger et konkret steg)
+   - Hvis barnet velger et tile uten flere children, kalles callback som sender path til `main.js`
+3. `main.js` oppdaterer `location.hash` via `updateHash()` når det faktisk navigeres
+4. Router fanger opp endring
+5. `main.js` håndterer ny rute
+6. Data lastes og viewer renderes
+
+**Onboarding**: Første gangs oppstart kan trigge en visuell “trykk her”-overlegg i `view-project-grid.js` (maskot/piler) som peker på prosjekttiles. Overlegget skal kunne avbrytes umiddelbart og lagre flagg i localStorage slik at det ikke vises hver gang.
+
+### Navigasjon mellom steg
+1. Bruker klikker pil eller progresjonslinje
+2. `view-viewer.js` kaller callback (f.eks. `onNextStep()`)
+3. `main.js` mottar callback og:
+   - Oppdaterer state via `updateState()`
+   - Oppdaterer URL-hash via `updateHash()`
+   - Lagrer progresjon til localStorage via `setStepFor()`
+4. Router fanger opp hash-endring og trigger re-render
+5. `view-viewer.js` re-renderer med nytt bilde fra oppdatert state
+
+**Viktig**: Views gjør IKKE direkte state/URL-oppdateringer. De kaller callbacks som sendes fra `main.js`, og `main.js` eier all state/URL-manipulasjon.
+
+### Navigasjon opp i hierarkiet
+1. Bruker klikker "Opp"-knapp
+2. `view-viewer.js` kaller `onGoUp()` callback
+3. `main.js` beregner forelder-path via `getParentPath()` og oppdaterer hash
+4. Router håndterer endring
+5. Hvis forelder har egne bilder → viser dem, ellers → viser children-liste
+
+## State Management
+
+### AppState vs Progresjonskart
+
+Det er viktig å skille mellom to typer state:
+
+1. **AppState** (i minne): Beskriver hva som vises nå
+   - Oppdateres kontinuerlig når bruker navigerer
+   - Holdes i minne, ikke lagret permanent
+   - Inneholder nåværende path, steg-indeks og prosjektmetadata
+
+2. **Progresjonskart** (localStorage): Lagrer siste steg per prosjektpath
+   - Lagres automatisk ved hver stegendring
+   - Leses ved applikasjonsstart
+   - Brukes for å gjenoppta der brukeren slapp
+
+### State-oppdateringer
+`AppState` oppdateres gjennom `state.js` som gir kontrollerte metoder. **Views gjør IKKE direkte state-oppdateringer**. I stedet:
+- Views kaller callbacks (f.eks. `onNextStep()`, `onGoUp()`) som sendes fra `main.js`
+- `main.js` eier all state/URL-manipulasjon og kaller `updateState()`, `updateHash()`, osv.
+- Dette sikrer at all state-logikk er sentralisert i `main.js` og views forblir rene presentasjonskomponenter
+
+### localStorage-synkronisering
+Progresjon lagres automatisk ved hver stegendring. Formatet er enkel key-value hvor:
+- **Key**: Prosjektpath (f.eks. `"project1/subproject-a"`)
+- **Value**: Steg-indeks (nummer)
+
+### State-persistence
+Ved applikasjonsstart leses lagret progresjon fra localStorage. Når bruker navigerer til et prosjekt, brukes lagret steg hvis ingen steg er spesifisert i URL.
+
+## Routing-system
+
+### Hash-basert routing
+Bruker hash-fragmenter (`#`) for routing siden dette ikke krever server-side konfigurasjon. Hash-endringer trigges ikke server-requests, perfekt for statisk hosting.
+
+### URL-struktur
+- **Root**: `/#/` eller `/#`
+- **Prosjekt**: `/#/p/<path>`
+- **Prosjekt med steg**: `/#/p/<path>?step=<index>`
+
+### Routing-flyt
+1. `window.addEventListener("hashchange")` fanger URL-endringer
+2. `router.js` parser hash til Route-objekt
+3. `main.js` mottar Route og bestemmer hvilket view som skal vises
+4. Riktig data lastes og view renderes
+
+**Eksempel på parsing** (illustrasjon, ikke fasit):
+
+```javascript
+// Eksempel på parsing av hash "#/p/project1/sub-a?step=3"
+const hash = location.hash.slice(1); // "/p/project1/sub-a?step=3"
+const [path, query] = hash.split('?');
+const stepMatch = query?.match(/step=(\d+)/);
+const stepIndex = stepMatch ? parseInt(stepMatch[1]) : undefined;
+// Resultat: { type: "project", path: "project1/sub-a", stepIndex: 3 }
+```
+
+## Filstruktur
+
+```
+/lego-instruksjoner/
+  index.html                 # Hoved-HTML-fil
+  /assets/
+    /css/
+      main.css              # Hovedstiler
+    /js/
+      main.js               # Hovedkoordinator
+      router.js             # Routing-logikk
+      state.js              # State management
+      view-project-grid.js   # Prosjektgalleri-view
+      view-viewer.js        # Instruksjonsviewer-view
+      data-loader.js        # Datahenting
+  /projects/                # Prosjektdata
+    project1/
+      meta.json
+      cover.png
+      1_1x.png
+      ...
+  projects.json             # Toppnivåliste
+```
+
+## Designvalg og begrunnelser
+
+### Hash-basert routing
+**Hvorfor**: Fungerer perfekt med statisk hosting, krever ingen server-konfigurasjon, og gir bookmarkable URLs.
+
+### localStorage for progresjon
+**Hvorfor**: Enkel, klient-side løsning som ikke krever backend. Fungerer offline og gir rask tilgang.
+
+### Modulær struktur
+**Hvorfor**: Gjør koden lettere å vedlikeholde, teste og utvide. Hver fil har klart ansvar.
+
+### Ren JavaScript (ingen frameworks)
+**Hvorfor**: Minimal overhead, enkel hosting, rask lasting, og full kontroll over implementasjonen.
+
+### Ingen build tools
+**Hvorfor**: Enklere setup, raskere utvikling, og direkte debugging i nettleseren.
+
+## Skalerbarhet og vedlikehold
+
+### Retningslinjer for filstørrelse
+
+#### Når en fil er for stor
+En fil bør vurderes for refaktorering når:
+- **Linjetall**: Over 400-500 linjer kode
+- **Kompleksitet**: Flere ansvar som ikke naturlig hører sammen
+- **Vedlikehold**: Vanskelig å finne spesifikke funksjoner eller logikk
+- **Testing**: Vanskelig å teste isolert
+
+#### Tegn på at en fil bør deles opp
+- Flere distinkte "seksjoner" i filen med ulike ansvar
+- Gjentatt kode som kunne vært ekstrahert
+- Flere store funksjoner (>50 linjer) som kunne vært egne moduler
+- Vanskelig å forstå filens hovedansvar ved første øyekast
+
+### Refaktoreringsstrategier
+
+#### Dele opp store filer
+
+**Eksempel: Hvis `view-viewer.js` blir for stor**
+
+1. **Identifiser ansvar**:
+   - Bildevisning
+   - Navigasjonskontroller
+   - Progresjonslinje
+   - Header/footer
+
+2. **Ekstraher komponenter**:
+   ```
+   view-viewer.js          # Hovedkoordinator
+   view-viewer-image.js    # Bildevisning
+   view-viewer-controls.js # Navigasjonskontroller
+   view-viewer-progress.js # Progresjonslinje
+   ```
+
+3. **Behold hovedfilen som koordinator**:
+   - Hovedfilen importerer og koordinerer komponentene
+   - Komponentene håndterer sitt spesifikke ansvar
+
+#### Når lage nye moduler
+
+**Opprett ny modul når**:
+- Funksjonalitet brukes i flere filer (DRY-prinsipp)
+- Funksjonalitet er kompleks nok til å være egen enhet
+- Funksjonalitet kan testes isolert
+- Det gir klarere kodeorganisering
+
+**Eksempler på nye moduler**:
+- `utils.js` - Hjelpefunksjoner (formatering, validering, etc.)
+- `image-utils.js` - Bildespesifikk logikk (preloading, caching)
+- `navigation-utils.js` - Navigasjonshjelpefunksjoner
+
+#### Når lage nye view-filer
+
+**Opprett ny view når**:
+- Ny type visning trengs (f.eks. `view-detail.js` for detaljvisning)
+- Eksisterende view blir for kompleks
+- View har klart distinkt ansvar fra andre views
+
+### Modulorganisering
+
+#### View-filer
+Alle view-filer skal følge samme mønster:
+- Eksporterer en hovedfunksjon som tar state/data som parameter
+- Returnerer eller oppdaterer DOM-elementer
+- Håndterer event listeners internt
+- Kan ta imot callbacks for navigasjon/actions
+
+**Eksempel struktur**:
+```javascript
+// view-example.js
+import { getImageUrl } from './data-loader.js';
+
+export function renderExample(data, onAction) {
+  const container = document.createElement('div');
+  container.className = 'example';
+  // ... rendering logic
+  // ... event listeners
+  return container;
+}
+```
+
+#### Utility-moduler
+Utility-moduler skal:
+- Være pure functions hvor mulig
+- Ha klare, beskrivende funksjonsnavn
+- Være testbare isolert
+- Ikke ha sideeffekter (unntatt nødvendig)
+
+### Code Review Checklist
+
+Før du committer store endringer, vurder:
+
+- [ ] Er filen under 500 linjer?
+- [ ] Har hver funksjon et klart ansvar?
+- [ ] Er koden testbar?
+- [ ] Er det gjentatt kode som kunne ekstraherts?
+- [ ] Er navngiving konsistent og beskrivende?
+- [ ] Er kommentarer tilstrekkelige for kompleks logikk?
+- [ ] Følger koden eksisterende mønstre i prosjektet?
+
+### Vedlikeholdsrutiner
+
+#### Månedlig review
+- Gå gjennom største filene i prosjektet
+- Identifiser potensielle refaktoreringsmuligheter
+- Dokumenter kompleksitet som vokser
+
+#### Ved nye features
+- Vurder om ny funksjonalitet passer i eksisterende filer
+- Vurder om ny funksjonalitet krever ny modul
+- Dokumenter nye patterns hvis de etableres
+
+#### Ved refaktorering
+- Oppdater denne dokumentasjonen hvis strukturen endres
+- Sørg for at alle views/utilities følger samme mønstre
+- Test grundig etter refaktorering
+
+### Eksempel: Refaktorering av stor fil
+
+**Før** (view-viewer.js - 600 linjer):
+```javascript
+// Alt i én fil: bildevisning, kontroller, progresjon, header, footer
+export function renderViewer(state) {
+  // 200 linjer bildevisning
+  // 150 linjer kontroller
+  // 100 linjer progresjon
+  // 100 linjer header/footer
+  // 50 linjer event handlers
+}
+```
+
+**Etter** (modulær struktur):
+```javascript
+// view-viewer.js (150 linjer) - Koordinator
+import { renderImageViewer } from './view-viewer-image.js';
+import { renderControls } from './view-viewer-controls.js';
+import { renderProgress } from './view-viewer-progress.js';
+
+export function renderViewer(state, callbacks) {
+  const container = document.createElement('div');
+  container.className = 'viewer';
+  container.appendChild(renderImageViewer(state));
+  container.appendChild(renderControls(state, callbacks));
+  container.appendChild(renderProgress(state, callbacks));
+  return container;
+}
+
+// view-viewer-image.js (100 linjer)
+export function renderImageViewer(state) { /* ... */ }
+
+// view-viewer-controls.js (80 linjer)
+export function renderControls(state, callbacks) { /* ... */ }
+
+// view-viewer-progress.js (70 linjer)
+export function renderProgress(state, callbacks) { /* ... */ }
+```
+
+## Testing og debugging
+
+### Debugging-tips
+- Bruk browser DevTools for å inspisere state
+- Sjekk localStorage i Application-tab
+- Bruk Network-tab for å se datahenting
+- Sett breakpoints i router for å følge navigasjon
+
+### Testing-strategi
+Siden dette er et statisk prosjekt uten build tools:
+- Manuell testing i nettleseren
+- Test på ulike skjermstørrelser
+- Test localStorage-funksjonalitet
+- Test navigasjon mellom alle views
+
+## Fremtidige arkitekturforbedringer
+
+### Potensielle utvidelser
+- Service Worker for offline-støtte
+- Image caching-strategi
+- Lazy loading av bilder
+- Virtual scrolling for store prosjektlister
+- TypeScript for type-sikkerhet (hvis kompleksitet vokser)
+
+### Når vurdere større endringer
+- Hvis prosjektet vokser betydelig (>10 prosjekter, >1000 bilder)
+- Hvis ytelse blir et problem
+- Hvis vedlikehold blir vanskelig
+- Hvis flere utviklere skal jobbe på prosjektet
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+docs\CSS_GUIDELINES.md
+File type: .md
+# CSS Guidelines
+
+Dette dokumentet beskriver CSS-struktur, styling-retningslinjer og design-prinsipper for LEGO Instruksjonsvisning-prosjektet.
+
+## Retningslinjer for AI-generert CSS
+
+Når AI foreslår ny CSS i dette prosjektet, gjelder:
+
+- Bruk alltid eksisterende design tokens (`var(--color-...)`, `var(--spacing-...)`) i stedet for hardkodede verdier.
+- Følg BEM-lignende navngivning: `.block`, `.block__element`, `.block--modifier`.
+- Ikke legg til nye farger uten å først definere dem som variabler i `:root`.
+- Unngå `!important` med mindre det er eksplisitt avtalt.
+- Gjenbruk eksisterende utilities (`.u-flex`, `.u-text-center`, osv.) før du lager nye.
+- Nye views skal følge mønsteret fra `.project-grid` og `.viewer`.
+- Utilities brukes sparsommelig. Hvis du gjentatte ganger trenger samme layout, vurder egen komponent-/layout-klasse framfor nye utilities.
+
+## Filstruktur
+
+CSS-organisering i `assets/css/main.css`:
+
+```css
+/* 1. CSS Variables / Design Tokens */
+:root {
+  /* Farger */
+  /* Typografi */
+  /* Spacing */
+  /* Breakpoints */
+}
+
+/* 2. Reset / Normalize */
+/* 3. Base styles */
+/* 4. Layout components */
+/* 5. View-specific styles */
+/* 6. Utilities */
+```
+
+## Design Tokens
+
+### CSS Variables
+
+Definer alle design-tokens som CSS-variabler i `:root`:
+
+```css
+:root {
+  /* Farger */
+  --color-primary: #0066cc;
+  --color-secondary: #666666;
+  --color-background: #ffffff;
+  --color-text: #333333;
+  --color-border: #e0e0e0;
+  --color-error: #cc0000;
+  --color-success: #00cc00;
+  
+  /* Typografi */
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-size-base: 16px;
+  --font-size-small: 14px;
+  --font-size-large: 18px;
+  --font-size-h1: 24px;
+  --font-size-h2: 20px;
+  --line-height-base: 1.5;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Breakpoints */
+  /* Merk: Breakpoint-variabler brukes som dokumentasjon. Media-queries må fortsatt bruke tall direkte siden CSS-variabler ikke støttes i media queries i alle nettlesere. */
+  --breakpoint-mobile: 375px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1920px;
+  
+  /* Layout */
+  --max-width-container: 1200px;
+  --border-radius: 4px;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+```
+
+## Navngivingskonvensjon
+
+### BEM-lignende struktur
+
+Bruk BEM-lignende navngivning for komponenter:
+
+```css
+/* Block */
+.project-grid { }
+.project-tile { }
+
+/* Block__Element */
+.project-tile__image { }
+.project-tile__name { }
+
+/* Block--Modifier */
+.project-grid--compact { }
+.project-tile--active { }
+```
+
+**Viktig**: Hver komponent er sin egen block. `.project-grid` er container, `.project-tile` er en egen block som brukes i grid'en. Elementer tilhører sin nærmeste block (f.eks. `.project-tile__image`, ikke `.project-grid__image`).
+
+### Klassestruktur
+
+- **Komponenter**: `.component-name` (f.eks. `.project-grid`, `.viewer`)
+- **Elementer**: `.component-name__element` (f.eks. `.viewer__image`, `.viewer__controls`)
+- **Modifikatorer**: `.component-name--modifier` (f.eks. `.button--primary`, `.tile--active`)
+- **Utilities**: `.u-utility-name` (f.eks. `.u-hidden`, `.u-text-center`)
+
+## Responsive Design
+
+### Mobile-First Approach
+
+Start med mobil-styling, legg til større skjermer med media queries:
+
+```css
+/* Base (mobil) */
+.container {
+  padding: var(--spacing-md);
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .container {
+    padding: var(--spacing-lg);
+  }
+}
+
+/* Desktop */
+@media (min-width: 1920px) {
+  .container {
+    padding: var(--spacing-xl);
+    max-width: var(--max-width-container);
+    margin: 0 auto;
+  }
+}
+```
+
+### Breakpoints
+
+Bruk definerte breakpoints:
+
+```css
+/* Mobil */
+@media (min-width: 375px) { }
+
+/* Nettbrett */
+@media (min-width: 768px) { }
+
+/* Desktop */
+@media (min-width: 1920px) { }
+```
+
+## Layout-komponenter
+
+### Prosjektgalleri (project-grid)
+
+```css
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+}
+
+.project-tile {
+  aspect-ratio: 1;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.project-tile:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow);
+}
+
+.project-tile__image {
+  width: 100%;
+  height: 80%;
+  object-fit: cover;
+}
+
+.project-tile__name {
+  height: 20%;
+  padding: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-small);
+  background: var(--color-background);
+}
+```
+
+### Viewer (instruksjonsvisning)
+
+```css
+.viewer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Merk: På mobil kan 100vh gi litt ekstra scroll pga. browser UI, men dette er akseptabelt for dette prosjektet */
+  overflow: hidden;
+}
+
+.viewer__header {
+  padding: var(--spacing-md);
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-large);
+  font-weight: bold;
+}
+
+.viewer__main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--color-background);
+  padding: var(--spacing-md);
+}
+
+.viewer__main img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.viewer__loading {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  background: var(--color-background);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bounce 1s infinite;
+}
+
+.viewer__loading-icon {
+  width: 64px;
+  height: 64px;
+  background-image: url('../img/loading-brick.svg'); /* Placeholder – bytt til faktisk ressurs */
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: spin 1.8s linear infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 
+ * Maksimal bildeflate - viktige prinsipper:
+ * 
+ * 1. Container (.viewer__main) skal IKKE ha hard width/height
+ *    - Bruk flex: 1 for å fylle tilgjengelig plass
+ *    - La høyden bestemmes av viewport og flex-layout
+ * 
+ * 2. Bildet skal bruke object-fit: contain
+ *    - Sikrer at hele bildet vises uten å kuttes
+ *    - Beholder aspect ratio
+ * 
+ * 3. max-width/height: 100% på bildet
+ *    - Sikrer at bildet ikke overstiger containeren
+ *    - Fungerer sammen med object-fit: contain
+ * 
+ * 4. Zoom-mekanisme:
+ *    - Browser zoom (Ctrl/Cmd +, Ctrl/Cmd -) er anbefalt zoom-mekanisme
+ *    - Bildet skal være zoombart via standard nettleser-funksjonalitet
+ *    - IKKE bruk pointer-events: none på bildet (blokkerer zoom)
+ *    - Hvis custom zoom skal implementeres senere:
+ *      * Bruk transform: scale() på bildet direkte
+ *      * IKKE endre container-størrelse (width/height)
+ *      * Behold flex-layout for responsivitet
+ */
+
+.viewer__bottom {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-background);
+  border-top: 1px solid var(--color-border);
+}
+
+.viewer__button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background: var(--color-background);
+  cursor: pointer;
+  font-size: var(--font-size-base);
+}
+
+.viewer__button:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: white;
+}
+
+.viewer__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.viewer__progress {
+  flex: 1;
+  height: 8px;
+}
+
+.viewer__step-indicator {
+  font-size: var(--font-size-small);
+  color: var(--color-secondary);
+}
+```
+
+## Base Styles
+
+### Reset og Normalize
+
+```css
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+```
+
+## Utilities
+
+### Utility Classes
+
+Utilities brukes sparsommelig. Hvis du gjentatte ganger trenger samme layout, vurder egen komponent-/layout-klasse framfor nye utilities.
+
+```css
+/* Display */
+.u-hidden {
+  display: none !important;
+}
+
+.u-flex {
+  display: flex !important;
+}
+
+.u-grid {
+  display: grid !important;
+}
+
+/* Text alignment */
+.u-text-center {
+  text-align: center !important;
+}
+
+.u-text-left {
+  text-align: left !important;
+}
+
+.u-text-right {
+  text-align: right !important;
+}
+
+/* Spacing */
+.u-margin-sm {
+  margin: var(--spacing-sm) !important;
+}
+
+.u-margin-md {
+  margin: var(--spacing-md) !important;
+}
+
+.u-padding-sm {
+  padding: var(--spacing-sm) !important;
+}
+
+.u-padding-md {
+  padding: var(--spacing-md) !important;
+}
+```
+
+## Responsive Patterns
+
+### Grid Layout
+
+```css
+/* Mobil: 1 kolonne */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+/* Tablet: 2 kolonner */
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop: 3 kolonner */
+@media (min-width: 1920px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+```
+
+### Flexbox Layout
+
+```css
+.flex-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .flex-container {
+    flex-direction: row;
+  }
+}
+```
+
+## Bildestyling
+
+### Primært mønster: Komponent-klasser
+
+I viewer og andre komponenter bruker vi hovedsakelig komponent-klasser:
+
+```css
+.viewer__main img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+```
+
+### Valgfrie hjelpeklasser
+
+`.instruction-image` og `.cover-image` er valgfrie hjelpeklasser som kan brukes hvis vi har bilder utenfor viewer/galleri:
+
+```css
+.instruction-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+```
+
+**Regel**: Prefer komponent-klasser (`.viewer__main img`) over globale semantics-klasser når mulig.
+
+## Interaktivitet
+
+### Hover States
+
+```css
+.interactive-element {
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.interactive-element:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+```
+
+### Focus States
+
+```css
+button:focus,
+a:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+```
+
+### Active States
+
+```css
+button:active {
+  transform: scale(0.95);
+}
+```
+
+## Progresjonslinje
+
+### Range Input Styling
+
+```css
+input[type="range"] {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-border);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+  border: none;
+}
+```
+
+## Mobile-Specific Styles
+
+### Touch Targets
+
+Sørg for at klikkbare elementer er store nok for touch:
+
+```css
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  padding: var(--spacing-sm);
+}
+```
+
+### Viewport Meta
+
+Husk å inkludere i HTML:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+```
+
+## Beste Praksis
+
+### 1. Bruk CSS Variables
+
+```css
+/* ✅ Bra */
+.button {
+  background: var(--color-primary);
+  padding: var(--spacing-md);
+}
+
+/* ❌ Dårlig */
+.button {
+  background: #0066cc;
+  padding: 16px;
+}
+```
+
+### 2. Mobile-First
+
+```css
+/* ✅ Bra - starter med mobil */
+.container {
+  padding: var(--spacing-sm);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+}
+
+/* ❌ Dårlig - starter med desktop */
+.container {
+  padding: var(--spacing-lg);
+}
+
+@media (max-width: 767px) {
+  .container {
+    padding: var(--spacing-sm);
+  }
+}
+```
+
+### 3. BEM-lignende Navngivning
+
+```css
+/* ✅ Bra - project-tile er egen block, så modifikator går på tile */
+.project-tile--active { }
+
+/* ❌ Dårlig - project-tile er ikke element av project-grid */
+.project-grid__tile--active { }
+
+/* ❌ Dårlig */
+.activeTile { }
+.tileActive { }
+```
+
+**Merk**: `.project-tile` er en egen block, ikke et element av `.project-grid`. Derfor brukes `.project-tile--active`, ikke `.project-grid__tile--active`.
+
+### 4. Unngå !important
+
+Bruk spesifisitet i stedet:
+
+```css
+/* ✅ Bra */
+.viewer .button {
+  color: red;
+}
+
+/* ❌ Dårlig */
+.button {
+  color: red !important;
+}
+```
+
+### 5. Organiser CSS Logisk
+
+```css
+/* 1. Variables */
+:root { }
+
+/* 2. Base */
+body { }
+img { }
+
+/* 3. Layout */
+.container { }
+.grid { }
+
+/* 4. Components */
+.project-grid { }
+.viewer { }
+
+/* 5. Utilities */
+.u-hidden { }
+```
+
+### 6. Z-index Retningslinjer
+
+Når du bruker z-index, følg denne policyen:
+
+```css
+/* 10-19: Faste elementer (header, bottom-bar) */
+.viewer__header {
+  z-index: 10;
+}
+
+.viewer__bottom {
+  z-index: 10;
+}
+
+/* 20-29: Overlays (loading, dimming) */
+.loading-overlay {
+  z-index: 20;
+}
+
+/* 30-39: Modaler / dialoger */
+.modal {
+  z-index: 30;
+}
+
+/* Unngå å bruke z-index > 40 */
+```
+
+### Barnevennlig UI (5–7 år)
+
+- **Ikoner foran tekst**: Anta at brukeren ikke kan lese flytende. Navigasjonsknapper (opp/hjem, neste/forrige, progresjonsindikator) skal bruke tydelige symboler (hus, piler, stjerner) og kan støttes av tall (f.eks. `3/10`) i stedet for tekststrenger som “Steg 3 av 10”.
+- **Store trykkflater**: Minimum 44x44px er absolutt minimum; sikte på ~64px (ca. 2 cm) for primærknapper slik at små fingre treffer riktig. Sørg for minst `var(--spacing-md)` mellom interaktive elementer.
+- **Plassering**: Neste/forrige-knapper kan up-skaleres og trekkes ut mot venstre/høyre hjørne av `.viewer__bottom` slik at de ikke konkurrerer med progressbar. Opp/hjem-knapp plasseres konsekvent (typisk øverst til venstre) for muskelminne.
+- **Farger og feedback**: Bruk klare, høy-kontrast LEGO-inspirerte farger på interaktive elementer. Alle knapper skal ha en aktiv/trykket-state (lys opp, skift farge, animasjon) slik at barn ser at trykket ble registrert.
+- **Lyd og animasjoner (valgfritt)**: Hvis UI-et utvides med lyd/animert feedback, reserver plass til et diskret “lyd av/på”-ikon og sørg for at animasjoner er korte (<300ms) for å holde tempoet oppe.
+- **Progresjonslinje**: Visuell indikator kan være en tykk bar eller en serie symboler. Dragging er sekundær; primærnavigasjonen er pilene, så progressbaren skal støttes via store tap-targets eller segmenter.
+- **Tom-state og belønning**: Når et prosjekt mangler steg, vis en vennlig illustrasjon (f.eks. minifigur) som sier “kommer snart”. Ved fullført prosjekt kan `.viewer__bottom` trigge en konfetti- eller stjerneanimert klasse for å feire ferdigstillelse.
+- **Loading-indikator**: Bruk LEGO-inspirert spinner (`.viewer__loading`) med myk animasjon mens bilder lastes. Den skal være barnlig og tydelig (ingen små spinnere).
+- **Onboarding-overlay**: Definer `.onboarding-overlay` (fullskjerm, semitransparent) med en maskot/figur som peker på galleri-tiles. Bruk sterke farger og en enkel puls/peke-animasjon.
+- **Belønning/badges**: For prosjekt fullført, bruk `.viewer__celebration` som legger til konfetti (CSS animasjon) eller stjerne-illustrasjon, eventuelt kombinert med en liten lyd hvis slått på.
+
+```css
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.onboarding-overlay__mascot {
+  width: 220px;
+  height: 220px;
+  background-image: url('../img/mascot.png');
+  background-size: contain;
+  animation: wiggle 1.2s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(4deg); }
+  75% { transform: rotate(-4deg); }
+}
+```
+
+## Testing
+
+### Test på ulike skjermstørrelser
+
+1. **Mobil**: 375px (iPhone SE)
+2. **Nettbrett**: 768px (iPad)
+3. **Desktop**: 1920px (Full HD)
+
+### Test i DevTools
+
+- Bruk Device Mode i Chrome DevTools
+- Test både portrait og landscape
+- Test touch-interaksjoner
+
+### Sjekkliste
+
+- [ ] Alle elementer er synlige på mobil
+- [ ] Tekst er lesbar på alle skjermstørrelser
+- [ ] Klikkbare elementer er store nok (min 44x44px)
+- [ ] Bilder tilpasses skjermen korrekt
+- [ ] Ingen horizontal scrolling
+- [ ] Focus states er synlige
+- [ ] Hover states fungerer (på desktop)
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+docs\DATA_FORMAT.md
+File type: .md
+# Data Format
+
+Dette dokumentet beskriver i detalj JSON-formatene som brukes i LEGO Instruksjonsvisning-prosjektet.
+
+## Oversikt
+
+Prosjektet bruker to hovedtyper JSON-filer:
+- **`meta.json`**: Metadata for hvert prosjekt/underprosjekt
+- **`projects.json`**: Liste over toppnivå-prosjekter
+
+## meta.json
+
+`meta.json`-filer beskriver metadata for et prosjekt eller underprosjekt. Hver prosjektmappe skal ha en `meta.json`-fil.
+
+### Struktur
+
+```json
+{
+  "id": "string",
+  "name": "string",
+  "coverImage": "string",
+  "steps": ["string"],
+  "children": [
+    {
+      "id": "string",
+      "name": "string",
+      "path": "string"
+    }
+  ]
+}
+```
+
+### Felter
+
+#### `id` (påkrevd)
+- **Type**: String
+- **Beskrivelse**: Unik identifikator for prosjektet/underprosjektet
+- **Eksempler**: `"castle-main"`, `"castle-tower"`, `"mitt-prosjekt"`
+- **Regler**:
+  - Må være unik innenfor samme nivå
+  - Anbefales å bruke kebab-case (små bokstaver med bindestrek)
+  - Ikke bruk mellomrom eller spesialtegn
+
+#### `name` (påkrevd)
+- **Type**: String
+- **Beskrivelse**: Visningsnavn som vises i brukergrensesnittet
+- **Eksempler**: `"Stor borg"`, `"Tårn"`, `"Mitt Prosjekt"`
+- **Regler**:
+  - Kan inneholde mellomrom og norske tegn (æ, ø, å)
+  - Dette er det navnet brukeren ser
+
+#### `coverImage` (valgfritt)
+- **Type**: String
+- **Beskrivelse**: Filnavn på cover-bildet som brukes i prosjektgalleriet
+- **Eksempler**: `"cover.png"`, `"1_cover.png"`
+- **Regler**:
+  - Hvis ikke spesifisert eller bildet ikke finnes, brukes det første bildet (laveste nummer)
+  - Må være et filnavn som finnes i samme mappe
+  - Anbefales å bruke `"cover.png"` for konsistens
+
+#### `steps` (påkrevd)
+- **Type**: Array of strings
+- **Beskrivelse**: Liste over alle steg-bildene i riktig rekkefølge
+- **Eksempler**: 
+  ```json
+  ["1_1x.png", "2_1x.png", "3_1x.png"]
+  ```
+- **Regler**:
+  - Må være en array
+  - Kan være tom array `[]` hvis prosjektet ikke har steg-bilder (f.eks. kun underprosjekter)
+  - Hvis tom: viewer viser "Ingen steg tilgjengelig" og deaktiverer navigasjonskontroller
+  - Filnavnene må matche faktiske filer i mappen
+  - Rekkefølgen i arrayet bestemmer visningsrekkefølgen
+  - Bildene sorteres automatisk basert på nummeret i filnavnet (se README.md)
+
+#### `children` (påkrevd)
+- **Type**: Array of objects
+- **Beskrivelse**: Liste over underprosjekter
+- **Eksempler**: 
+  ```json
+  [
+    {
+      "id": "castle-tower",
+      "name": "Tårn",
+      "path": "subproject-tower"
+    },
+    {
+      "id": "castle-gate",
+      "name": "Port",
+      "path": "subproject-gate"
+    }
+  ]
+  ```
+- **Regler**:
+  - Må være en array, selv om den er tom (`[]`)
+  - Hvert objekt må ha `id`, `name` og `path`
+  - `path` er relativ sti til undermappen (se nedenfor)
+
+#### `audioSteps` (valgfritt)
+- **Type**: Array of strings
+- **Beskrivelse**: Lydfiler (en per steg) som kan spilles av i viewer for muntlig hjelp
+- **Eksempler**:
+  ```json
+  "audioSteps": ["audio/1.mp3", "audio/2.mp3", "audio/3.mp3"]
+  ```
+- **Regler**:
+  - Lengden bør samsvare med `steps`. Manglende elementer betyr “ingen lyd”.
+  - Filene må ligge i samme mappe eller en `audio/`-undermappe slik at URL bygges som `/projects/{path}/{audioSteps[i]}`
+  - Filformat bør være `.mp3` eller `.ogg` for bred støtte
+
+#### `children[].id` (påkrevd)
+- **Type**: String
+- **Beskrivelse**: Unik identifikator for underprosjektet
+- **Regler**: Samme regler som toppnivå `id`
+
+#### `children[].name` (påkrevd)
+- **Type**: String
+- **Beskrivelse**: Visningsnavn for underprosjektet
+- **Regler**: Samme regler som toppnivå `name`
+
+#### `children[].path` (påkrevd)
+- **Type**: String
+- **Beskrivelse**: Relativ sti til undermappen fra hovedprosjektmappen
+- **Eksempler**: 
+  - Hvis undermappen heter `tårn/` og ligger i `/projects/castle-main/tårn/`, settes `path` til `"tårn"`
+  - Hvis undermappen heter `subproject-tower/`, settes `path` til `"subproject-tower"`
+- **Regler**:
+  - Må være navnet på undermappen (uten trailing slash)
+  - Må matche faktisk mappestruktur
+  - Relativ fra hovedprosjektmappen, ikke absolutt sti
+  - Brukes til å bygge full sti: `/projects/{hovedprosjekt-path}/{path}/meta.json`
+
+#### `children[].hidden` (valgfritt)
+- **Type**: Boolean
+- **Beskrivelse**: Hvis `true`, skjules underprosjektet fra visning i children-liste
+- **Eksempler**: `true`, `false`
+- **Regler**:
+  - Hvis ikke spesifisert eller `false`, vises underprosjektet normalt
+  - Hvis `true`, skjules det fra children-listen i viewer
+  - Skjulte underprosjekter er fortsatt tilgjengelige via direkte URL
+  - Brukes for å skjule uferdige eller private underprosjekter
+
+### Eksempler
+
+#### Prosjekt uten underprosjekter
+
+```json
+{
+  "id": "castle-tower",
+  "name": "Tårn",
+  "coverImage": "cover.png",
+  "steps": [
+    "1_1x.png",
+    "2_1x.png",
+    "3_1x.png"
+  ],
+  "children": []
+}
+```
+
+#### Prosjekt med underprosjekter
+
+```json
+{
+  "id": "castle-main",
+  "name": "Stor borg",
+  "coverImage": "cover.png",
+  "steps": [
+    "step-001.png",
+    "step-002.png",
+    "step-003.png"
+  ],
+  "children": [
+    {
+      "id": "castle-tower",
+      "name": "Tårn",
+      "path": "subproject-tower"
+    },
+    {
+      "id": "castle-gate",
+      "name": "Port",
+      "path": "subproject-gate",
+      "hidden": true
+    }
+  ]
+}
+```
+
+#### Prosjekt med egne bilder og underprosjekter
+
+Et prosjekt kan ha både egne steg-bilder og underprosjekter:
+
+```json
+{
+  "id": "house-main",
+  "name": "Huset Vårt",
+  "coverImage": "cover.png",
+  "steps": [
+    "174_1x.png",
+    "175_1x.png",
+    "176_1x.png",
+    "177_1x.png",
+    "178_1x.png",
+    "179_1x.png"
+  ],
+  "children": [
+    {
+      "id": "spiserom",
+      "name": "1-Spiserom",
+      "path": "1-Spiserom"
+    },
+    {
+      "id": "alma-rom",
+      "name": "2-Alma sitt Rom",
+      "path": "2-Alma sitt Rom"
+    }
+  ]
+}
+```
+
+## projects.json
+
+`projects.json` ligger i rotmappen og lister alle toppnivå-prosjekter.
+
+### Struktur
+
+```json
+[
+  {
+    "id": "string",
+    "name": "string",
+    "path": "string"
+  }
+]
+```
+
+### Felter
+
+#### `id` (påkrevd)
+- **Type**: String
+- **Beskrivelse**: Unik identifikator for prosjektet
+- **Regler**: Samme regler som `meta.json` `id`
+- **Viktig**: Må matche `id` i prosjektets `meta.json`
+
+#### `name` (påkrevd)
+- **Type**: String
+- **Beskrivelse**: Visningsnavn for prosjektet
+- **Regler**: Samme regler som `meta.json` `name`
+- **Viktig**: Må matche `name` i prosjektets `meta.json` (anbefalt, men ikke påkrevd)
+
+#### `path` (påkrevd)
+- **Type**: String
+- **Beskrivelse**: Relativ sti til prosjektmappen fra `/projects/`
+- **Eksempler**: 
+  - Hvis prosjektet ligger i `/projects/castle-main/`, settes `path` til `"castle-main"`
+  - Hvis prosjektet ligger i `/projects/mitt-prosjekt/`, settes `path` til `"mitt-prosjekt"`
+- **Regler**:
+  - Må være navnet på prosjektmappen (uten trailing slash)
+  - Må matche faktisk mappestruktur
+  - Relativ fra `/projects/`, ikke absolutt sti
+  - Brukes til å bygge full sti: `/projects/{path}/meta.json`
+
+#### `hidden` (valgfritt)
+- **Type**: Boolean
+- **Beskrivelse**: Hvis `true`, skjules prosjektet fra prosjektgalleri
+- **Eksempler**: `true`, `false`
+- **Regler**:
+  - Hvis ikke spesifisert eller `false`, vises prosjektet normalt i galleri
+  - Hvis `true`, skjules det fra prosjektgalleri
+  - Skjulte prosjekter er fortsatt tilgjengelige via direkte URL
+  - Brukes for å skjule uferdige eller private prosjekter
+
+### Eksempel
+
+```json
+[
+  {
+    "id": "project1",
+    "name": "Stor borg",
+    "path": "project1"
+  },
+  {
+    "id": "project2",
+    "name": "Uferdig prosjekt",
+    "path": "project2",
+    "hidden": true
+  },
+  {
+    "id": "project3",
+    "name": "Romskip",
+    "path": "project3"
+  },
+  {
+    "id": "house-main",
+    "name": "Huset Vårt",
+    "path": "Huset Vårt"
+  }
+]
+```
+
+## Sti-bygging
+
+### Hvordan stier bygges
+
+1. **Toppnivå-prosjekt**:
+   - Fra `projects.json`: `path = "castle-main"`
+   - Full sti: `/projects/castle-main/meta.json`
+
+2. **Underprosjekt**:
+   - Fra `projects.json`: `path = "castle-main"`
+   - Fra `meta.json` children: `path = "subproject-tower"`
+   - Full sti: `/projects/castle-main/subproject-tower/meta.json`
+
+3. **Bilde-URL**:
+   - Prosjekt: `/projects/castle-main/`
+   - Bilde: `1_1x.png`
+   - Full URL: `/projects/castle-main/1_1x.png`
+
+### Eksempel på komplett hierarki
+
+```
+/projects/
+  castle-main/
+    meta.json          # id: "castle-main", children: [{id: "tower", path: "tower"}]
+    cover.png
+    1_1x.png
+    2_1x.png
+    tower/
+      meta.json        # id: "tower", children: []
+      cover.png
+      1_1x.png
+      2_1x.png
+
+projects.json:
+[
+  {id: "castle-main", name: "Stor borg", path: "castle-main"}
+]
+```
+
+## Validering
+
+### Påkrevde felt
+
+Alle følgende felt er påkrevd og må være tilstede:
+
+**meta.json**:
+- `id`
+- `name`
+- `steps` (kan være tom array)
+- `children` (kan være tom array)
+
+**projects.json**:
+- Hvert objekt må ha `id`, `name`, og `path`
+
+### Valideringsregler
+
+1. **Unike ID-er**: `id` må være unik innenfor samme nivå
+2. **Matchende stier**: `path` i `projects.json` og `children` må matche faktiske mapper
+3. **Eksisterende filer**: Alle filnavn i `steps` og `coverImage` må referere til faktiske filer
+4. **Gyldig JSON**: Alle filer må være gyldig JSON
+5. **Array-typer**: `steps` og `children` må være arrays, selv om de er tomme
+
+### Feilhåndtering
+
+Hvis en `meta.json` eller `projects.json` er ugyldig:
+- Applikasjonen vil prøve å håndtere feilen gracefully
+- Feilmeldinger vises i konsollen
+- Manglende prosjekter vil ikke vises i galleriet
+
+## Beste praksis
+
+### Navngiving
+
+- **ID-er**: Bruk kebab-case (`castle-main`, `spiserom`)
+- **Navn**: Bruk lesbare navn med mellomrom (`"Stor borg"`, `"Alma sitt Rom"`)
+- **Paths**: Bruk samme navn som mappen (kan være forskjellig fra `id`)
+
+### Organisering
+
+- Hold `meta.json` og `projects.json` synkronisert
+- Bruk konsistent navngiving for bilder (`1_1x.png`, `2_1x.png`, etc.)
+- Organiser underprosjekter logisk i mapper
+
+### Vedlikehold
+
+- Oppdater `projects.json` når nye prosjekter legges til
+- Sørg for at alle `path`-referanser er korrekte
+- Test at alle bilder eksisterer etter endringer
+
+## Eksempel på komplett oppsett
+
+### Filstruktur
+
+```
+/projects/
+  castle-main/
+    meta.json
+    cover.png
+    1_1x.png
+    2_1x.png
+    tower/
+      meta.json
+      cover.png
+      1_1x.png
+      2_1x.png
+  spaceship/
+    meta.json
+    cover.png
+    1_1x.png
+    2_1x.png
+    3_1x.png
+
+projects.json
+```
+
+### projects.json
+
+```json
+[
+  {
+    "id": "castle-main",
+    "name": "Stor borg",
+    "path": "castle-main"
+  },
+  {
+    "id": "spaceship",
+    "name": "Romskip",
+    "path": "spaceship"
+  }
+]
+```
+
+### /projects/castle-main/meta.json
+
+```json
+{
+  "id": "castle-main",
+  "name": "Stor borg",
+  "coverImage": "cover.png",
+  "steps": [
+    "1_1x.png",
+    "2_1x.png"
+  ],
+  "children": [
+    {
+      "id": "tower",
+      "name": "Tårn",
+      "path": "tower"
+    }
+  ]
+}
+```
+
+### /projects/castle-main/tower/meta.json
+
+```json
+{
+  "id": "tower",
+  "name": "Tårn",
+  "coverImage": "cover.png",
+  "steps": [
+    "1_1x.png",
+    "2_1x.png"
+  ],
+  "children": []
+}
+```
+
+### /projects/spaceship/meta.json
+
+```json
+{
+  "id": "spaceship",
+  "name": "Romskip",
+  "coverImage": "cover.png",
+  "steps": [
+    "1_1x.png",
+    "2_1x.png",
+    "3_1x.png"
+  ],
+  "children": []
+}
+```
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+docs\IMPLEMENTATION.md
+File type: .md
+# Implementasjonsguide
+
+Dette dokumentet beskriver hvordan koden skal implementeres, inkludert funksjonssignaturer, patterns og konvensjoner.
+
+## Hvordan denne guiden skal brukes (for AI)
+
+- Følg funksjonssignaturene og typedefs som fasit; ikke finn opp egne varianter.
+- Bruk samme modulansvar som beskrevet (main koordinerer, views bygger DOM, data-loader fetcher).
+- Ikke legg til nye globale mønstre (f.eks. nye navngivningskonvensjoner) uten å oppdatere denne filen.
+- Når du foreslår endringer på tvers av moduler, sørg for at Implementation.md oppdateres samtidig.
+- Bruk klassnavn som matcher [CSS_GUIDELINES.md](./CSS_GUIDELINES.md) - f.eks. `.viewer__header`, ikke `.viewer-header`.
+- state.js eksporteres som enkeltfunksjoner, ikke som et state-objekt.
+
+## Generelle prinsipper
+
+### Kode-stil
+- Bruk moderne JavaScript (ES6+)
+- Bruk `const` og `let`, unngå `var`
+- Bruk arrow functions hvor det gir mening
+- Bruk template literals for string-interpolasjon
+- Hold funksjoner korte og fokuserte (maks 50 linjer per funksjon)
+
+### Modulstruktur
+- Hver fil skal være en ES6-modul med `export`
+- Bruk named exports, ikke default exports
+- Hver modul skal ha et klart ansvar
+
+### Navngiving
+- Funksjoner: camelCase (`loadProjectMeta`, `renderViewer`)
+- Konstanter: UPPER_SNAKE_CASE (`BASE_URL`, `STORAGE_KEY`)
+- Filer: kebab-case (`view-viewer.js`, `data-loader.js`)
+
+## Modul-implementasjoner
+
+### main.js
+
+**Rolle**: Hovedkoordinator som kobler alt sammen. main.js skal **ikke** gjøre egen DOM-rendering - den kaller view-funksjoner fra view-moduler og monterer dem i root-containeren.
+
+**Eksporterte funksjoner**:
+
+```javascript
+/**
+ * Initialiserer applikasjonen
+ * Kalles én gang når siden laster
+ */
+export function init() {
+  // Initialiser router
+  // Initialiser state
+  // Håndter initial route
+}
+
+/**
+ * Håndterer ruteendringer
+ * @param {Route} route - Route-objekt fra router
+ */
+export function handleRoute(route) {
+  // Basert på route.type:
+  // - "root" → last projects.json og render projectGrid
+  // - "project" → last meta.json og render viewer
+}
+
+```
+
+**Viktig**: main.js skal importere render-funksjoner fra view-modulene, ikke implementere dem selv:
+
+```javascript
+import { renderProjectGrid } from './view-project-grid.js';
+import { renderViewer } from './view-viewer.js';
+```
+
+**Viktig**: main.js eier all state/URL-manipulasjon. Views kaller callbacks som sendes fra main.js, og main.js håndterer alle state-oppdateringer og URL-endringer.
+
+**Eksempel på init()**:
+
+```javascript
+import { init as initRouter, parseHash, updateHash, getParentPath } from './router.js';
+import { loadProjects } from './data-loader.js';
+import { getState, updateState, getLastStepFor } from './state.js';
+import { loadProjectMeta } from './data-loader.js';
+import { renderProjectGrid } from './view-project-grid.js';
+import { renderViewer } from './view-viewer.js';
+
+export function init() {
+  // Initialiser router
+  initRouter((route) => {
+    handleRoute(route);
+  });
+  
+  // Håndter initial route
+  const initialRoute = parseHash(window.location.hash);
+  handleRoute(initialRoute);
+}
+```
+
+**Eksempel på handleRoute() - hel flyt**:
+
+```javascript
+export async function handleRoute(route) {
+  const root = document.getElementById('app');
+  root.innerHTML = '';
+
+  if (route.type === 'root') {
+    // Last prosjekter og render galleri
+    const projects = await loadProjects();
+    const grid = renderProjectGrid(projects, (path) => {
+      updateHash({ type: 'project', path });
+    });
+    root.appendChild(grid);
+  } else if (route.type === 'project') {
+    // Last prosjektmetadata
+    const meta = await loadProjectMeta(route.path);
+    const lastStep = route.stepIndex ?? getLastStepFor(route.path);
+    
+    // Oppdater state
+    updateState({
+      currentPath: route.path,
+      currentStepIndex: lastStep,
+      currentProjectMeta: meta
+    });
+    
+    // Render viewer med callbacks
+    const viewer = renderViewer(getState(), {
+      onPrevStep: () => {
+        const state = getState();
+        const newIndex = Math.max(0, state.currentStepIndex - 1);
+        updateState({ currentStepIndex: newIndex });
+        updateHash({ type: 'project', path: state.currentPath, stepIndex: newIndex });
+      },
+      onNextStep: () => {
+        const state = getState();
+        const maxIndex = (state.currentProjectMeta?.steps.length || 1) - 1;
+        const newIndex = Math.min(maxIndex, state.currentStepIndex + 1);
+        updateState({ currentStepIndex: newIndex });
+        updateHash({ type: 'project', path: state.currentPath, stepIndex: newIndex });
+      },
+      onStepChange: (stepIndex) => {
+        updateState({ currentStepIndex: stepIndex });
+        const { currentPath } = getState();
+        updateHash({ type: 'project', path: currentPath, stepIndex });
+      },
+      onGoUp: () => {
+        const { currentPath } = getState();
+        const parentPath = getParentPath(currentPath);
+        if (parentPath) {
+          updateHash({ type: 'project', path: parentPath });
+        } else {
+          updateHash({ type: 'root' });
+        }
+      }
+    });
+    root.appendChild(viewer);
+  }
+}
+```
+
+### router.js
+
+**Rolle**: Hash-basert routing og URL-parsing
+
+**Eksporterte funksjoner**:
+
+```javascript
+/**
+ * Route-objekt struktur
+ * @typedef {Object} Route
+ * @property {"root"|"project"} type - Type rute
+ * @property {string} [path] - Prosjektpath (kun for "project")
+ * @property {number} [stepIndex] - Steg-indeks (kun for "project")
+ */
+
+/**
+ * Initialiserer router
+ * @param {function(Route): void} onRouteChange - Callback når rute endres
+ */
+export function init(onRouteChange) {
+  // Legg til hashchange listener
+  // Kall onRouteChange ved endringer
+}
+
+/**
+ * Parser hash-fragment til Route-objekt
+ * @param {string} hash - Hash-fragment (f.eks. "#/p/project1?step=3")
+ * @returns {Route} Route-objekt
+ */
+export function parseHash(hash) {
+  // Parse hash til Route-objekt
+  // Returner { type: "root" } eller { type: "project", path: "...", stepIndex: ... }
+}
+
+/**
+ * Oppdaterer URL-hash basert på Route
+ * @param {Route} route - Route-objekt
+ */
+export function updateHash(route) {
+  // Bygg hash-string fra Route
+  // Oppdater window.location.hash
+}
+
+/**
+ * Beregner forelder-path fra en gitt path
+ * @param {string|null} path - Prosjektpath (f.eks. "project1/sub-a")
+ * @returns {string|null} Forelder-path eller null hvis ingen forelder
+ */
+export function getParentPath(path) {
+  if (!path) return null;
+  const parts = path.split('/');
+  parts.pop();
+  return parts.join('/') || null;
+}
+```
+
+**Eksempel på parseHash()**:
+
+```javascript
+export function parseHash(hash) {
+  // Fjern # fra starten
+  const path = hash.slice(1);
+  
+  // Hvis tom eller bare "/", returner root
+  if (!path || path === '/') {
+    return { type: 'root' };
+  }
+  
+  // Parse "/p/project1/sub-a?step=3"
+  const match = path.match(/^\/p\/(.+?)(?:\?step=(\d+))?$/);
+  if (!match) {
+    return { type: 'root' }; // Fallback til root ved ugyldig hash
+  }
+  
+  return {
+    type: 'project',
+    path: match[1],
+    stepIndex: match[2] ? parseInt(match[2], 10) : undefined
+  };
+}
+```
+
+### state.js
+
+**Rolle**: State management og localStorage-integrasjon
+
+**Viktig**: state.js inneholder ett modul-globalt `let appState`-objekt. `updateState()` muterer dette og returnerer den nye staten. Eventuell re-render styres av main.js.
+
+**Eksporterte funksjoner**:
+
+```javascript
+/**
+ * AppState struktur
+ * @typedef {Object} AppState
+ * @property {string|null} currentPath - Nåværende prosjektpath
+ * @property {number} currentStepIndex - Nåværende steg-indeks (0-basert)
+ * @property {ProjectMeta|null} currentProjectMeta - Nåværende prosjektmetadata
+ */
+
+/**
+ * Henter nåværende AppState
+ * @returns {AppState} Nåværende state
+ */
+export function getState() {
+  // Returner nåværende AppState
+}
+
+/**
+ * Oppdaterer AppState
+ * @param {Partial<AppState>} updates - Delvis oppdatering av state
+ */
+export function updateState(updates) {
+  // Oppdater state
+  // Trigger event eller callback hvis nødvendig
+}
+
+/**
+ * Henter lagret progresjon fra localStorage
+ * @returns {Object<string, number>} Kart med path → steg-indeks
+ */
+export function loadProgress() {
+  // Les fra localStorage
+  // Returner objekt eller tomt objekt hvis ikke funnet
+}
+
+/**
+ * Lagrer progresjon til localStorage
+ * @param {Object<string, number>} progressMap - Kart med path → steg-indeks
+ */
+export function saveProgress(progressMap) {
+  // Lagre til localStorage
+}
+
+/**
+ * Henter siste steg for en path
+ * @param {string} path - Prosjektpath
+ * @returns {number} Steg-indeks (0 hvis ikke funnet)
+ */
+export function getLastStepFor(path) {
+  // Hent fra localStorage
+  // Returner 0 hvis ikke funnet
+}
+
+/**
+ * Setter steg for en path
+ * @param {string} path - Prosjektpath
+ * @param {number} stepIndex - Steg-indeks
+ */
+export function setStepFor(path, stepIndex) {
+  // Hent eksisterende progresjon
+  // Oppdater for denne path
+  // Lagre tilbake til localStorage
+}
+```
+
+**Eksempel på state.js struktur**:
+
+```javascript
+const STORAGE_KEY = 'legoInstructions.progress';
+
+// Modul-global state
+let appState = {
+  currentPath: null,
+  currentStepIndex: 0,
+  currentProjectMeta: null
+};
+
+export function getState() {
+  return { ...appState }; // Returner kopi
+}
+
+export function updateState(updates) {
+  appState = { ...appState, ...updates };
+  return getState();
+}
+
+export function loadProgress() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : {};
+  } catch (e) {
+    console.error('Kunne ikke lese progresjon fra localStorage:', e);
+    return {};
+  }
+}
+```
+
+### data-loader.js
+
+**Rolle**: Datahenting fra JSON-filer
+
+**Eksporterte funksjoner**:
+
+```javascript
+/**
+ * ProjectMeta struktur (fra meta.json)
+ * @typedef {Object} ProjectMeta
+ * @property {string} id
+ * @property {string} name
+ * @property {string} coverImage
+ * @property {string[]} steps
+ * @property {Array<{id: string, name: string, path: string}>} children
+ */
+
+/**
+ * Henter meta.json for et prosjekt/underprosjekt
+ * @param {string} path - Prosjektpath (f.eks. "project1" eller "project1/sub-a")
+ * @returns {Promise<ProjectMeta>} Prosjektmetadata
+ */
+export async function loadProjectMeta(path) {
+  // Bygg URL: /projects/{path}/meta.json
+  // Fetch og parse JSON
+  // Returner ProjectMeta
+}
+
+/**
+ * Henter projects.json
+ * @returns {Promise<Array<{id: string, name: string, path: string}>>} Liste over prosjekter
+ */
+export async function loadProjects() {
+  // Fetch /projects.json
+  // Parse JSON
+  // Returner array
+}
+
+/**
+ * Bygger URL til et bilde
+ * @param {string} path - Prosjektpath
+ * @param {string} imageName - Filnavn på bildet
+ * @returns {string} Full URL til bildet
+ */
+export function getImageUrl(path, imageName) {
+  // Returner /projects/{path}/{imageName}
+}
+
+/**
+ * Bygger URL til en lydfil (for steg-hjelp)
+ * @param {string} path - Prosjektpath
+ * @param {string} audioName - Filnavn på lydfil (kan ligge i /audio/)
+ * @returns {string} Full URL til lydfilen
+ */
+export function getAudioUrl(path, audioName) {
+  // Returner /projects/{path}/{audioName}
+}
+
+/**
+ * Trekker ut steg-nummer fra filnavn for sortering
+ * @param {string} filename - Filnavn (f.eks. "1_1x.png", "174_1x.png")
+ * @returns {number|null} Steg-nummer eller null hvis ikke funnet
+ */
+export function extractStepNumber(filename) {
+  const match = filename.match(/^(\d+)/);
+  return match ? parseInt(match[1], 10) : null;
+}
+```
+
+**Eksempel på loadProjectMeta()**:
+
+```javascript
+const BASE_URL = '/projects/';
+
+export async function loadProjectMeta(path) {
+  const url = `${BASE_URL}${path}/meta.json`;
+  
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Kunne ikke laste meta.json for ${path}:`, error);
+    throw error;
+  }
+}
+
+export function getImageUrl(path, imageName) {
+  return `${BASE_URL}${path}/${imageName}`;
+}
+
+export function getAudioUrl(path, audioName) {
+  return `${BASE_URL}${path}/${audioName}`;
+}
+
+export function extractStepNumber(filename) {
+  const match = filename.match(/^(\d+)/);
+  return match ? parseInt(match[1], 10) : null;
+}
+```
+
+### view-project-grid.js
+
+**Rolle**: Prosjektgalleri-view
+
+- **Onboarding**: Ved første besøk skal viewet kunne tegne et lett gjennomskinnelig overlay (maskot/piler) som peker på første tile med tekstfri “trykk her”-indikasjon. Overlegget forsvinner straks barnet trykker, og en flaggverdi lagres i localStorage slik at overlayet ikke vises hver gang.
+- **Underprosjekter inline**: Hvis et prosjekt har `children` og “barnemodus”-flagget (lagret i state/localStorage) er aktivt, kan viewet vise child-tiles direkte under hovedtile i stedet for å navigere opp/ned. Klikk på child kaller fortsatt `onProjectClick` med full path.
+
+**Eksporterte funksjoner**:
+
+```javascript
+/**
+ * Renderer prosjektgalleri
+ * @param {Array<{id: string, name: string, path: string}>} projects - Liste over prosjekter
+ * @param {function(string): void} onProjectClick - Callback når prosjekt klikkes (tar path)
+ * @returns {HTMLElement} Container-element med galleri
+ * 
+ * Viktig: View gjør IKKE direkte state/URL-oppdateringer. Den kaller onProjectClick callback
+ * som sendes fra main.js, og main.js håndterer state/URL-oppdateringer.
+ */
+export function renderProjectGrid(projects, onProjectClick) {
+  // Opprett container
+  // For hvert prosjekt: opprett tile med cover-bilde og navn
+  // Legg til event listeners som kaller onProjectClick callback
+  // Returner container
+}
+```
+
+**Eksempel på renderProjectGrid()**:
+
+```javascript
+import { getImageUrl } from './data-loader.js';
+
+export function renderProjectGrid(projects, onProjectClick) {
+  const container = document.createElement('div');
+  container.className = 'project-grid';
+  
+  // Filtrer bort skjulte prosjekter
+  const visibleProjects = projects.filter(project => !project.hidden);
+  
+  visibleProjects.forEach(project => {
+    const tile = document.createElement('div');
+    tile.className = 'project-tile';
+    tile.setAttribute('data-path', project.path);
+    
+    // Cover-bilde
+    const img = document.createElement('img');
+    img.className = 'project-tile__image';
+    img.src = getImageUrl(project.path, 'cover.png');
+    img.alt = project.name;
+    img.onerror = () => {
+      // Fallback til første bilde hvis cover.png ikke finnes
+      img.src = getImageUrl(project.path, '1_1x.png');
+    };
+    
+    // Navn
+    const name = document.createElement('div');
+    name.className = 'project-tile__name';
+    name.textContent = project.name;
+    
+    tile.appendChild(img);
+    tile.appendChild(name);
+    
+    // Event listener
+    tile.addEventListener('click', () => {
+      onProjectClick(project.path);
+    });
+    
+    container.appendChild(tile);
+  });
+  
+  return container;
+}
+```
+
+### view-viewer.js
+
+**Rolle**: Instruksjonsviewer-view
+
+- **Lyd/haptikk**:
+  - Eksponer et høyttaler-ikon for å skru av/på korte navigasjonslyder (lagres i localStorage).
+  - Alle piltaster/knapper kan trigge `callbacks.onFeedback?.('next')`/`('prev')` slik at main.js kan spille lyd eller trigge haptikk på støttede enheter.
+  - Hvis prosjektene leverer egne lydhint (f.eks. `meta.audioSteps`), vis en knapp i header/bunn som spiller av hjelpetekst.
+- **Loading-indikator**: Mens nytt bilde lastes skal `.viewer__main` vise en LEGO-kloss-/spinner-animajson, og knapper deaktiveres til bildet er klart.
+- **Fullføringsbelønning**: Når `currentStepIndex === steps.length - 1` og barnet går videre, vis en gratulasjonsstate (konfetti-animajson + badge) og kall `callbacks.onProjectCompleted?.(state.currentPath)` slik at hovedlogikk kan markere prosjektet som ferdig.
+- **Underprosjektfallback**: Dersom et prosjekt mangler `steps` men har `children`, renderer viewer en child-liste med samme ikonografi som galleriet i stedet for en tom melding.
+
+- **Layoutkrav**:
+  - `.viewer__main` skal fylle all ledig høyde (`flex: 1`) og la bildet skaleres med `object-fit: contain` slik at det alltid er maks mulig størrelse uten scroll.
+  - Standard-zoom i nettleser skal fungere (ikke deaktiver `pointer-events` eller `user-select` på bildet). Eventuell fremtidig custom zoom skjer via `transform: scale()` direkte på IMG.
+  - Navigasjonsfeltet (`.viewer__bottom`) skal ligge helt nederst, bruke fleksibel grid/flex og inneholde store tap-targets for barn (sikte på ~64px høyde for knapper).
+  - Neste/forrige er primære kontroller; progressbaren er sekundær og må håndtere både tap og drag, men UI skal ikke kreve presis drag for bruk.
+  - Stegindikator bør bruke tallformat (`3/10`) og/eller ikoner i stedet for tekst (“Steg 3 av 10”) slik at målgruppen (5–7 år) forstår den uten å lese.
+  - Opp/hjem-knapp representeres som ikon (hus/pil opp) og plasseres konsekvent (typisk øverst til venstre) slik at barna kjenner den igjen.
+
+**Eksporterte funksjoner**:
+
+```javascript
+/**
+ * Renderer instruksjonsviewer
+ * @param {AppState} state - Nåværende applikasjonsstate
+ * @param {Object} callbacks - Callback-funksjoner fra main.js
+ * @param {function(): void} callbacks.onPrevStep - Kalles når forrige steg klikkes
+ * @param {function(): void} callbacks.onNextStep - Kalles når neste steg klikkes
+ * @param {function(number): void} callbacks.onStepChange - Kalles når steg endres (tar stepIndex)
+ * @param {function(): void} callbacks.onGoUp - Kalles når "Opp"-knapp klikkes
+ * @returns {HTMLElement} Container-element med viewer
+ * 
+ * Viktig: View gjør IKKE direkte state/URL-oppdateringer. Den kaller callbacks som sendes
+ * fra main.js, og main.js eier all state/URL-manipulasjon. Hvis steps-array er tomt,
+ * vis "Ingen steg tilgjengelig" og deaktiver navigasjonskontroller.
+ * Filtrer bort children med hidden: true når children-liste vises.
+ */
+export function renderViewer(state, callbacks) {
+  // Håndter tom steps-array: vis melding og deaktiver kontroller
+  // Filtrer bort skjulte children: const visibleChildren = (state.currentProjectMeta?.children || []).filter(c => !c.hidden)
+  // Opprett container med header, image container og bottom bar
+  // Vis nåværende bilde (hvis steps ikke er tom) eller children-liste (hvis steps er tom)
+  // Legg til kontroller (piler, progresjonslinje, opp-knapp)
+  // Legg til event listeners som kaller callbacks
+  // Returner container
+}
+```
+
+**Eksempel på renderViewer() struktur**:
+
+```javascript
+import { getImageUrl } from './data-loader.js';
+
+export function renderViewer(state, callbacks) {
+  const container = document.createElement('div');
+  container.className = 'viewer';
+  
+  // Header (valgfritt)
+  const header = document.createElement('div');
+  header.className = 'viewer__header';
+  header.textContent = state.currentProjectMeta?.name || '';
+  
+  // Image container
+  const imageContainer = document.createElement('div');
+  imageContainer.className = 'viewer__main';
+  
+  // Håndter tom steps-array
+  const steps = state.currentProjectMeta?.steps || [];
+  if (steps.length === 0) {
+    const message = document.createElement('div');
+    message.className = 'viewer__empty-message';
+    message.textContent = 'Ingen steg tilgjengelig';
+    imageContainer.appendChild(message);
+  } else {
+    // Bilde-rendering: Bildet skal fylle tilgjengelig plass innenfor viewport
+    // - Container (.viewer__main) bruker flex: 1 for å fylle resten av høyden
+    // - Bottom bar har fast høyde, så hovedbildet får all tilgjengelig plass
+    // - Bildet skal være zoombart via standard nettleser-mekanismer (Ctrl/Cmd +, Ctrl/Cmd -)
+    // - IKKE bruk pointer-events: none på bildet (blokkerer browser zoom)
+    // - Hvis custom zoom skal implementeres senere: bruk transform: scale() på bildet,
+    //   ikke endre container-størrelse (behold flex-layout for responsivitet)
+    const img = document.createElement('img');
+    const currentStep = steps[state.currentStepIndex];
+    if (currentStep) {
+      img.src = getImageUrl(state.currentPath, currentStep);
+      img.alt = `Steg ${state.currentStepIndex + 1}`;
+    }
+    imageContainer.appendChild(img);
+  }
+  
+  // Bottom bar: Har fast høyde slik at hovedbildet alltid kan bruke resten av høyden
+  const bottomBar = document.createElement('div');
+  bottomBar.className = 'viewer__bottom';
+  
+  // Opp-knapp
+  const upButton = document.createElement('button');
+  upButton.className = 'viewer__button';
+  upButton.textContent = 'Opp';
+  upButton.addEventListener('click', callbacks.onGoUp);
+  
+  // Pil-knapper (deaktiver hvis ingen steg)
+  const prevButton = document.createElement('button');
+  prevButton.className = 'viewer__button';
+  prevButton.textContent = '←';
+  prevButton.disabled = steps.length === 0 || state.currentStepIndex === 0;
+  if (steps.length > 0) {
+    prevButton.addEventListener('click', callbacks.onPrevStep);
+  }
+  
+  const nextButton = document.createElement('button');
+  nextButton.className = 'viewer__button';
+  nextButton.textContent = '→';
+  nextButton.disabled = steps.length === 0 || state.currentStepIndex === (steps.length - 1);
+  if (steps.length > 0) {
+    nextButton.addEventListener('click', callbacks.onNextStep);
+  }
+  
+  // Progresjonslinje (skjul hvis ingen steg)
+  const progressBar = document.createElement('input');
+  progressBar.className = 'viewer__progress';
+  progressBar.type = 'range';
+  progressBar.min = 0;
+  progressBar.max = Math.max(0, steps.length - 1);
+  progressBar.value = state.currentStepIndex;
+  progressBar.disabled = steps.length === 0;
+  if (steps.length > 0) {
+    progressBar.addEventListener('input', (e) => {
+      callbacks.onStepChange(parseInt(e.target.value, 10));
+    });
+  }
+  
+  // Steg-indikator
+  const stepIndicator = document.createElement('div');
+  stepIndicator.className = 'viewer__step-indicator';
+  stepIndicator.textContent = steps.length === 0 
+    ? 'Ingen steg tilgjengelig'
+    : `Steg ${state.currentStepIndex + 1} av ${steps.length}`;
+  
+  bottomBar.appendChild(upButton);
+  bottomBar.appendChild(prevButton);
+  bottomBar.appendChild(progressBar);
+  bottomBar.appendChild(nextButton);
+  bottomBar.appendChild(stepIndicator);
+  
+  container.appendChild(header);
+  container.appendChild(imageContainer);
+  container.appendChild(bottomBar);
+  
+  return container;
+}
+```
+
+## Error handling
+
+### Prinsipper
+
+1. **Graceful degradation**: Applikasjonen skal ikke krasje ved feil
+2. **Brukervennlige meldinger**: Vis forståelige feilmeldinger
+3. **Logging**: Log feil til konsollen for debugging
+
+### Error handling-patterns
+
+```javascript
+// Ved datahenting
+try {
+  const meta = await loadProjectMeta(path);
+  // Bruk meta
+} catch (error) {
+  console.error('Kunne ikke laste prosjekt:', error);
+  // Vis feilmelding til bruker
+  showError('Kunne ikke laste prosjekt. Prøv igjen senere.');
+}
+
+// Ved bildevisning
+img.onerror = () => {
+  console.error('Kunne ikke laste bilde:', img.src);
+  // Vis fallback eller feilmelding
+  img.src = '/assets/placeholder.png';
+};
+
+// Ved localStorage
+try {
+  localStorage.setItem(key, value);
+} catch (e) {
+  console.warn('Kunne ikke lagre til localStorage:', e);
+  // Fortsett uten lagring
+}
+```
+
+## Event handling
+
+### Pattern for event listeners
+
+```javascript
+// Legg til event listener
+element.addEventListener('click', handleClick);
+
+// Fjern event listener (hvis nødvendig)
+element.removeEventListener('click', handleClick);
+
+// Event delegation (hvis dynamisk innhold)
+container.addEventListener('click', (e) => {
+  if (e.target.matches('.project-tile')) {
+    handleProjectClick(e.target);
+  }
+});
+```
+
+### Callback-pattern
+
+```javascript
+import { getState, updateState } from './state.js';
+import { updateHash } from './router.js';
+
+// Definer callback-interface
+const callbacks = {
+  onProjectClick: (path) => {
+    updateState({ currentPath: path });
+    updateHash({ type: 'project', path });
+  },
+  onStepChange: (stepIndex) => {
+    updateState({ currentStepIndex: stepIndex });
+    const { currentPath } = getState();
+    updateHash({ 
+      type: 'project', 
+      path: currentPath,
+      stepIndex 
+    });
+  }
+};
+
+// Pass til view
+const view = renderViewer(getState(), callbacks);
+```
+
+## DOM-manipulering
+
+### Pattern for rendering
+
+```javascript
+// Opprett element
+const element = document.createElement('div');
+element.className = 'my-class';
+
+// Sett attributter
+element.setAttribute('data-id', id);
+element.id = 'unique-id';
+
+// Legg til innhold
+element.textContent = 'Tekst';
+element.innerHTML = '<span>HTML</span>'; // Bruk forsiktig
+
+// Legg til child
+parent.appendChild(child);
+
+// Erstatt innhold
+container.innerHTML = ''; // Tøm
+container.appendChild(newContent); // Legg til nytt
+```
+
+### Oppdatering av eksisterende views
+
+**Merk**: Følgende er valgfrie patterns som kan brukes ved behov, men er ikke krav i første versjon.
+
+```javascript
+import { getImageUrl } from './data-loader.js';
+
+// I stedet for å re-rendere hele view, oppdater kun det som endres
+function updateViewerImage(state) {
+  const img = document.querySelector('.viewer__main img');
+  const step = state.currentProjectMeta.steps[state.currentStepIndex];
+  img.src = getImageUrl(state.currentPath, step);
+}
+
+function updateProgressBar(state) {
+  const progressBar = document.querySelector('.viewer__bottom input[type="range"]');
+  progressBar.value = state.currentStepIndex;
+  progressBar.max = state.currentProjectMeta.steps.length - 1;
+}
+```
+
+## Async/await patterns
+
+```javascript
+// Håndter async operasjoner
+async function loadAndRender(path) {
+  try {
+    const meta = await loadProjectMeta(path);
+    const state = {
+      currentPath: path,
+      currentStepIndex: 0,
+      currentProjectMeta: meta
+    };
+    renderViewer(state, callbacks);
+  } catch (error) {
+    console.error('Feil ved lasting:', error);
+    showError('Kunne ikke laste prosjekt');
+  }
+}
+
+// Parallel lasting (valgfri pattern, ikke krav i første versjon)
+async function loadMultipleProjects(paths) {
+  const promises = paths.map(path => loadProjectMeta(path));
+  const results = await Promise.all(promises);
+  return results;
+}
+
+## Testing under implementering
+
+### Manuell testing-checklist
+
+For hver funksjon du implementerer:
+
+1. **Test i nettleseren** (se ROADMAP.md for detaljer)
+2. **Sjekk konsollen** for feil
+3. **Test edge cases**:
+   - Tomme arrays
+   - Manglende filer
+   - Ugyldig data
+   - localStorage deaktivert
+4. **Test på ulike skjermstørrelser**
+5. **Test navigasjon** mellom alle views
+
+### Debugging-tips
+
+```javascript
+// Logging for debugging
+console.log('State:', state);
+console.log('Route:', route);
+
+// Breakpoints i DevTools
+debugger; // Pause her
+
+// Sjekk localStorage
+console.log('Progress:', localStorage.getItem('legoInstructions.progress'));
+
+// Inspiser DOM
+console.log('Container:', container);
+```
+
+## Beste praksis
+
+1. **Kort og fokuserte funksjoner**: Maks 50 linjer per funksjon
+2. **Dokumenter kompleks logikk**: Kommenter hvorfor, ikke hva
+3. **Bruk beskrivende navn**: `loadProjectMeta` er bedre enn `load`
+4. **Håndter feil gracefully**: Applikasjonen skal ikke krasje
+5. **Test inkrementelt**: Test hver del før du går videre
+6. **Hold moduler løst koblet**: Moduler skal ikke være for avhengige av hverandre
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+docs\README.md
+File type: .md
+# LEGO Instruksjonsvisning
+
+Et enkelt, statisk nettsted for å vise LEGO-byggeinstruksjoner som PNG-bilder med strukturert navigasjon.
+
+## Prosjektoversikt
+
+Dette prosjektet lar deg organisere og vise LEGO-instruksjoner i et hierarkisk system:
+- **Prosjekt** → (valgfritt) **Underprosjekter** → **Steg-bilder**
+
+Dette prosjektet lar deg bla i instruksjonssteg som på en ekte LEGO-byggebok — men med dine egne modeller.
+
+Nettsiden er bygget med ren HTML, CSS og JavaScript, og kan hostes hvor som helst som støtter statisk hosting.
+
+## Funksjoner
+
+### Første versjon
+
+- **Prosjektgalleri**: Oversikt over alle tilgjengelige prosjekter med cover-bilder
+- **Hierarkisk navigasjon**: Støtte for prosjekter med underprosjekter
+- **Stegvis visning**: Naviger mellom instruksjonsbilder med pil-knapper
+- **Progresjonslinje**: Vis hvor langt du har kommet, klikk/drag for å hoppe til spesifikt steg
+- **Opp-navigasjon**: Knapp for å gå "ett hakk opp" i hierarkiet
+- **Posisjonslagring**: Automatisk lagring av hvor du var (prosjekt + steg) i localStorage
+- **Responsivt design**: Fungerer på mobil, nettbrett og PC
+- **Ingen scroll**: Instruksjonsbildet tilpasses skjermen uten scrolling
+
+### Planlagte funksjoner
+
+- QR-kode-generering for å dele spesifikke steg
+- Loading-indikatorer og preloading av bilder
+- Caching-strategier for bedre ytelse
+
+## Brukeropplevelse for barn 5–7 år
+
+Prosjektet er primært laget for barn som ennå ikke kan lese flytende. UI-et skal derfor følge disse prinsippene:
+
+- **Ikoner og tall fremfor tekst**: Bruk hus/pil-symboler, store neste/forrige-ikoner og tallformat (`3/10`) i stedet for strenger som “Steg 3 av 10”.
+- **Store trykkflater**: Alle primærknapper skal minst være 44x44px – helst rundt 64px (≈2 cm) – med god avstand (`var(--spacing-md)`+) mellom elementene slik at små fingre treffer riktig.
+- **Tydelig feedback**: Navigasjonsknapper skal animere/lyses opp ved trykk, og applikasjonen kan spille korte lyder eller vise små animasjoner (f.eks. konfetti ved fullføring) for å gi mestringsfølelse.
+- **Hierarki uten tekst**: Opp/hjem-knappen skal være et ikon og ligge på samme sted på alle skjermer. Underprosjekter kan presenteres som egne tiles med klare bilder slik at barna skjønner hva som skjer uten beskrivelse.
+- **Enkle interaksjoner**: Pilene er primærnavigasjon. Progresjonslinjen er sekundær (tapping fremfor presis dragging). Swipe-gestures på bildet kan implementeres som ekstra hjelp.
+- **Tilgjengelighet**: Alle bilder skal ha `alt`-tekst myntet på foreldre, og fargevalg skal ha god kontrast slik at knappene er tydelige under alle lysforhold.
+- **Onboarding**: Første gang appen åpnes, vis en visuell overlay (maskot/piler) som peker på det første prosjektet og forsvinner idet barnet trykker. Lagre i localStorage at onboarding er gjennomført.
+- **Underprosjekter inline**: Prosjekter med `children` kan vises i samme skjerm som galleriet (flatt layout) slik at barnet slipper å navigere “opp ett nivå”. Viewer skal kun åpnes når man velger et konkret steg eller child.
+- **Lyd og haptikk**: En høyttaler-knapp lar voksne skru av/på korte “klikk”-lyder. På enheter som støtter det kan knappetrykk trigge haptisk feedback. Eventuelle lydinstruksjoner per steg kan legges i `projects/<path>/audio/` og refereres fra `meta.json`.
+- **Loading og belønning**: Mens bilder lastes skal en LEGO-inspirert spinner vises, og når siste steg fullføres vises en enkel gratulasjonsanimasjon (konfetti/badge) samt at progresjonen markeres som ferdig.
+- **Barnemodus**: UI-et kan styres av en `childMode`-innstilling (lagret i localStorage eller konfigurasjonsfil). Når den er aktiv vil galleri/child-visning følge flat struktur, onboarding-overlegg aktiveres, og tekst erstattes med ikoner.
+
+## Teknisk oversikt
+
+- **Teknologi**: Ren HTML + CSS + JavaScript (ingen build tools eller dependencies)
+- **Hosting**: Statisk hosting (designet for GitHub Pages)
+- **Routing**: Hash-basert routing (`#/p/project1?step=3`)
+- **State management**: localStorage for progresjonslagring
+- **Dataformat**: JSON-filer (`meta.json` og `projects.json`)
+
+## Bildstruktur og navngivning
+
+### Bildnavn
+
+Bilder skal navngis med formatet: `[nummer]*.png`
+
+- Nummeret må komme først i filnavnet (dette er formatet som Bricklink Studio 2.0 genererer bildene på)
+- Nummeret må stå først fordi filene sorteres automatisk basert på nummeret. Alt etter nummeret ignoreres ved sortering
+- Etter nummeret kan det være hva som helst (f.eks. `_1x`, `_2x`, `_cover`, etc.)
+- Filen må ende med `.png`
+
+**Eksempler:**
+- `1_1x.png`
+- `174_1x.png`
+- `1_2x.png`
+- `1_cover.png`
+
+### Cover-bilde
+
+Hver prosjektmappe kan ha et spesielt `cover.png`-bilde som brukes som cover i prosjektgalleriet.
+
+- Hvis `cover.png` finnes, brukes den som cover-bilde
+- Hvis `cover.png` ikke finnes, brukes det første bildet (laveste nummer) som cover
+
+### Rekkefølge og sortering
+
+Bildene sorteres automatisk basert på nummeret i filnavnet. Sørg for at nummerene er konsistente for riktig rekkefølge.
+
+**Hvordan sortering fungerer:**
+- Systemet leser kun nummeret i starten av filnavnet
+- Alt etter nummeret (som `_1x`, `_cover`, `_2x`, etc.) ignoreres ved sortering
+- Dette betyr at `1_1x.png`, `1_cover.png` og `1_2x.png` alle vil sorteres som nummer 1
+- For å sikre riktig rekkefølge, bruk unike numre for hvert steg
+
+## Filstruktur
+
+```
+/lego-instruksjoner/
+  index.html
+  /assets/
+    /css/
+      main.css
+    /js/
+      main.js
+      router.js
+      state.js
+      view-project-grid.js
+      view-viewer.js
+      data-loader.js
+  /projects/
+    project1/
+      meta.json
+      cover.png (valgfritt)
+      1_1x.png
+      2_1x.png
+      ...
+      subproject-a/
+        meta.json
+        cover.png (valgfritt)
+        1_1x.png
+        2_1x.png
+        ...
+    project2/
+      meta.json
+      ...
+  projects.json
+```
+
+## Hurtigstart
+
+### 1. Klon eller last ned prosjektet
+
+```bash
+git clone <repository-url>
+cd lego-instruksjoner
+```
+
+### 2. Legg til prosjekter
+
+Se [Hvordan legge til nye prosjekter](#hvordan-legge-til-nye-prosjekter) nedenfor.
+
+### 3. Test lokalt
+
+Siden dette skal hostes på GitHub Pages, anbefales det å teste via en lokal webserver:
+
+```bash
+# Python 3
+python -m http.server 8000
+
+# Node.js (med http-server)
+npx http-server -p 8000
+```
+
+Åpne nettleseren og gå til `http://localhost:8000`
+
+### 4. Deploy til GitHub Pages
+
+1. Push koden til GitHub-repositoryet
+2. Gå til Settings → Pages i GitHub-repositoryet
+3. Velg branch og mappe (vanligvis `main` og `/root`)
+4. Nettsiden vil være tilgjengelig på `https://<username>.github.io/<repository-name>`
+
+## Hvordan legge til nye prosjekter
+
+**Kortversjon:**
+1. Lag mappe under `/projects/`
+2. Legg inn bilder med riktig navngivning
+3. Lag `meta.json`-fil
+4. (Valgfritt) Legg til underprosjekter
+5. Oppdater `projects.json`
+
+### Steg 1: Opprett prosjektmappe
+
+Opprett en ny mappe under `/projects/` med et beskrivende navn:
+
+```
+/projects/mitt-prosjekt/
+```
+
+### Steg 2: Legg til bilder
+
+Legg alle instruksjonsbildene i prosjektmappen med riktig navngivning:
+
+```
+/projects/mitt-prosjekt/
+  1_1x.png
+  2_1x.png
+  3_1x.png
+  ...
+```
+
+### Steg 3: Legg til cover-bilde (valgfritt)
+
+Hvis du vil ha et spesielt cover-bilde, legg det til som `cover.png`:
+
+```
+/projects/mitt-prosjekt/
+  cover.png
+  1_1x.png
+  ...
+```
+
+### Steg 4: Opprett meta.json
+
+Opprett en `meta.json`-fil i prosjektmappen:
+
+```json
+{
+  "id": "mitt-prosjekt",
+  "name": "Mitt Prosjekt",
+  "coverImage": "cover.png",
+  "steps": [
+    "1_1x.png",
+    "2_1x.png",
+    "3_1x.png"
+  ],
+  "children": []
+}
+```
+
+**Forklaring:**
+- `id`: Unik identifikator for prosjektet
+- `name`: Visningsnavn
+- `coverImage`: Navn på cover-bildet (eller første bilde hvis ikke spesifisert)
+- `steps`: Array med alle steg-bildene i riktig rekkefølge
+- `children`: Array med underprosjekter (tom hvis ingen)
+
+### Steg 5: Legg til underprosjekter (valgfritt)
+
+Hvis prosjektet har underprosjekter:
+
+1. Opprett undermappe: `/projects/mitt-prosjekt/underprosjekt-a/`
+2. Legg til bilder og `meta.json` i undermappen
+3. Oppdater `meta.json` i hovedprosjektet:
+
+```json
+{
+  "id": "mitt-prosjekt",
+  "name": "Mitt Prosjekt",
+  "coverImage": "cover.png",
+  "steps": [
+    "1_1x.png",
+    "2_1x.png"
+  ],
+  "children": [
+    {
+      "id": "underprosjekt-a",
+      "name": "Underprosjekt A",
+      "path": "underprosjekt-a"
+    }
+  ]
+}
+```
+
+**Forklaring av `path`:**
+- `path` er navnet på undermappen (relativ sti)
+- Hvis undermappen heter `tårn/`, settes `path` til `"tårn"`
+- Dette er den relative stien fra hovedprosjektmappen til undermappen
+
+### Steg 6: Oppdater projects.json
+
+Legg til det nye prosjektet i `projects.json` i rotmappen:
+
+```json
+[
+  {
+    "id": "mitt-prosjekt",
+    "name": "Mitt Prosjekt",
+    "path": "mitt-prosjekt"
+  },
+  {
+    "id": "annet-prosjekt",
+    "name": "Annet Prosjekt",
+    "path": "annet-prosjekt"
+  }
+]
+```
+
+Se [DATA_FORMAT.md](./DATA_FORMAT.md) for detaljert dokumentasjon av JSON-formatene.
+
+## Bruk
+
+### Navigasjon
+
+1. **Prosjektgalleri**: Startside viser alle tilgjengelige prosjekter
+2. **Velg prosjekt**: Klikk på et prosjekt for å åpne det
+3. **Naviger mellom steg**: Bruk pil-knappene eller progresjonslinjen
+4. **Gå tilbake**: Bruk "Opp"-knappen for å gå ett nivå opp i hierarkiet
+5. **Gå til prosjektgalleri**: Gå tilbake til rotnivået for å velge et annet prosjekt
+
+### URL-struktur
+
+- Prosjektgalleri: `/#/` eller `/#`
+- Prosjekt: `/#/p/project1`
+- Prosjekt med steg: `/#/p/project1?step=3`
+- Underprosjekt: `/#/p/project1/subproject-a`
+
+URL-en oppdateres automatisk når du navigerer, så du kan bookmarke spesifikke steg.
+
+For tekniske detaljer om routing, state og modulstruktur, se [ARCHITECTURE.md](./ARCHITECTURE.md).
+
+## Støttede plattformer
+
+Nettsiden er designet for moderne nettlesere på:
+
+- **Mobil**: iOS Safari, Chrome Mobile, Samsung Internet
+- **Nettbrett**: iPad, Android-tabletter
+- **PC**: Chrome, Firefox, Edge, Safari (siste versjoner)
+
+Ingen støtte for eldre nettlesere (IE, etc.).
+
+## Kjente begrensninger
+
+Følgende funksjoner er planlagt for fremtidige versjoner:
+
+- Loading-indikatorer mens bilder lastes
+- Preloading av neste bilde for raskere navigasjon
+- Caching-strategier for bedre ytelse
+- Tastaturnavigasjon (piltaster, escape)
+- Touch gestures på mobil (swipe)
+- Ingen offline-støtte ennå (kommer med caching-strategien)
+
+## Dokumentasjon
+
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Teknisk arkitektur og komponentoversikt
+- [ROADMAP.md](./ROADMAP.md) - Implementasjonsplan og fremtidige funksjoner
+- [DATA_FORMAT.md](./DATA_FORMAT.md) - Detaljert dokumentasjon av JSON-formater
+
+## Skjermbilder
+
+Skjermbilder av grensesnittet vil bli lagt til når UI-en er implementert.
+
+## Lisens
+
+Privat prosjekt – ingen redistribusjon.
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+docs\ROADMAP.md
+File type: .md
+# Roadmap
+
+Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for LEGO Instruksjonsvisning-prosjektet.
+
+## Hvordan denne roadmapen skal brukes (for AI)
+
+**⚠️ START HER**: Les [AI_GUIDE.md](./AI_GUIDE.md) først for en oversikt over alle dokumenter og kritiske regler.
+
+- Jobb alltid i rekkefølge innenfor en fase (1.1 før 1.2, osv.), med mindre jeg eksplisitt sier noe annet.
+- Etter hver oppgave: oppdater denne filen og sett `[ ]` → `[x]` der det passer.
+- Ikke hopp til Fase 2 eller 3 før alle M1/M2-kriterier er oppfylt.
+- Respekter dataformater som beskrevet i [DATA_FORMAT.md](./DATA_FORMAT.md) – ikke endre formater uten å foreslå det først.
+- Ved tvil: foreslå 2–3 alternativer i en kommentar, ikke gjett.
+- Se [ARCHITECTURE.md](./ARCHITECTURE.md) for arkitekturdetaljer og [IMPLEMENTATION.md](./IMPLEMENTATION.md) for kodeeksempler.
+
+## Fase 1: Grunnleggende struktur (Første versjon)
+
+### 1.1 Prosjektoppsett
+- [ ] **1.1.1** Opprett filstruktur (index.html, assets/css/main.css, assets/js/*.js)
+  - **Mål**: Opprett alle nødvendige mapper og tomme filer
+- [ ] **1.1.2** Sett opp grunnleggende HTML-struktur
+  - **Mål**: Opprett index.html med grunnleggende struktur og lenker til CSS/JS
+- [ ] **1.1.3** Implementer grunnleggende CSS-layout
+  - **Mål**: Grunnleggende styling og layout (se [CSS_GUIDELINES.md](./CSS_GUIDELINES.md))
+  - **🌐 TEST I NETTLESER**: Verifiser at siden laster og grunnleggende styling vises
+
+### 1.2 Statiske testdata
+- [ ] **1.2.1** Opprett én testprosjektmappe med meta.json
+  - **Mål**: Opprett mappe under /projects/ med meta.json (se [DATA_FORMAT.md](./DATA_FORMAT.md))
+- [ ] **1.2.2** Legg til cover.png og noen step-bilder
+  - **Mål**: Legg til minst 3-5 testbilder med riktig navngivning
+  - **Merk**: Dette gjøres manuelt av brukeren - AI skal ikke implementere dette steget
+- [ ] **1.2.3** Opprett projects.json med testprosjektet
+  - **Mål**: Opprett projects.json i rotmappen med referanse til testprosjektet
+
+### 1.3 Router og root-view
+- [ ] **1.3.1** Implementer router.js med hash-parsing
+  - **Mål**: Funksjoner for å parse hash og oppdatere URL (se [IMPLEMENTATION.md](./IMPLEMENTATION.md))
+- [ ] **1.3.2** Implementer view-project-grid.js
+  - **Mål**: Renderer prosjektgalleri med cover-bilder og navn
+  - **🌐 TEST I NETTLESER**: Verifiser at prosjektgalleri vises med cover-bilder
+- [ ] **1.3.3** Koble router til prosjektgalleri-view
+  - **Mål**: Router trigges ved hash-endringer og viser galleri
+  - **🌐 TEST I NETTLESER**: Verifiser at hash-endringer trigges og galleri vises
+- [ ] **1.3.4** Test navigasjon til prosjektgalleri
+  - **🌐 TEST I NETTLESER**: Test at klikk på prosjekt navigerer til riktig URL
+
+### 1.4 Data-loader og viewer
+- [ ] **1.4.1** Implementer data-loader.js for å hente meta.json
+  - **Mål**: Funksjoner for å hente projects.json og meta.json med fetch
+  - **🌐 TEST I NETTLESER**: Sjekk i Network-tab at meta.json og projects.json lastes uten feil
+- [ ] **1.4.2** Implementer view-viewer.js med enkel bildevisning
+  - **Mål**: Vise første steg-bilde for valgt prosjekt
+  - **🌐 TEST I NETTLESER**: Verifiser at riktig bilde vises når du går direkte til /#/p/<path>
+- [ ] **1.4.3** Legg til pil-knapper for neste/forrige steg
+  - **Mål**: Navigasjonsknapper som oppdaterer state og URL
+  - **🌐 TEST I NETTLESER**: Test at pil-knappene fungerer og bytter bilde
+- [ ] **1.4.4** Test navigasjon mellom steg
+  - **🌐 TEST I NETTLESER**: Test at alle steg kan navigeres mellom
+
+### 1.5 Progresjonslinje og opp-knapp
+- [ ] **1.5.1** Implementer progresjonslinje (range-input eller custom)
+  - **Mål**: Range-input eller custom progress bar som viser nåværende steg
+  - **🌐 TEST I NETTLESER**: Verifiser at progresjonslinje vises og kan klikkes/dragges
+- [ ] **1.5.2** Legg til "Opp"-knapp for hierarkisk navigasjon
+  - **Mål**: Knapp som navigerer ett nivå opp i hierarkiet
+  - **🌐 TEST I NETTLESER**: Verifiser at "Opp"-knappen vises og fungerer
+- [ ] **1.5.3** Implementer logikk for å gå tilbake til forelder
+  - **Mål**: Beregn forelder-path og naviger dit
+  - **🌐 TEST I NETTLESER**: Test at "Opp"-knapp navigerer til forelder
+- [ ] **1.5.4** Test hierarkisk navigasjon
+  - **🌐 TEST I NETTLESER**: Test full hierarkisk navigasjon (opp/ned i treet)
+
+### 1.6 localStorage-lagring
+- [ ] **1.6.1** Implementer state.js med localStorage-integrasjon
+  - **Mål**: State management med getters/setters og localStorage-synkronisering
+- [ ] **1.6.2** Lagre progresjon per prosjektpath
+  - **Mål**: Automatisk lagring av steg-indeks når bruker navigerer
+  - **🌐 TEST I NETTLESER**: Verifiser i DevTools Application-tab at data lagres i localStorage
+- [ ] **1.6.3** Les lagret progresjon ved applikasjonsstart
+  - **Mål**: Hent lagret progresjon og bruk ved navigering til prosjekt
+  - **🌐 TEST I NETTLESER**: Test at lagret progresjon leses ved reload av siden
+- [ ] **1.6.4** Test at posisjon lagres og gjenopptas
+  - **🌐 TEST I NETTLESER**: Naviger til steg 5, reload siden, verifiser at steg 5 vises
+
+### 1.7 CSS og responsivt design
+- [ ] **1.7.1** Implementer "ingen scroll" på instruksjonsvisning
+  - **Mål**: Image container skal fylle plass uten scroll (se [CSS_GUIDELINES.md](./CSS_GUIDELINES.md))
+  - **🌐 TEST I NETTLESER**: Verifiser at ingen scroll-bars vises på image container
+- [ ] **1.7.2** Tilpass bildet til skjermen (object-fit: contain)
+  - **Mål**: Bildet skal tilpasses skjermen uten å kuttes
+  - **🌐 TEST I NETTLESER**: Verifiser at bildet tilpasses skjermen uten å kuttes
+- [ ] **1.7.3** Responsivt design for mobil, nettbrett og PC
+  - **Mål**: Mobile-first CSS med media queries
+  - **🌐 TEST I NETTLESER**: Test responsivt design i DevTools device mode
+- [ ] **1.7.4** Test på ulike skjermstørrelser
+  - **🌐 TEST I NETTLESER**: Test på mobil (375px), nettbrett (768px) og desktop (1920px)
+
+### 1.8 Filtrering av skjulte prosjekter
+- [ ] **1.8.1** Implementer filtrering av skjulte prosjekter i prosjektgalleri
+  - **Mål**: Filtrer bort prosjekter med `hidden: true` fra prosjektgalleri (se [DATA_FORMAT.md](./DATA_FORMAT.md))
+  - **🌐 TEST I NETTLESER**: Legg til prosjekt med `hidden: true` i projects.json, verifiser at det ikke vises i galleri
+- [ ] **1.8.2** Implementer filtrering av skjulte children i viewer
+  - **Mål**: Filtrer bort children med `hidden: true` når children-liste vises (se [DATA_FORMAT.md](./DATA_FORMAT.md))
+  - **🌐 TEST I NETTLESER**: Legg til child med `hidden: true` i meta.json, verifiser at det ikke vises i children-liste
+- [ ] **1.8.3** Test at skjulte prosjekter fortsatt er tilgjengelige via direkte URL
+  - **🌐 TEST I NETTLESER**: Naviger direkte til skjult prosjekt via URL, verifiser at det vises
+
+### 1.9 Generalisering
+- [ ] **1.9.1** Test med flere prosjekter
+  - **🌐 TEST I NETTLESER**: Legg til 2-3 prosjekter og verifiser at alle synlige vises i galleri
+- [ ] **1.9.2** Test med underprosjekter
+  - **🌐 TEST I NETTLESER**: Test prosjekt med underprosjekter, verifiser navigasjon
+- [ ] **1.9.3** Verifiser at hierarkisk navigasjon fungerer
+  - **🌐 TEST I NETTLESER**: Test full navigasjonsflyt: galleri → prosjekt → underprosjekt → steg → tilbake
+- [ ] **1.9.4** End-to-end testing
+  - **🌐 TEST I NETTLESER**: Gjennomføre komplett brukeropplevelse fra start til slutt
+
+## Fase 2: Forbedringer og optimalisering
+
+### 2.1 Brukeropplevelse
+- [ ] **2.1.1** Loading-indikatorer mens bilder lastes
+  - **Mål**: Vis spinner eller loading-indikator mens bilder lastes
+  - **🌐 TEST I NETTLESER**: Verifiser at loading-indikator vises mens bilder lastes
+- [ ] **2.1.2** Preloading av neste bilde for raskere navigasjon
+  - **Mål**: Last neste bilde i bakgrunnen for raskere navigasjon
+  - **🌐 TEST I NETTLESER**: Verifiser i Network-tab at neste bilde lastes i forkant
+- [ ] **2.1.3** Feilhåndtering for manglende bilder/filer
+  - **Mål**: Graceful error handling med fallback eller feilmeldinger
+  - **🌐 TEST I NETTLESER**: Test med manglende bilder/filer, verifiser feilhåndtering
+- [ ] **2.1.4** Forbedret feilmeldinger
+  - **Mål**: Brukervennlige feilmeldinger i stedet for tekniske
+  - **🌐 TEST I NETTLESER**: Verifiser at brukervennlige feilmeldinger vises
+
+### 2.2 Navigasjon
+- [ ] **2.2.1** Tastaturnavigasjon (piltaster for neste/forrige)
+  - **Mål**: Arrow keys for å navigere mellom steg
+  - **🌐 TEST I NETTLESER**: Test at piltaster fungerer for neste/forrige steg
+- [ ] **2.2.2** Escape-tast for å gå tilbake
+  - **Mål**: Escape-tast navigerer ett nivå opp eller tilbake
+  - **🌐 TEST I NETTLESER**: Test at Escape-tast navigerer tilbake
+- [ ] **2.2.3** Touch gestures på mobil (swipe venstre/høyre)
+  - **Mål**: Swipe-gestures for navigasjon på touch-enheter
+  - **🌐 TEST I NETTLESER**: Test swipe-gestures på mobil eller i DevTools device mode
+- [ ] **2.2.4** Keyboard shortcuts-dokumentasjon
+  - **Mål**: Dokumenter alle keyboard shortcuts
+
+### 2.3 Ytelse
+- [ ] **2.3.1** Caching-strategier for bilder
+  - **Mål**: Implementer caching for raskere lasting av bilder
+  - **🌐 TEST I NETTLESER**: Verifiser i Network-tab at bilder caches og lastes fra cache
+- [ ] **2.3.2** Lazy loading av bilder
+  - **Mål**: Last bilder kun når de trengs, ikke alle på en gang
+  - **🌐 TEST I NETTLESER**: Verifiser at bilder lastes kun når de trengs
+- [ ] **2.3.3** Optimalisering av bildevisning
+  - **Mål**: Optimaliser bildevisning for bedre ytelse
+  - **🌐 TEST I NETTLESER**: Test ytelse med Performance-tab i DevTools
+- [ ] **2.3.4** Grunnleggende caching-strategier (uten Service Worker)
+  - **Mål**: Browser-caching og localStorage for bilder/metadata
+  - **🌐 TEST I NETTLESER**: Verifiser at browser cacher ressurser
+
+### 2.4 Progresjonsvisning
+- [ ] **2.4.1** Vis progresjonsindikator i prosjektgalleri
+  - **Mål**: Vis hvor langt brukeren har kommet i hvert prosjekt i galleriet
+  - **🌐 TEST I NETTLESER**: Verifiser at progresjonsindikator vises i prosjektgalleri
+- [ ] **2.4.2** Vis hvor langt man har kommet per prosjekt
+  - **Mål**: Vis progresjon (f.eks. "3/10 steg") for hvert prosjekt
+  - **🌐 TEST I NETTLESER**: Verifiser at korrekt progresjon vises for hvert prosjekt
+- [ ] **2.4.3** Mulighet for å nullstille progresjon
+  - **Mål**: Knapp eller funksjonalitet for å nullstille lagret progresjon
+  - **🌐 TEST I NETTLESER**: Test at nullstilling fungerer og oppdaterer visning
+
+### 2.5 Barnevennlig UI
+- [ ] **2.5.1** Ikonbasert navigasjon
+  - **Mål**: Erstatt/suppler tekst med ikoner (hus, piler, stjerner) i viewer og galleri
+  - **🌐 TEST I NETTLESER**: Verifiser at alle primære handlinger kan utføres uten å lese tekst
+- [ ] **2.5.2** Store trykkflater og spacing
+  - **Mål**: Øk størrelse på knapper og klikksoner (≥64px) og legg til tilstrekkelig spacing
+  - **🌐 TEST I NETTLESER**: Test på mobil/nettbrett at knapper er lette å treffe
+- [ ] **2.5.3** Visuell/lyd feedback
+  - **Mål**: Legg til mikroanimasjoner og valgfri lyd når barnet navigerer, samt en enkel belønning ved fullført prosjekt
+  - **🌐 TEST I NETTLESER**: Verifiser at feedback trigges ved interaksjon og kan skrus av/på
+- [ ] **2.5.4** Intro/hjelp for barn
+  - **Mål**: Implementer en kort visuell onboarding (f.eks. maskot eller highlight) som viser hvordan man blar
+  - **🌐 TEST I NETTLESER**: Test at introen kan avbrytes og kun vises ved behov
+
+### 2.6 Tilgjengelighet og input
+- [ ] **2.6.1** Swipe-gestures i viewer
+  - **Mål**: Swipe venstre/høyre på bildet gjør samme som pilene
+  - **🌐 TEST I NETTLESER**: Test på touch-enheter
+- [ ] **2.6.2** Alt-tekst og kontrastsjekk
+  - **Mål**: Sørg for alt-tekst på bilder og dokumenter kontrastkrav i CSS_guidelines
+  - **🌐 TEST I NETTLESER**: Kjør Lighthouse/axe for tilgjengelighetsvarsler
+
+### 2.7 Loading, feilhåndtering og belønning
+- [ ] **2.7.1** LEGO-inspirert loading-indikator
+  - **Mål**: Vise animert kloss/spinner mens bilder lastes, deaktivere kontroller inntil bildet er klart
+  - **🌐 TEST I NETTLESER**: Kunstig treghet (DevTools) for å verifisere at indikator vises
+- [ ] **2.7.2** Brukervennlige feilmeldinger
+  - **Mål**: Vennlig melding når bilde/meta mangler (“Oi! Fant ikke bildet – spør en voksen”)
+  - **🌐 TEST I NETTLESER**: Simuler 404 og sjekk at melding vises
+- [ ] **2.7.3** Fullføringsbelønning
+  - **Mål**: Konfetti/badge + state-markering når prosjekt er ferdig
+  - **🌐 TEST I NETTLESER**: Naviger til siste steg og se at belønning trigges, og at det kan trigges kun én gang per prosjekt
+
+### 2.8 Lyd, haptikk og voiceover
+- [ ] **2.8.1** Navigasjonslyd/haptikk
+  - **Mål**: Korte “klikk”-lyder og haptikk på pil/opp-knapp (kan skrus av/på)
+  - **🌐 TEST I NETTLESER**: Verifiser toggle + fallback når API ikke støttes
+- [ ] **2.8.2** Steg-vis lydhint
+  - **Mål**: Støtte `audioSteps` fra meta.json og knapp for å spille av lyd per steg
+  - **🌐 TEST I NETTLESER**: Test med sample-lyd, verifiser at feil håndteres
+- [ ] **2.8.3** Onboarding-stemme/figur
+  - **Mål**: Maskot/overlay som visuelt (og evt. auditivt) viser hvordan man starter
+  - **🌐 TEST I NETTLESER**: Sørg for at overlay vises kun første gang og kan avbrytes
+
+## Fase 3: Avanserte funksjoner
+
+### 3.1 QR-kode-generering
+- [ ] **3.1.1** Implementer QR-kode-generering for spesifikke steg
+  - **Mål**: Generer QR-kode basert på nåværende URL
+  - **🌐 TEST I NETTLESER**: Verifiser at QR-kode genereres og vises korrekt
+- [ ] **3.1.2** QR-kode for prosjekt (starter på første steg)
+  - **Mål**: QR-kode som peker til prosjektets første steg
+  - **🌐 TEST I NETTLESER**: Test at QR-kode for prosjekt peker til riktig URL
+- [ ] **3.1.3** QR-kode for spesifikt steg
+  - **Mål**: QR-kode som peker til spesifikt steg med step-parameter
+  - **🌐 TEST I NETTLESER**: Test at QR-kode for steg peker til riktig URL med step-parameter
+- [ ] **3.1.4** Deling via QR-kode
+  - **Mål**: Mulighet for å dele spesifikke steg via QR-kode
+  - **🌐 TEST I NETTLESER**: Test at QR-kode kan skannes og navigerer til riktig sted
+
+### 3.2 Ekstra funksjoner
+- [ ] **3.2.1** Søkefunksjonalitet i prosjekter
+  - **Mål**: Søkefelt for å finne prosjekter basert på navn
+  - **🌐 TEST I NETTLESER**: Test søkefunksjonalitet og verifiser at riktige resultater vises
+- [ ] **3.2.2** Filtrering/kategorisering av prosjekter
+  - **Mål**: Filtrer prosjekter basert på kategorier eller tags
+  - **🌐 TEST I NETTLESER**: Test filtrering og verifiser at prosjekter filtreres korrekt
+- [ ] **3.2.3** Favoritter/bookmarking
+  - **Mål**: Lagre favoritt-prosjekter i localStorage
+  - **🌐 TEST I NETTLESER**: Test at favoritter lagres og vises korrekt
+- [ ] **3.2.4** Eksport av instruksjoner (PDF?)
+  - **Mål**: Eksporter instruksjoner til PDF eller annet format
+  - **🌐 TEST I NETTLESER**: Test eksport-funksjonalitet hvis implementert
+
+## Fase 4: Progressive Web App (PWA)
+
+### 4.1 Web App Manifest
+- [ ] **4.1.1** Opprett manifest.json
+  - **Mål**: Web App Manifest med app-navn, ikoner, start-URL, display-mode
+  - **🌐 TEST I NETTLESER**: Verifiser at manifest.json lastes korrekt
+- [ ] **4.1.2** Legg til app-ikoner (flere størrelser)
+  - **Mål**: Ikoner for iOS, Android og desktop (192x192, 512x512, etc.)
+  - **🌐 TEST I NETTLESER**: Verifiser at ikoner vises korrekt i browser
+- [ ] **4.1.3** Konfigurer manifest for installasjon
+  - **Mål**: display: "standalone", start_url, theme_color, background_color
+  - **🌐 TEST I NETTLESER**: Test installasjonsprompt i nettleser
+
+### 4.2 Service Worker
+- [ ] **4.2.1** Opprett service-worker.js
+  - **Mål**: Grunnleggende Service Worker med install/activate events
+  - **🌐 TEST I NETTLESER**: Verifiser at Service Worker registreres i Application-tab
+- [ ] **4.2.2** Implementer caching-strategi for statiske ressurser
+  - **Mål**: Cache HTML, CSS, JS ved install (Cache First)
+  - **🌐 TEST I NETTLESER**: Test offline-tilgang til statiske filer
+- [ ] **4.2.3** Implementer caching-strategi for bilder
+  - **Mål**: Cache bilder ved bruk (Cache First eller Network First med fallback)
+  - **🌐 TEST I NETTLESER**: Test at bilder caches og fungerer offline
+- [ ] **4.2.4** Implementer caching-strategi for JSON-data
+  - **Mål**: Cache projects.json og meta.json (Network First med cache fallback)
+  - **🌐 TEST I NETTLESER**: Test at JSON-data fungerer offline
+- [ ] **4.2.5** Implementer cache-oppdatering og versjonering
+  - **Mål**: Oppdater cache ved nye versjoner, fjern gamle caches
+  - **🌐 TEST I NETTLESER**: Test cache-oppdatering ved deploy
+
+### 4.3 Offline-støtte
+- [ ] **4.3.1** Offline-fallback side
+  - **Mål**: Vis offline-melding hvis ressurser ikke er tilgjengelige
+  - **🌐 TEST I NETTLESER**: Test offline-tilstand (DevTools → Network → Offline)
+- [ ] **4.3.2** Offline-indikator
+  - **Mål**: Vis visuell indikator når appen er offline
+  - **🌐 TEST I NETTLESER**: Test at offline-indikator vises korrekt
+- [ ] **4.3.3** Sync av progresjon når online
+  - **Mål**: Sikre at progresjon synkroniseres når nettverk kommer tilbake
+  - **🌐 TEST I NETTLESER**: Test sync ved nettverksgjenoppretting
+
+### 4.4 Installerbar app
+- [ ] **4.4.1** Installasjonsprompt
+  - **Mål**: Vis "Installer app"-prompt når kriterier er oppfylt
+  - **🌐 TEST I NETTLESER**: Test installasjonsprompt i nettleser
+- [ ] **4.4.2** App-ikon på hjemmeskjerm
+  - **Mål**: Verifiser at app vises korrekt når installert
+  - **🌐 TEST I NETTLESER**: Installer app og verifiser at ikon vises
+- [ ] **4.4.3** Standalone-modus
+  - **Mål**: App skal fungere i standalone-modus (uten browser UI)
+  - **🌐 TEST I NETTLESER**: Test app i standalone-modus etter installasjon
+
+### 4.5 PWA-testing og optimalisering
+- [ ] **4.5.1** Lighthouse PWA-audit
+  - **Mål**: Oppnå minst 90+ score på Lighthouse PWA-audit
+  - **🌐 TEST I NETTLESER**: Kjør Lighthouse audit og verifiser score
+- [ ] **4.5.2** Test på ulike enheter
+  - **Mål**: Test PWA-funksjonalitet på iOS, Android og desktop
+  - **🌐 TEST I NETTLESER**: Test installasjon og offline-funksjonalitet på ulike enheter
+- [ ] **4.5.3** Optimaliser cache-størrelse
+  - **Mål**: Sørg for at cache ikke blir for stor, implementer cache-quota-håndtering
+  - **🌐 TEST I NETTLESER**: Verifiser cache-størrelse i Application-tab
+
+## Milepæler
+
+### M1: MVP (Minimum Viable Product)
+**Status**: NOT_STARTED
+
+Grunnleggende funksjonalitet:
+- Prosjektgalleri fungerer
+- Navigasjon mellom steg fungerer
+- Progresjonslinje fungerer
+- localStorage-lagring fungerer
+- Responsivt design på mobil/PC
+
+**Kriterier for ferdig**:
+- Kan vise minst ett prosjekt med flere steg
+- Kan navigere mellom steg
+- Progresjon lagres og gjenopptas
+- Fungerer på mobil og PC
+
+### M2: Første versjon (v1.0)
+**Status**: NOT_STARTED
+
+Alle funksjoner fra Fase 1 implementert og testet.
+
+**Kriterier for ferdig**:
+- Alle funksjoner fra Fase 1 er implementert
+- Testet med flere prosjekter og underprosjekter
+- Dokumentasjon er komplett
+- Ingen kritiske bugs
+
+### M3: Forbedret versjon (v1.1)
+**Status**: NOT_STARTED
+
+Fase 2-funksjoner implementert.
+
+**Kriterier for ferdig**:
+- Loading-indikatorer og preloading
+- Tastaturnavigasjon og touch gestures
+- Caching-strategier implementert
+- Bedre brukeropplevelse
+
+### M4: Avansert versjon (v2.0)
+**Status**: NOT_STARTED
+
+Fase 3-funksjoner implementert, inkludert QR-kode.
+
+**Kriterier for ferdig**:
+- QR-kode-generering fungerer
+- Alle avanserte funksjoner implementert
+- Fullstendig dokumentasjon
+
+### M5: Progressive Web App (v3.0)
+**Status**: NOT_STARTED
+
+Fase 4-funksjoner implementert, full PWA-støtte.
+
+**Kriterier for ferdig**:
+- Web App Manifest implementert
+- Service Worker med caching-strategier fungerer
+- Offline-støtte fungerer
+- App kan installeres på enheter
+- Lighthouse PWA-score minst 90+
+- Fungerer i standalone-modus
+
+## Prioritering
+
+### Høy prioritet (Fase 1)
+Disse funksjonene er essensielle for at prosjektet skal fungere. Se [ARCHITECTURE.md](./ARCHITECTURE.md) for detaljer:
+- Router og routing
+- Data-loader
+- View-komponenter
+- localStorage-lagring
+- Grunnleggende CSS
+
+### Middels prioritet (Fase 2)
+Disse forbedrer brukeropplevelsen betydelig:
+- Loading-indikatorer
+- Tastaturnavigasjon
+- Caching og preloading
+- Touch gestures
+
+### Lav prioritet (Fase 3)
+Disse er "nice to have" og kan implementeres senere:
+- QR-kode-generering
+- Søk og filtrering
+- Favoritter
+- Eksport-funksjoner
+
+### Fremtidig (Fase 4)
+PWA-funksjonalitet for full offline-støtte og installerbar app:
+- Web App Manifest
+- Service Worker
+- Offline-støtte
+- Installerbar app
+
+## Tekniske gjeld og forbedringer
+
+### Kjent teknisk gjeld
+- Ingen offline-støtte ennå (kommer i Fase 4)
+- Ingen error boundaries eller feilhåndtering
+- Ingen loading states (kommer i Fase 2)
+- Ingen Service Worker caching-strategi (kommer i Fase 4)
+
+### Fremtidige forbedringer
+- TypeScript for type-sikkerhet (hvis kompleksitet vokser)
+- Testing-framework (hvis prosjektet vokser)
+- Build tools (hvis behovet oppstår)
+- Progressive Web App (PWA) - planlagt i Fase 4
+
+## Tidsestimater
+
+**Merk**: Tidsestimatene er for menneskelig utviklingstid, ikke for AI-kjøring, men beholdes for planleggingsfølelse. Disse er grove estimater og kan variere.
+
+- **Fase 1**: 2-4 uker (avhengig av tidsbruk)
+- **Fase 2**: 1-2 uker
+- **Fase 3**: 2-3 uker
+- **Fase 4**: 2-3 uker (PWA)
+
+**Totalt estimat for første versjon (v1.0)**: 2-4 uker
+**Totalt estimat for PWA-versjon (v3.0)**: 7-12 uker
+
+## Notater
+
+- Implementer funksjoner inkrementelt og test hver del
+- **🌐 Viktig**: Alle steg markert med "TEST I NETTLESER" skal testes i nettleseren før man går videre
+- Hold koden enkel og modulær
+- Dokumenter endringer underveis
+- Test på ulike enheter og nettlesere
+- Vurder refaktorering hvis filer blir for store (se ARCHITECTURE.md)
+
+## Testing i nettleseren
+
+For alle steg markert med **🌐 TEST I NETTLESER**:
+
+1. Åpne nettstedet i nettleseren (via lokal webserver, se README.md)
+2. Test funksjonaliteten manuelt
+3. Bruk DevTools for å verifisere:
+   - **Console**: Sjekk for JavaScript-feil
+   - **Network**: Verifiser at filer lastes korrekt
+   - **Application**: Sjekk localStorage og sessionStorage
+   - **Elements**: Inspiser DOM-struktur
+4. Test på ulike skjermstørrelser (DevTools device mode)
+5. Verifiser at funksjonaliteten fungerer som forventet før du går videre
+
+## Oppdateringshistorikk
+
+- **2024-XX-XX**: Opprettet roadmap
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------

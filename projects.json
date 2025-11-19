@@ -1,0 +1,12 @@
+[
+  {
+    "id": "huset-vaart",
+    "name": "Huset Vårt",
+    "path": "huset-vaart"
+  },
+  {
+    "id": "test-prosjekt",
+    "name": "Test Prosjekt",
+    "path": "test-prosjekt"
+  }
+]

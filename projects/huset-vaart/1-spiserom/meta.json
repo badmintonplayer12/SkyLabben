@@ -1,0 +1,25 @@
+{
+  "id": "1-spiserom",
+  "name": "1-Spiserom",
+  "steps": [
+    "1_1x.png",
+    "2_1x.png",
+    "3_1x.png",
+    "4_1x.png",
+    "5_1x.png",
+    "6_1x.png",
+    "7_1x.png",
+    "8_1x.png",
+    "9_1x.png",
+    "10_1x.png",
+    "11_1x.png",
+    "12_1x.png",
+    "13_1x.png",
+    "14_1x.png",
+    "15_1x.png",
+    "16_1x.png",
+    "17_1x.png",
+    "18_1x.png"
+  ],
+  "children": []
+}

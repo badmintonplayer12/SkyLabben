@@ -96,6 +96,18 @@ Prosjektet bruker to hovedtyper JSON-filer:
   - Hvert objekt må ha `id`, `name` og `path`
   - `path` er relativ sti til undermappen (se nedenfor)
 
+#### `audioSteps` (valgfritt)
+- **Type**: Array of strings
+- **Beskrivelse**: Lydfiler (en per steg) som kan spilles av i viewer for muntlig hjelp
+- **Eksempler**:
+  ```json
+  "audioSteps": ["audio/1.mp3", "audio/2.mp3", "audio/3.mp3"]
+  ```
+- **Regler**:
+  - Lengden bør samsvare med `steps`. Manglende elementer betyr “ingen lyd”.
+  - Filene må ligge i samme mappe eller en `audio/`-undermappe slik at URL bygges som `/projects/{path}/{audioSteps[i]}`
+  - Filformat bør være `.mp3` eller `.ogg` for bred støtte
+
 #### `children[].id` (påkrevd)
 - **Type**: String
 - **Beskrivelse**: Unik identifikator for underprosjektet
@@ -110,13 +122,24 @@ Prosjektet bruker to hovedtyper JSON-filer:
 - **Type**: String
 - **Beskrivelse**: Relativ sti til undermappen fra hovedprosjektmappen
 - **Eksempler**: 
-  - Hvis undermappen heter `tårn/` og ligger i `/projects/castle-main/tårn/`, settes `path` til `"tårn"`
+  - Hvis undermappen heter `taarn/` og ligger i `/projects/castle-main/taarn/`, settes `path` til `"taarn"`
   - Hvis undermappen heter `subproject-tower/`, settes `path` til `"subproject-tower"`
 - **Regler**:
   - Må være navnet på undermappen (uten trailing slash)
   - Må matche faktisk mappestruktur
   - Relativ fra hovedprosjektmappen, ikke absolutt sti
   - Brukes til å bygge full sti: `/projects/{hovedprosjekt-path}/{path}/meta.json`
+  - **Viktig**: Mappenavnet skal være web-vennlig (kebab-case, ingen mellomrom/spesialtegn)
+
+#### `children[].hidden` (valgfritt)
+- **Type**: Boolean
+- **Beskrivelse**: Hvis `true`, skjules underprosjektet fra visning i children-liste
+- **Eksempler**: `true`, `false`
+- **Regler**:
+  - Hvis ikke spesifisert eller `false`, vises underprosjektet normalt
+  - Hvis `true`, skjules det fra children-listen i viewer
+  - Skjulte underprosjekter er fortsatt tilgjengelige via direkte URL
+  - Brukes for å skjule uferdige eller private underprosjekter
 
 ### Eksempler
 
@@ -157,7 +180,8 @@ Prosjektet bruker to hovedtyper JSON-filer:
     {
       "id": "castle-gate",
       "name": "Port",
-      "path": "subproject-gate"
+      "path": "subproject-gate",
+      "hidden": true
     }
   ]
 }
@@ -168,31 +192,31 @@ Prosjektet bruker to hovedtyper JSON-filer:
 Et prosjekt kan ha både egne steg-bilder og underprosjekter:
 
 ```json
-{
-  "id": "house-main",
-  "name": "Huset Vårt",
-  "coverImage": "cover.png",
-  "steps": [
-    "174_1x.png",
-    "175_1x.png",
-    "176_1x.png",
-    "177_1x.png",
-    "178_1x.png",
-    "179_1x.png"
-  ],
-  "children": [
-    {
-      "id": "spiserom",
-      "name": "1-Spiserom",
-      "path": "1-Spiserom"
-    },
-    {
-      "id": "alma-rom",
-      "name": "2-Alma sitt Rom",
-      "path": "2-Alma sitt Rom"
-    }
-  ]
-}
+  {
+    "id": "house-main",
+    "name": "Huset Vårt",
+    "coverImage": "cover.png",
+    "steps": [
+      "174_1x.png",
+      "175_1x.png",
+      "176_1x.png",
+      "177_1x.png",
+      "178_1x.png",
+      "179_1x.png"
+    ],
+    "children": [
+      {
+        "id": "spiserom",
+        "name": "1-Spiserom",
+        "path": "1-spiserom"
+      },
+      {
+        "id": "alma-rom",
+        "name": "2-Alma sitt Rom",
+        "path": "2-alma-sitt-rom"
+      }
+    ]
+  }
 ```
 
 ## projects.json
@@ -236,6 +260,17 @@ Et prosjekt kan ha både egne steg-bilder og underprosjekter:
   - Må matche faktisk mappestruktur
   - Relativ fra `/projects/`, ikke absolutt sti
   - Brukes til å bygge full sti: `/projects/{path}/meta.json`
+  - **Viktig**: Mappenavnet skal være web-vennlig (se nedenfor)
+
+#### `hidden` (valgfritt)
+- **Type**: Boolean
+- **Beskrivelse**: Hvis `true`, skjules prosjektet fra prosjektgalleri
+- **Eksempler**: `true`, `false`
+- **Regler**:
+  - Hvis ikke spesifisert eller `false`, vises prosjektet normalt i galleri
+  - Hvis `true`, skjules det fra prosjektgalleri
+  - Skjulte prosjekter er fortsatt tilgjengelige via direkte URL
+  - Brukes for å skjule uferdige eller private prosjekter
 
 ### Eksempel
 
@@ -248,13 +283,19 @@ Et prosjekt kan ha både egne steg-bilder og underprosjekter:
   },
   {
     "id": "project2",
+    "name": "Uferdig prosjekt",
+    "path": "project2",
+    "hidden": true
+  },
+  {
+    "id": "project3",
     "name": "Romskip",
-    "path": "project2"
+    "path": "project3"
   },
   {
     "id": "house-main",
     "name": "Huset Vårt",
-    "path": "Huset Vårt"
+    "path": "huset-vaart"
   }
 ]
 ```
@@ -334,7 +375,29 @@ Hvis en `meta.json` eller `projects.json` er ugyldig:
 
 - **ID-er**: Bruk kebab-case (`castle-main`, `spiserom`)
 - **Navn**: Bruk lesbare navn med mellomrom (`"Stor borg"`, `"Alma sitt Rom"`)
-- **Paths**: Bruk samme navn som mappen (kan være forskjellig fra `id`)
+- **Paths**: Bruk samme navn som mappen (må være web-vennlig, se nedenfor)
+- **Mappenavn**: Må være web-vennlig (se nedenfor)
+
+### Web-vennlige mappenavn
+
+**Krav til mappenavn** (gjelder både hovedprosjekter og underprosjekter):
+- Bruk kebab-case: små bokstaver med bindestrek (`huset-vaart`, `alma-sitt-rom`)
+- Ikke bruk mellomrom eller spesialtegn
+- Konverter norske tegn: `æ` → `ae`, `ø` → `o`, `å` → `aa`
+- Eksempler:
+  - `"Huset Vårt"` → mappe: `huset-vaart`
+  - `"Alma sitt Rom"` → mappe: `alma-sitt-rom`
+  - `"1-Spiserom"` → mappe: `1-spiserom` (tall er OK)
+
+**Hvorfor?**
+- URL-er blir rene og lesbare (`#/p/huset-vaart` i stedet for `#/p/Huset%20V%C3%A5rt`)
+- Fungerer konsistent på alle servere og nettlesere
+- Enklere å håndtere i kode og filstier
+
+**Visningsnavn (`name`-feltet)**:
+- Kan fortsatt ha mellomrom og norske tegn (`"Huset Vårt"`, `"Alma sitt Rom"`)
+- Dette er det navnet brukeren ser i UI
+- Skal være lesbart og forståelig for brukeren
 
 ### Organisering
 

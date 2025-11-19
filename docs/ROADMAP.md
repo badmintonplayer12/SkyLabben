@@ -16,94 +16,104 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for LE
 ## Fase 1: Grunnleggende struktur (Første versjon)
 
 ### 1.1 Prosjektoppsett
-- [ ] **1.1.1** Opprett filstruktur (index.html, assets/css/main.css, assets/js/*.js)
+- [x] **1.1.1** Opprett filstruktur (index.html, assets/css/main.css, assets/js/*.js)
   - **Mål**: Opprett alle nødvendige mapper og tomme filer
-- [ ] **1.1.2** Sett opp grunnleggende HTML-struktur
+- [x] **1.1.2** Sett opp grunnleggende HTML-struktur
   - **Mål**: Opprett index.html med grunnleggende struktur og lenker til CSS/JS
-- [ ] **1.1.3** Implementer grunnleggende CSS-layout
+- [x] **1.1.3** Implementer grunnleggende CSS-layout
   - **Mål**: Grunnleggende styling og layout (se [CSS_GUIDELINES.md](./CSS_GUIDELINES.md))
   - **🌐 TEST I NETTLESER**: Verifiser at siden laster og grunnleggende styling vises
 
 ### 1.2 Statiske testdata
-- [ ] **1.2.1** Opprett én testprosjektmappe med meta.json
+- [x] **1.2.1** Opprett én testprosjektmappe med meta.json
   - **Mål**: Opprett mappe under /projects/ med meta.json (se [DATA_FORMAT.md](./DATA_FORMAT.md))
 - [ ] **1.2.2** Legg til cover.png og noen step-bilder
   - **Mål**: Legg til minst 3-5 testbilder med riktig navngivning
   - **Merk**: Dette gjøres manuelt av brukeren - AI skal ikke implementere dette steget
-- [ ] **1.2.3** Opprett projects.json med testprosjektet
+- [x] **1.2.3** Opprett projects.json med testprosjektet
   - **Mål**: Opprett projects.json i rotmappen med referanse til testprosjektet
 
 ### 1.3 Router og root-view
-- [ ] **1.3.1** Implementer router.js med hash-parsing
+- [x] **1.3.1** Implementer router.js med hash-parsing
   - **Mål**: Funksjoner for å parse hash og oppdatere URL (se [IMPLEMENTATION.md](./IMPLEMENTATION.md))
-- [ ] **1.3.2** Implementer view-project-grid.js
+- [x] **1.3.2** Implementer view-project-grid.js
   - **Mål**: Renderer prosjektgalleri med cover-bilder og navn
   - **🌐 TEST I NETTLESER**: Verifiser at prosjektgalleri vises med cover-bilder
-- [ ] **1.3.3** Koble router til prosjektgalleri-view
+- [x] **1.3.3** Koble router til prosjektgalleri-view
   - **Mål**: Router trigges ved hash-endringer og viser galleri
   - **🌐 TEST I NETTLESER**: Verifiser at hash-endringer trigges og galleri vises
-- [ ] **1.3.4** Test navigasjon til prosjektgalleri
+- [x] **1.3.4** Test navigasjon til prosjektgalleri
   - **🌐 TEST I NETTLESER**: Test at klikk på prosjekt navigerer til riktig URL
 
 ### 1.4 Data-loader og viewer
-- [ ] **1.4.1** Implementer data-loader.js for å hente meta.json
+- [x] **1.4.1** Implementer data-loader.js for å hente meta.json
   - **Mål**: Funksjoner for å hente projects.json og meta.json med fetch
   - **🌐 TEST I NETTLESER**: Sjekk i Network-tab at meta.json og projects.json lastes uten feil
-- [ ] **1.4.2** Implementer view-viewer.js med enkel bildevisning
+- [x] **1.4.2** Implementer view-viewer.js med enkel bildevisning
   - **Mål**: Vise første steg-bilde for valgt prosjekt
   - **🌐 TEST I NETTLESER**: Verifiser at riktig bilde vises når du går direkte til /#/p/<path>
-- [ ] **1.4.3** Legg til pil-knapper for neste/forrige steg
+- [x] **1.4.3** Legg til pil-knapper for neste/forrige steg
   - **Mål**: Navigasjonsknapper som oppdaterer state og URL
   - **🌐 TEST I NETTLESER**: Test at pil-knappene fungerer og bytter bilde
-- [ ] **1.4.4** Test navigasjon mellom steg
+- [x] **1.4.4** Test navigasjon mellom steg
   - **🌐 TEST I NETTLESER**: Test at alle steg kan navigeres mellom
 
 ### 1.5 Progresjonslinje og opp-knapp
-- [ ] **1.5.1** Implementer progresjonslinje (range-input eller custom)
+- [x] **1.5.1** Implementer progresjonslinje (range-input eller custom)
   - **Mål**: Range-input eller custom progress bar som viser nåværende steg
   - **🌐 TEST I NETTLESER**: Verifiser at progresjonslinje vises og kan klikkes/dragges
-- [ ] **1.5.2** Legg til "Opp"-knapp for hierarkisk navigasjon
+- [x] **1.5.2** Legg til "Opp"-knapp for hierarkisk navigasjon
   - **Mål**: Knapp som navigerer ett nivå opp i hierarkiet
   - **🌐 TEST I NETTLESER**: Verifiser at "Opp"-knappen vises og fungerer
-- [ ] **1.5.3** Implementer logikk for å gå tilbake til forelder
+- [x] **1.5.3** Implementer logikk for å gå tilbake til forelder
   - **Mål**: Beregn forelder-path og naviger dit
   - **🌐 TEST I NETTLESER**: Test at "Opp"-knapp navigerer til forelder
-- [ ] **1.5.4** Test hierarkisk navigasjon
+- [x] **1.5.4** Test hierarkisk navigasjon
   - **🌐 TEST I NETTLESER**: Test full hierarkisk navigasjon (opp/ned i treet)
 
 ### 1.6 localStorage-lagring
-- [ ] **1.6.1** Implementer state.js med localStorage-integrasjon
+- [x] **1.6.1** Implementer state.js med localStorage-integrasjon
   - **Mål**: State management med getters/setters og localStorage-synkronisering
-- [ ] **1.6.2** Lagre progresjon per prosjektpath
+- [x] **1.6.2** Lagre progresjon per prosjektpath
   - **Mål**: Automatisk lagring av steg-indeks når bruker navigerer
   - **🌐 TEST I NETTLESER**: Verifiser i DevTools Application-tab at data lagres i localStorage
-- [ ] **1.6.3** Les lagret progresjon ved applikasjonsstart
+- [x] **1.6.3** Les lagret progresjon ved applikasjonsstart
   - **Mål**: Hent lagret progresjon og bruk ved navigering til prosjekt
   - **🌐 TEST I NETTLESER**: Test at lagret progresjon leses ved reload av siden
-- [ ] **1.6.4** Test at posisjon lagres og gjenopptas
+- [x] **1.6.4** Test at posisjon lagres og gjenopptas
   - **🌐 TEST I NETTLESER**: Naviger til steg 5, reload siden, verifiser at steg 5 vises
 
 ### 1.7 CSS og responsivt design
-- [ ] **1.7.1** Implementer "ingen scroll" på instruksjonsvisning
+- [x] **1.7.1** Implementer "ingen scroll" på instruksjonsvisning
   - **Mål**: Image container skal fylle plass uten scroll (se [CSS_GUIDELINES.md](./CSS_GUIDELINES.md))
   - **🌐 TEST I NETTLESER**: Verifiser at ingen scroll-bars vises på image container
-- [ ] **1.7.2** Tilpass bildet til skjermen (object-fit: contain)
+- [x] **1.7.2** Tilpass bildet til skjermen (object-fit: contain)
   - **Mål**: Bildet skal tilpasses skjermen uten å kuttes
   - **🌐 TEST I NETTLESER**: Verifiser at bildet tilpasses skjermen uten å kuttes
-- [ ] **1.7.3** Responsivt design for mobil, nettbrett og PC
+- [x] **1.7.3** Responsivt design for mobil, nettbrett og PC
   - **Mål**: Mobile-first CSS med media queries
   - **🌐 TEST I NETTLESER**: Test responsivt design i DevTools device mode
-- [ ] **1.7.4** Test på ulike skjermstørrelser
+- [x] **1.7.4** Test på ulike skjermstørrelser
   - **🌐 TEST I NETTLESER**: Test på mobil (375px), nettbrett (768px) og desktop (1920px)
 
-### 1.8 Generalisering
-- [ ] **1.8.1** Test med flere prosjekter
-  - **🌐 TEST I NETTLESER**: Legg til 2-3 prosjekter og verifiser at alle vises i galleri
-- [ ] **1.8.2** Test med underprosjekter
+### 1.8 Filtrering av skjulte prosjekter
+- [x] **1.8.1** Implementer filtrering av skjulte prosjekter i prosjektgalleri
+  - **Mål**: Filtrer bort prosjekter med `hidden: true` fra prosjektgalleri (se [DATA_FORMAT.md](./DATA_FORMAT.md))
+  - **🌐 TEST I NETTLESER**: Legg til prosjekt med `hidden: true` i projects.json, verifiser at det ikke vises i galleri
+- [x] **1.8.2** Implementer filtrering av skjulte children i viewer
+  - **Mål**: Filtrer bort children med `hidden: true` når children-liste vises (se [DATA_FORMAT.md](./DATA_FORMAT.md))
+  - **🌐 TEST I NETTLESER**: Legg til child med `hidden: true` i meta.json, verifiser at det ikke vises i children-liste
+- [x] **1.8.3** Test at skjulte prosjekter fortsatt er tilgjengelige via direkte URL
+  - **🌐 TEST I NETTLESER**: Naviger direkte til skjult prosjekt via URL, verifiser at det vises
+
+### 1.9 Generalisering
+- [x] **1.9.1** Test med flere prosjekter
+  - **🌐 TEST I NETTLESER**: Legg til 2-3 prosjekter og verifiser at alle synlige vises i galleri
+- [x] **1.9.2** Test med underprosjekter
   - **🌐 TEST I NETTLESER**: Test prosjekt med underprosjekter, verifiser navigasjon
-- [ ] **1.8.3** Verifiser at hierarkisk navigasjon fungerer
+- [x] **1.9.3** Verifiser at hierarkisk navigasjon fungerer
   - **🌐 TEST I NETTLESER**: Test full navigasjonsflyt: galleri → prosjekt → underprosjekt → steg → tilbake
-- [ ] **1.8.4** End-to-end testing
+- [x] **1.9.4** End-to-end testing
   - **🌐 TEST I NETTLESER**: Gjennomføre komplett brukeropplevelse fra start til slutt
 
 ## Fase 2: Forbedringer og optimalisering
@@ -159,6 +169,50 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for LE
 - [ ] **2.4.3** Mulighet for å nullstille progresjon
   - **Mål**: Knapp eller funksjonalitet for å nullstille lagret progresjon
   - **🌐 TEST I NETTLESER**: Test at nullstilling fungerer og oppdaterer visning
+
+### 2.5 Barnevennlig UI
+- [ ] **2.5.1** Ikonbasert navigasjon
+  - **Mål**: Erstatt/suppler tekst med ikoner (hus, piler, stjerner) i viewer og galleri
+  - **🌐 TEST I NETTLESER**: Verifiser at alle primære handlinger kan utføres uten å lese tekst
+- [ ] **2.5.2** Store trykkflater og spacing
+  - **Mål**: Øk størrelse på knapper og klikksoner (≥64px) og legg til tilstrekkelig spacing
+  - **🌐 TEST I NETTLESER**: Test på mobil/nettbrett at knapper er lette å treffe
+- [ ] **2.5.3** Visuell/lyd feedback
+  - **Mål**: Legg til mikroanimasjoner og valgfri lyd når barnet navigerer, samt en enkel belønning ved fullført prosjekt
+  - **🌐 TEST I NETTLESER**: Verifiser at feedback trigges ved interaksjon og kan skrus av/på
+- [ ] **2.5.4** Intro/hjelp for barn
+  - **Mål**: Implementer en kort visuell onboarding (f.eks. maskot eller highlight) som viser hvordan man blar
+  - **🌐 TEST I NETTLESER**: Test at introen kan avbrytes og kun vises ved behov
+
+### 2.6 Tilgjengelighet og input
+- [ ] **2.6.1** Swipe-gestures i viewer
+  - **Mål**: Swipe venstre/høyre på bildet gjør samme som pilene
+  - **🌐 TEST I NETTLESER**: Test på touch-enheter
+- [ ] **2.6.2** Alt-tekst og kontrastsjekk
+  - **Mål**: Sørg for alt-tekst på bilder og dokumenter kontrastkrav i CSS_guidelines
+  - **🌐 TEST I NETTLESER**: Kjør Lighthouse/axe for tilgjengelighetsvarsler
+
+### 2.7 Loading, feilhåndtering og belønning
+- [ ] **2.7.1** LEGO-inspirert loading-indikator
+  - **Mål**: Vise animert kloss/spinner mens bilder lastes, deaktivere kontroller inntil bildet er klart
+  - **🌐 TEST I NETTLESER**: Kunstig treghet (DevTools) for å verifisere at indikator vises
+- [ ] **2.7.2** Brukervennlige feilmeldinger
+  - **Mål**: Vennlig melding når bilde/meta mangler (“Oi! Fant ikke bildet – spør en voksen”)
+  - **🌐 TEST I NETTLESER**: Simuler 404 og sjekk at melding vises
+- [ ] **2.7.3** Fullføringsbelønning
+  - **Mål**: Konfetti/badge + state-markering når prosjekt er ferdig
+  - **🌐 TEST I NETTLESER**: Naviger til siste steg og se at belønning trigges, og at det kan trigges kun én gang per prosjekt
+
+### 2.8 Lyd, haptikk og voiceover
+- [ ] **2.8.1** Navigasjonslyd/haptikk
+  - **Mål**: Korte “klikk”-lyder og haptikk på pil/opp-knapp (kan skrus av/på)
+  - **🌐 TEST I NETTLESER**: Verifiser toggle + fallback når API ikke støttes
+- [ ] **2.8.2** Steg-vis lydhint
+  - **Mål**: Støtte `audioSteps` fra meta.json og knapp for å spille av lyd per steg
+  - **🌐 TEST I NETTLESER**: Test med sample-lyd, verifiser at feil håndteres
+- [ ] **2.8.3** Onboarding-stemme/figur
+  - **Mål**: Maskot/overlay som visuelt (og evt. auditivt) viser hvordan man starter
+  - **🌐 TEST I NETTLESER**: Sørg for at overlay vises kun første gang og kan avbrytes
 
 ## Fase 3: Avanserte funksjoner
 
@@ -272,7 +326,7 @@ Grunnleggende funksjonalitet:
 - Fungerer på mobil og PC
 
 ### M2: Første versjon (v1.0)
-**Status**: NOT_STARTED
+**Status**: COMPLETED
 
 Alle funksjoner fra Fase 1 implementert og testet.
 

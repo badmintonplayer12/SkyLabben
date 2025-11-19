@@ -30,6 +30,22 @@ Nettsiden er bygget med ren HTML, CSS og JavaScript, og kan hostes hvor som hels
 - Loading-indikatorer og preloading av bilder
 - Caching-strategier for bedre ytelse
 
+## Brukeropplevelse for barn 5–7 år
+
+Prosjektet er primært laget for barn som ennå ikke kan lese flytende. UI-et skal derfor følge disse prinsippene:
+
+- **Ikoner og tall fremfor tekst**: Bruk hus/pil-symboler, store neste/forrige-ikoner og tallformat (`3/10`) i stedet for strenger som “Steg 3 av 10”.
+- **Store trykkflater**: Alle primærknapper skal minst være 44x44px – helst rundt 64px (≈2 cm) – med god avstand (`var(--spacing-md)`+) mellom elementene slik at små fingre treffer riktig.
+- **Tydelig feedback**: Navigasjonsknapper skal animere/lyses opp ved trykk, og applikasjonen kan spille korte lyder eller vise små animasjoner (f.eks. konfetti ved fullføring) for å gi mestringsfølelse.
+- **Hierarki uten tekst**: Opp/hjem-knappen skal være et ikon og ligge på samme sted på alle skjermer. Underprosjekter kan presenteres som egne tiles med klare bilder slik at barna skjønner hva som skjer uten beskrivelse.
+- **Enkle interaksjoner**: Pilene er primærnavigasjon. Progresjonslinjen er sekundær (tapping fremfor presis dragging). Swipe-gestures på bildet kan implementeres som ekstra hjelp.
+- **Tilgjengelighet**: Alle bilder skal ha `alt`-tekst myntet på foreldre, og fargevalg skal ha god kontrast slik at knappene er tydelige under alle lysforhold.
+- **Onboarding**: Første gang appen åpnes, vis en visuell overlay (maskot/piler) som peker på det første prosjektet og forsvinner idet barnet trykker. Lagre i localStorage at onboarding er gjennomført.
+- **Underprosjekter inline**: Prosjekter med `children` kan vises i samme skjerm som galleriet (flatt layout) slik at barnet slipper å navigere “opp ett nivå”. Viewer skal kun åpnes når man velger et konkret steg eller child.
+- **Lyd og haptikk**: En høyttaler-knapp lar voksne skru av/på korte “klikk”-lyder. På enheter som støtter det kan knappetrykk trigge haptisk feedback. Eventuelle lydinstruksjoner per steg kan legges i `projects/<path>/audio/` og refereres fra `meta.json`.
+- **Loading og belønning**: Mens bilder lastes skal en LEGO-inspirert spinner vises, og når siste steg fullføres vises en enkel gratulasjonsanimasjon (konfetti/badge) samt at progresjonen markeres som ferdig.
+- **Barnemodus**: UI-et kan styres av en `childMode`-innstilling (lagret i localStorage eller konfigurasjonsfil). Når den er aktiv vil galleri/child-visning følge flat struktur, onboarding-overlegg aktiveres, og tekst erstattes med ikoner.
+
 ## Teknisk oversikt
 
 - **Teknologi**: Ren HTML + CSS + JavaScript (ingen build tools eller dependencies)
@@ -151,11 +167,23 @@ npx http-server -p 8000
 
 ### Steg 1: Opprett prosjektmappe
 
-Opprett en ny mappe under `/projects/` med et beskrivende navn:
+Opprett en ny mappe under `/projects/` med et web-vennlig navn:
+
+**Viktig**: Mappenavnet skal være web-vennlig:
+- Bruk kebab-case: små bokstaver med bindestrek
+- Ikke bruk mellomrom eller spesialtegn
+- Konverter norske tegn: `æ` → `ae`, `ø` → `o`, `å` → `aa`
+
+**Eksempler**:
+- `"Huset Vårt"` → mappe: `huset-vaart`
+- `"Alma sitt Rom"` → mappe: `alma-sitt-rom`
+- `"Mitt Prosjekt"` → mappe: `mitt-prosjekt`
 
 ```
 /projects/mitt-prosjekt/
 ```
+
+**Merk**: Visningsnavnet (som vises i UI) settes i `meta.json` `name`-feltet og kan ha mellomrom og norske tegn.
 
 ### Steg 2: Legg til bilder
 
@@ -229,12 +257,19 @@ Hvis prosjektet har underprosjekter:
       "path": "underprosjekt-a"
     }
   ]
+}
 ```
 
 **Forklaring av `path`:**
 - `path` er navnet på undermappen (relativ sti)
-- Hvis undermappen heter `tårn/`, settes `path` til `"tårn"`
+- Mappenavnet skal være web-vennlig (kebab-case, ingen mellomrom/spesialtegn)
+- Hvis undermappen heter `taarn/`, settes `path` til `"taarn"`
 - Dette er den relative stien fra hovedprosjektmappen til undermappen
+- **Viktig**: Mappenavnet må matche `path`-verdien eksakt
+
+**Eksempel på web-vennlig konvertering**:
+- Originalt navn: `"Alma sitt Rom"` → mappe: `alma-sitt-rom`
+- I `meta.json`: `"path": "alma-sitt-rom"`, `"name": "Alma sitt Rom"`
 
 ### Steg 6: Oppdater projects.json
 

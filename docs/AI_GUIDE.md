@@ -113,6 +113,12 @@ Et statisk nettsted for å vise LEGO-byggeinstruksjoner som PNG-bilder. Bygget m
 **Hvordan strukturere meta.json?**
 → [DATA_FORMAT.md](./DATA_FORMAT.md) - Seksjon "meta.json struktur"
 
+**Hvordan skjule prosjekter/children?**
+→ [DATA_FORMAT.md](./DATA_FORMAT.md) - Seksjon "hidden felt" - Bruk `hidden: true` for å skjule fra visning
+
+**Hvordan konvertere prosjekter til web-vennlig format?**
+→ [IMPORT_GUIDE.md](./IMPORT_GUIDE.md) - Komplett guide for konvertering av mapper med mellomrom/spesialtegn
+
 **Hvordan håndtere state?**
 → [IMPLEMENTATION.md](./IMPLEMENTATION.md) - Seksjon "state.js"
 

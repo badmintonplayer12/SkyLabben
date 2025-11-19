@@ -389,6 +389,16 @@ export function getImageUrl(path, imageName) {
 }
 
 /**
+ * Bygger URL til en lydfil (for steg-hjelp)
+ * @param {string} path - Prosjektpath
+ * @param {string} audioName - Filnavn på lydfil (kan ligge i /audio/)
+ * @returns {string} Full URL til lydfilen
+ */
+export function getAudioUrl(path, audioName) {
+  // Returner /projects/{path}/{audioName}
+}
+
+/**
  * Trekker ut steg-nummer fra filnavn for sortering
  * @param {string} filename - Filnavn (f.eks. "1_1x.png", "174_1x.png")
  * @returns {number|null} Steg-nummer eller null hvis ikke funnet
@@ -423,6 +433,10 @@ export function getImageUrl(path, imageName) {
   return `${BASE_URL}${path}/${imageName}`;
 }
 
+export function getAudioUrl(path, audioName) {
+  return `${BASE_URL}${path}/${audioName}`;
+}
+
 export function extractStepNumber(filename) {
   const match = filename.match(/^(\d+)/);
   return match ? parseInt(match[1], 10) : null;
@@ -432,6 +446,9 @@ export function extractStepNumber(filename) {
 ### view-project-grid.js
 
 **Rolle**: Prosjektgalleri-view
+
+- **Onboarding**: Ved første besøk skal viewet kunne tegne et lett gjennomskinnelig overlay (maskot/piler) som peker på første tile med tekstfri “trykk her”-indikasjon. Overlegget forsvinner straks barnet trykker, og en flaggverdi lagres i localStorage slik at overlayet ikke vises hver gang.
+- **Underprosjekter inline**: Hvis et prosjekt har `children` og “barnemodus”-flagget (lagret i state/localStorage) er aktivt, kan viewet vise child-tiles direkte under hovedtile i stedet for å navigere opp/ned. Klikk på child kaller fortsatt `onProjectClick` med full path.
 
 **Eksporterte funksjoner**:
 
@@ -462,7 +479,10 @@ export function renderProjectGrid(projects, onProjectClick) {
   const container = document.createElement('div');
   container.className = 'project-grid';
   
-  projects.forEach(project => {
+  // Filtrer bort skjulte prosjekter
+  const visibleProjects = projects.filter(project => !project.hidden);
+  
+  visibleProjects.forEach(project => {
     const tile = document.createElement('div');
     tile.className = 'project-tile';
     tile.setAttribute('data-path', project.path);
@@ -501,6 +521,22 @@ export function renderProjectGrid(projects, onProjectClick) {
 
 **Rolle**: Instruksjonsviewer-view
 
+- **Lyd/haptikk**:
+  - Eksponer et høyttaler-ikon for å skru av/på korte navigasjonslyder (lagres i localStorage).
+  - Alle piltaster/knapper kan trigge `callbacks.onFeedback?.('next')`/`('prev')` slik at main.js kan spille lyd eller trigge haptikk på støttede enheter.
+  - Hvis prosjektene leverer egne lydhint (f.eks. `meta.audioSteps`), vis en knapp i header/bunn som spiller av hjelpetekst.
+- **Loading-indikator**: Mens nytt bilde lastes skal `.viewer__main` vise en LEGO-kloss-/spinner-animajson, og knapper deaktiveres til bildet er klart.
+- **Fullføringsbelønning**: Når `currentStepIndex === steps.length - 1` og barnet går videre, vis en gratulasjonsstate (konfetti-animajson + badge) og kall `callbacks.onProjectCompleted?.(state.currentPath)` slik at hovedlogikk kan markere prosjektet som ferdig.
+- **Underprosjektfallback**: Dersom et prosjekt mangler `steps` men har `children`, renderer viewer en child-liste med samme ikonografi som galleriet i stedet for en tom melding.
+
+- **Layoutkrav**:
+  - `.viewer__main` skal fylle all ledig høyde (`flex: 1`) og la bildet skaleres med `object-fit: contain` slik at det alltid er maks mulig størrelse uten scroll.
+  - Standard-zoom i nettleser skal fungere (ikke deaktiver `pointer-events` eller `user-select` på bildet). Eventuell fremtidig custom zoom skjer via `transform: scale()` direkte på IMG.
+  - Navigasjonsfeltet (`.viewer__bottom`) skal ligge helt nederst, bruke fleksibel grid/flex og inneholde store tap-targets for barn (sikte på ~64px høyde for knapper).
+  - Neste/forrige er primære kontroller; progressbaren er sekundær og må håndtere både tap og drag, men UI skal ikke kreve presis drag for bruk.
+  - Stegindikator bør bruke tallformat (`3/10`) og/eller ikoner i stedet for tekst (“Steg 3 av 10”) slik at målgruppen (5–7 år) forstår den uten å lese.
+  - Opp/hjem-knapp representeres som ikon (hus/pil opp) og plasseres konsekvent (typisk øverst til venstre) slik at barna kjenner den igjen.
+
 **Eksporterte funksjoner**:
 
 ```javascript
@@ -517,11 +553,13 @@ export function renderProjectGrid(projects, onProjectClick) {
  * Viktig: View gjør IKKE direkte state/URL-oppdateringer. Den kaller callbacks som sendes
  * fra main.js, og main.js eier all state/URL-manipulasjon. Hvis steps-array er tomt,
  * vis "Ingen steg tilgjengelig" og deaktiver navigasjonskontroller.
+ * Filtrer bort children med hidden: true når children-liste vises.
  */
 export function renderViewer(state, callbacks) {
   // Håndter tom steps-array: vis melding og deaktiver kontroller
+  // Filtrer bort skjulte children: const visibleChildren = (state.currentProjectMeta?.children || []).filter(c => !c.hidden)
   // Opprett container med header, image container og bottom bar
-  // Vis nåværende bilde (hvis steps ikke er tom)
+  // Vis nåværende bilde (hvis steps ikke er tom) eller children-liste (hvis steps er tom)
   // Legg til kontroller (piler, progresjonslinje, opp-knapp)
   // Legg til event listeners som kaller callbacks
   // Returner container
@@ -554,6 +592,13 @@ export function renderViewer(state, callbacks) {
     message.textContent = 'Ingen steg tilgjengelig';
     imageContainer.appendChild(message);
   } else {
+    // Bilde-rendering: Bildet skal fylle tilgjengelig plass innenfor viewport
+    // - Container (.viewer__main) bruker flex: 1 for å fylle resten av høyden
+    // - Bottom bar har fast høyde, så hovedbildet får all tilgjengelig plass
+    // - Bildet skal være zoombart via standard nettleser-mekanismer (Ctrl/Cmd +, Ctrl/Cmd -)
+    // - IKKE bruk pointer-events: none på bildet (blokkerer browser zoom)
+    // - Hvis custom zoom skal implementeres senere: bruk transform: scale() på bildet,
+    //   ikke endre container-størrelse (behold flex-layout for responsivitet)
     const img = document.createElement('img');
     const currentStep = steps[state.currentStepIndex];
     if (currentStep) {
@@ -563,7 +608,7 @@ export function renderViewer(state, callbacks) {
     imageContainer.appendChild(img);
   }
   
-  // Bottom bar
+  // Bottom bar: Har fast høyde slik at hovedbildet alltid kan bruke resten av høyden
   const bottomBar = document.createElement('div');
   bottomBar.className = 'viewer__bottom';
   

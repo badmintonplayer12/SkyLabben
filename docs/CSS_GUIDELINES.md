@@ -229,6 +229,62 @@ Bruk definerte breakpoints:
   object-fit: contain;
 }
 
+.viewer__loading {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  background: var(--color-background);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bounce 1s infinite;
+}
+
+.viewer__loading-icon {
+  width: 64px;
+  height: 64px;
+  background-image: url('../img/loading-brick.svg'); /* Placeholder – bytt til faktisk ressurs */
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: spin 1.8s linear infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 
+ * Maksimal bildeflate - viktige prinsipper:
+ * 
+ * 1. Container (.viewer__main) skal IKKE ha hard width/height
+ *    - Bruk flex: 1 for å fylle tilgjengelig plass
+ *    - La høyden bestemmes av viewport og flex-layout
+ * 
+ * 2. Bildet skal bruke object-fit: contain
+ *    - Sikrer at hele bildet vises uten å kuttes
+ *    - Beholder aspect ratio
+ * 
+ * 3. max-width/height: 100% på bildet
+ *    - Sikrer at bildet ikke overstiger containeren
+ *    - Fungerer sammen med object-fit: contain
+ * 
+ * 4. Zoom-mekanisme:
+ *    - Browser zoom (Ctrl/Cmd +, Ctrl/Cmd -) er anbefalt zoom-mekanisme
+ *    - Bildet skal være zoombart via standard nettleser-funksjonalitet
+ *    - IKKE bruk pointer-events: none på bildet (blokkerer zoom)
+ *    - Hvis custom zoom skal implementeres senere:
+ *      * Bruk transform: scale() på bildet direkte
+ *      * IKKE endre container-størrelse (width/height)
+ *      * Behold flex-layout for responsivitet
+ */
+
 .viewer__bottom {
   display: flex;
   align-items: center;
@@ -654,6 +710,50 @@ Når du bruker z-index, følg denne policyen:
 }
 
 /* Unngå å bruke z-index > 40 */
+```
+
+### Barnevennlig UI (5–7 år)
+
+- **Ikoner foran tekst**: Anta at brukeren ikke kan lese flytende. Navigasjonsknapper (opp/hjem, neste/forrige, progresjonsindikator) skal bruke tydelige symboler (hus, piler, stjerner) og kan støttes av tall (f.eks. `3/10`) i stedet for tekststrenger som “Steg 3 av 10”.
+- **Store trykkflater**: Minimum 44x44px er absolutt minimum; sikte på ~64px (ca. 2 cm) for primærknapper slik at små fingre treffer riktig. Sørg for minst `var(--spacing-md)` mellom interaktive elementer.
+- **Plassering**: Neste/forrige-knapper kan up-skaleres og trekkes ut mot venstre/høyre hjørne av `.viewer__bottom` slik at de ikke konkurrerer med progressbar. Opp/hjem-knapp plasseres konsekvent (typisk øverst til venstre) for muskelminne.
+- **Farger og feedback**: Bruk klare, høy-kontrast LEGO-inspirerte farger på interaktive elementer. Alle knapper skal ha en aktiv/trykket-state (lys opp, skift farge, animasjon) slik at barn ser at trykket ble registrert.
+- **Lyd og animasjoner (valgfritt)**: Hvis UI-et utvides med lyd/animert feedback, reserver plass til et diskret “lyd av/på”-ikon og sørg for at animasjoner er korte (<300ms) for å holde tempoet oppe.
+- **Progresjonslinje**: Visuell indikator kan være en tykk bar eller en serie symboler. Dragging er sekundær; primærnavigasjonen er pilene, så progressbaren skal støttes via store tap-targets eller segmenter.
+- **Tom-state og belønning**: Når et prosjekt mangler steg, vis en vennlig illustrasjon (f.eks. minifigur) som sier “kommer snart”. Ved fullført prosjekt kan `.viewer__bottom` trigge en konfetti- eller stjerneanimert klasse for å feire ferdigstillelse.
+- **Loading-indikator**: Bruk LEGO-inspirert spinner (`.viewer__loading`) med myk animasjon mens bilder lastes. Den skal være barnlig og tydelig (ingen små spinnere).
+- **Onboarding-overlay**: Definer `.onboarding-overlay` (fullskjerm, semitransparent) med en maskot/figur som peker på galleri-tiles. Bruk sterke farger og en enkel puls/peke-animasjon.
+- **Belønning/badges**: For prosjekt fullført, bruk `.viewer__celebration` som legger til konfetti (CSS animasjon) eller stjerne-illustrasjon, eventuelt kombinert med en liten lyd hvis slått på.
+
+```css
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.onboarding-overlay__mascot {
+  width: 220px;
+  height: 220px;
+  background-image: url('../img/mascot.png');
+  background-size: contain;
+  animation: wiggle 1.2s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(4deg); }
+  75% { transform: rotate(-4deg); }
+}
 ```
 
 ## Testing
