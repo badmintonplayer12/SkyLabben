@@ -242,7 +242,7 @@ export function renderViewer(state, callbacks) {
   container.appendChild(imageContainer);
   container.appendChild(bottomBar);
   
-  // Tastaturnavigasjon (kun hvis det er steg)
+  // Tastaturnavigasjon og touch gestures (kun hvis det er steg)
   if (steps.length > 0) {
     const handleKeyDown = (e) => {
       // Arrow keys for neste/forrige steg
@@ -266,9 +266,56 @@ export function renderViewer(state, callbacks) {
     // Legg til event listener på document (fungerer uavhengig av fokus)
     document.addEventListener('keydown', handleKeyDown);
     
-    // Lagre cleanup-funksjon på containeren for å fjerne listener når view fjernes
+    // Touch gestures for swipe venstre/høyre
+    let touchStartX = null;
+    let touchStartY = null;
+    const minSwipeDistance = 50; // Minimum avstand for å registrere swipe
+    const maxVerticalDistance = 100; // Maksimal vertikal avstand for å unngå konflikt med scroll
+    
+    const handleTouchStart = (e) => {
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    };
+    
+    const handleTouchEnd = (e) => {
+      if (touchStartX === null || touchStartY === null) return;
+      
+      const touch = e.changedTouches[0];
+      const touchEndX = touch.clientX;
+      const touchEndY = touch.clientY;
+      
+      const deltaX = touchEndX - touchStartX;
+      const deltaY = touchEndY - touchStartY;
+      
+      // Sjekk at det er en horisontal swipe (ikke vertikal scroll)
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaY) < maxVerticalDistance) {
+        // Swipe venstre (neste steg)
+        if (deltaX < -minSwipeDistance && !nextButton.disabled && callbacks.onNextStep) {
+          e.preventDefault();
+          callbacks.onNextStep();
+        }
+        // Swipe høyre (forrige steg)
+        else if (deltaX > minSwipeDistance && !prevButton.disabled && callbacks.onPrevStep) {
+          e.preventDefault();
+          callbacks.onPrevStep();
+        }
+      }
+      
+      // Reset
+      touchStartX = null;
+      touchStartY = null;
+    };
+    
+    // Legg til touch event listeners på image container
+    imageContainer.addEventListener('touchstart', handleTouchStart, { passive: true });
+    imageContainer.addEventListener('touchend', handleTouchEnd, { passive: false });
+    
+    // Lagre cleanup-funksjon på containeren for å fjerne listeners når view fjernes
     container._keyboardCleanup = () => {
       document.removeEventListener('keydown', handleKeyDown);
+      imageContainer.removeEventListener('touchstart', handleTouchStart);
+      imageContainer.removeEventListener('touchend', handleTouchEnd);
     };
   }
   

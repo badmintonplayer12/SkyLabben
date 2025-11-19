@@ -5,6 +5,10 @@
  */
 
 const BASE_URL = '/projects/';
+const CACHE_VERSION = '1.0'; // Øk dette når cache-struktur endres
+const META_CACHE_KEY = 'legoInstructions.metaCache';
+const PROJECTS_CACHE_KEY = 'legoInstructions.projectsCache';
+const CACHE_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 timer
 
 /**
  * ProjectMeta struktur (fra meta.json)
@@ -17,11 +21,59 @@ const BASE_URL = '/projects/';
  */
 
 /**
- * Henter meta.json for et prosjekt/underprosjekt
+ * Henter cached metadata hvis den finnes og ikke er utløpt
+ * @param {string} key - Cache key
+ * @returns {Object|null} Cached data eller null
+ */
+function getCachedData(key) {
+  try {
+    const cached = localStorage.getItem(key);
+    if (!cached) return null;
+    
+    const parsed = JSON.parse(cached);
+    if (parsed.version !== CACHE_VERSION) return null;
+    if (Date.now() > parsed.expiry) return null;
+    
+    return parsed.data;
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
+ * Lagrer data i cache med utløpstid
+ * @param {string} key - Cache key
+ * @param {*} data - Data å lagre
+ */
+function setCachedData(key, data) {
+  try {
+    const cacheEntry = {
+      version: CACHE_VERSION,
+      expiry: Date.now() + CACHE_EXPIRY_MS,
+      data: data
+    };
+    localStorage.setItem(key, JSON.stringify(cacheEntry));
+  } catch (e) {
+    // Hvis localStorage er full, prøv å rydde gamle entries
+    console.warn('Kunne ikke lagre i cache, localStorage kan være full:', e);
+  }
+}
+
+/**
+ * Henter meta.json for et prosjekt/underprosjekt med caching
  * @param {string} path - Prosjektpath (f.eks. "project1" eller "project1/sub-a")
  * @returns {Promise<ProjectMeta>} Prosjektmetadata
  */
 export async function loadProjectMeta(path) {
+  const cacheKey = `${META_CACHE_KEY}.${path}`;
+  
+  // Sjekk cache først
+  const cached = getCachedData(cacheKey);
+  if (cached) {
+    return cached;
+  }
+  
+  // Hent fra server
   const url = `${BASE_URL}${path}/meta.json`;
   
   try {
@@ -29,7 +81,12 @@ export async function loadProjectMeta(path) {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    return await response.json();
+    const data = await response.json();
+    
+    // Lagre i cache
+    setCachedData(cacheKey, data);
+    
+    return data;
   } catch (error) {
     console.error(`Kunne ikke laste meta.json for ${path}:`, error);
     throw error;
@@ -37,19 +94,48 @@ export async function loadProjectMeta(path) {
 }
 
 /**
- * Henter projects.json
+ * Henter projects.json med caching
  * @returns {Promise<Array<{id: string, name: string, path: string, hidden?: boolean}>>} Liste over prosjekter
  */
 export async function loadProjects() {
+  // Sjekk cache først
+  const cached = getCachedData(PROJECTS_CACHE_KEY);
+  if (cached) {
+    return cached;
+  }
+  
+  // Hent fra server
   try {
     const response = await fetch('/projects.json');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    return await response.json();
+    const data = await response.json();
+    
+    // Lagre i cache
+    setCachedData(PROJECTS_CACHE_KEY, data);
+    
+    return data;
   } catch (error) {
     console.error('Kunne ikke laste projects.json:', error);
     throw error;
+  }
+}
+
+/**
+ * Rydder cache (nyttig for debugging eller ved oppdateringer)
+ */
+export function clearCache() {
+  try {
+    // Rydd alle cache-entries
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.startsWith(META_CACHE_KEY) || key === PROJECTS_CACHE_KEY) {
+        localStorage.removeItem(key);
+      }
+    });
+  } catch (e) {
+    console.error('Kunne ikke rydde cache:', e);
   }
 }
 

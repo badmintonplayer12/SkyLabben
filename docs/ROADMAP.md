@@ -119,43 +119,43 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for LE
 ## Fase 2: Forbedringer og optimalisering
 
 ### 2.1 Brukeropplevelse
-- [ ] **2.1.1** Loading-indikatorer mens bilder lastes
+- [x] **2.1.1** Loading-indikatorer mens bilder lastes
   - **Mål**: Vis spinner eller loading-indikator mens bilder lastes
   - **🌐 TEST I NETTLESER**: Verifiser at loading-indikator vises mens bilder lastes
-- [ ] **2.1.2** Preloading av neste bilde for raskere navigasjon
+- [x] **2.1.2** Preloading av neste bilde for raskere navigasjon
   - **Mål**: Last neste bilde i bakgrunnen for raskere navigasjon
   - **🌐 TEST I NETTLESER**: Verifiser i Network-tab at neste bilde lastes i forkant
-- [ ] **2.1.3** Feilhåndtering for manglende bilder/filer
+- [x] **2.1.3** Feilhåndtering for manglende bilder/filer
   - **Mål**: Graceful error handling med fallback eller feilmeldinger
   - **🌐 TEST I NETTLESER**: Test med manglende bilder/filer, verifiser feilhåndtering
-- [ ] **2.1.4** Forbedret feilmeldinger
+- [x] **2.1.4** Forbedret feilmeldinger
   - **Mål**: Brukervennlige feilmeldinger i stedet for tekniske
   - **🌐 TEST I NETTLESER**: Verifiser at brukervennlige feilmeldinger vises
 
 ### 2.2 Navigasjon
-- [ ] **2.2.1** Tastaturnavigasjon (piltaster for neste/forrige)
+- [x] **2.2.1** Tastaturnavigasjon (piltaster for neste/forrige)
   - **Mål**: Arrow keys for å navigere mellom steg
   - **🌐 TEST I NETTLESER**: Test at piltaster fungerer for neste/forrige steg
-- [ ] **2.2.2** Escape-tast for å gå tilbake
+- [x] **2.2.2** Escape-tast for å gå tilbake
   - **Mål**: Escape-tast navigerer ett nivå opp eller tilbake
   - **🌐 TEST I NETTLESER**: Test at Escape-tast navigerer tilbake
-- [ ] **2.2.3** Touch gestures på mobil (swipe venstre/høyre)
+- [x] **2.2.3** Touch gestures på mobil (swipe venstre/høyre)
   - **Mål**: Swipe-gestures for navigasjon på touch-enheter
   - **🌐 TEST I NETTLESER**: Test swipe-gestures på mobil eller i DevTools device mode
-- [ ] **2.2.4** Keyboard shortcuts-dokumentasjon
+- [x] **2.2.4** Keyboard shortcuts-dokumentasjon
   - **Mål**: Dokumenter alle keyboard shortcuts
 
 ### 2.3 Ytelse
-- [ ] **2.3.1** Caching-strategier for bilder
+- [x] **2.3.1** Caching-strategier for bilder
   - **Mål**: Implementer caching for raskere lasting av bilder
   - **🌐 TEST I NETTLESER**: Verifiser i Network-tab at bilder caches og lastes fra cache
-- [ ] **2.3.2** Lazy loading av bilder
+- [x] **2.3.2** Lazy loading av bilder
   - **Mål**: Last bilder kun når de trengs, ikke alle på en gang
   - **🌐 TEST I NETTLESER**: Verifiser at bilder lastes kun når de trengs
-- [ ] **2.3.3** Optimalisering av bildevisning
+- [x] **2.3.3** Optimalisering av bildevisning
   - **Mål**: Optimaliser bildevisning for bedre ytelse
   - **🌐 TEST I NETTLESER**: Test ytelse med Performance-tab i DevTools
-- [ ] **2.3.4** Grunnleggende caching-strategier (uten Service Worker)
+- [x] **2.3.4** Grunnleggende caching-strategier (uten Service Worker)
   - **Mål**: Browser-caching og localStorage for bilder/metadata
   - **🌐 TEST I NETTLESER**: Verifiser at browser cacher ressurser
 

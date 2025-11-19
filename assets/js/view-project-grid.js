@@ -5,6 +5,7 @@
  */
 
 import { getImageUrl, loadProjectMeta } from './data-loader.js';
+import { getLastStepFor } from './state.js';
 
 /**
  * Renderer prosjektgalleri
@@ -57,8 +58,32 @@ export function renderProjectGrid(projects, onProjectClick) {
     name.className = 'project-tile__name';
     name.textContent = project.name;
     
+    // Progresjonsindikator (lastes asynkront)
+    const progressIndicator = document.createElement('div');
+    progressIndicator.className = 'project-tile__progress';
+    
+    // Last meta for å få totalt antall steg og vis progresjon
+    loadProjectMeta(project.path).then(meta => {
+      const steps = meta.steps || [];
+      const totalSteps = steps.length;
+      const lastStep = getLastStepFor(project.path);
+      
+      if (totalSteps > 0 && lastStep > 0) {
+        const progressPercent = ((lastStep + 1) / totalSteps) * 100;
+        progressIndicator.style.width = `${progressPercent}%`;
+        progressIndicator.setAttribute('aria-label', `${lastStep + 1}/${totalSteps} steg`);
+        progressIndicator.classList.add('project-tile__progress--visible');
+      } else {
+        progressIndicator.style.display = 'none';
+      }
+    }).catch(() => {
+      // Hvis meta ikke kan lastes, skjul progresjonsindikator
+      progressIndicator.style.display = 'none';
+    });
+    
     tile.appendChild(img);
     tile.appendChild(name);
+    tile.appendChild(progressIndicator);
     
     // Event listener
     tile.addEventListener('click', () => {

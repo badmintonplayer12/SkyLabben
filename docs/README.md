@@ -23,6 +23,8 @@ Nettsiden er bygget med ren HTML, CSS og JavaScript, og kan hostes hvor som hels
 - **Posisjonslagring**: Automatisk lagring av hvor du var (prosjekt + steg) i localStorage
 - **Responsivt design**: Fungerer på mobil, nettbrett og PC
 - **Ingen scroll**: Instruksjonsbildet tilpasses skjermen uten scrolling
+- **Tastaturnavigasjon**: Piltaster for neste/forrige steg, Escape for å gå tilbake
+- **Touch gestures**: Swipe venstre/høyre på bildet for å navigere mellom steg
 
 ### Planlagte funksjoner
 

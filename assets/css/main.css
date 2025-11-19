@@ -90,6 +90,7 @@ button {
   background: var(--color-background);
   display: flex;
   flex-direction: column;
+  position: relative; /* For progresjonsindikator */
 }
 
 .project-tile:hover {
@@ -112,6 +113,22 @@ button {
   font-size: var(--font-size-small);
   background: var(--color-background);
   text-align: center;
+}
+
+.project-tile__progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: var(--color-primary);
+  opacity: 0;
+  transition: opacity 0.2s;
+  width: 0%;
+  z-index: 1;
+}
+
+.project-tile__progress--visible {
+  opacity: 1;
 }
 
 /* 5. View-specific styles */
