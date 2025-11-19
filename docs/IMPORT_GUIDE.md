@@ -76,8 +76,10 @@ Opprett eller oppdater `meta.json` i prosjektmappen:
   "coverImage": "cover.png",
   "steps": [],
   "children": []
-}
-```
+    }
+   ```
+
+3. **Oppdater meta.json for hvert underprosjekt**:
 
 **Viktig**:
 - `id`: Web-vennlig identifikator (samme som mappenavn)
@@ -112,9 +114,11 @@ Hvis prosjektet har underprosjekter:
          "name": "2-Alma sitt Rom",
          "path": "2-alma-sitt-rom"
        }
-     ]
-   }
-   ```
+    ]
+  }
+  ```
+
+   **Tips**: Nummeret før første bindestrek (`1-`, `2-`, `10-` …) bestemmer rekkefølgen barna vises i. `convert-to-web-friendly.js` sorterer automatisk barna numerisk, så behold prefiksene hvis du vil styre rekkefølgen.
 
 3. **Oppdater meta.json for hvert underprosjekt**:
    ```json
@@ -421,4 +425,3 @@ Etter konvertering, verifiser:
 - **Behold originalt navn i `name`-feltet** for visning i UI
 - **Test URL-er** etter konvertering for å sikre at de er rene
 - **Dokumenter konverteringer** hvis du har mange prosjekter å konvertere
-

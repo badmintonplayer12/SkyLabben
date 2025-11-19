@@ -1,6 +1,7 @@
 {
   "id": "5-lea-sitt-rom",
   "name": "5-Lea sitt rom",
+  "coverImage": "cover.png",
   "steps": [
     "80_1x.png",
     "81_1x.png",

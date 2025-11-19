@@ -6,56 +6,53 @@
   "children": [
     {
       "id": "1-spiserom",
-      "name": "1-Spiserom",
+      "name": "1-spiserom",
       "path": "1-spiserom"
     },
     {
-      "id": "10-simon-sitt-rom",
-      "name": "10-Simon sitt rom",
-      "path": "10-simon-sitt-rom"
-    },
-    {
       "id": "2-alma-sitt-rom",
-      "name": "2-Alma sitt Rom",
+      "name": "2-alma-sitt-rom",
       "path": "2-alma-sitt-rom"
     },
     {
       "id": "3-joanna-sitt-rom",
-      "name": "3-Joanna sitt Rom",
+      "name": "3-joanna-sitt-rom",
       "path": "3-joanna-sitt-rom"
     },
     {
       "id": "4-lekerom",
-      "name": "4-Lekerom",
+      "name": "4-lekerom",
       "path": "4-lekerom"
     },
     {
       "id": "5-lea-sitt-rom",
-      "name": "5-Lea sitt rom",
+      "name": "5-lea-sitt-rom",
       "path": "5-lea-sitt-rom"
     },
     {
       "id": "6-stue",
-      "name": "6-Stue",
-      "path": "6-stue",
-      "hidden": true
+      "name": "6-stue",
+      "path": "6-stue"
     },
     {
       "id": "7-kjokken",
-      "name": "7-Kjøkken",
+      "name": "7-kjokken",
       "path": "7-kjokken"
     },
     {
       "id": "8-bad",
-      "name": "8-Bad",
-      "path": "8-bad",
-      "hidden": true
+      "name": "8-bad",
+      "path": "8-bad"
     },
     {
       "id": "9-peis",
-      "name": "9-Peis",
-      "path": "9-peis",
-      "hidden": true
+      "name": "9-peis",
+      "path": "9-peis"
+    },
+    {
+      "id": "10-simon-sitt-rom",
+      "name": "10-simon-sitt-rom",
+      "path": "10-simon-sitt-rom"
     }
   ]
 }

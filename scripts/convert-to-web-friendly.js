@@ -35,6 +35,24 @@ function toWebFriendly(name) {
     .replace(/^-|-$/g, ''); // Fjern ledende/trailing bindestreker
 }
 
+function compareByLeadingNumber(a, b) {
+  const extract = (value) => {
+    const match = value.match(/^(\d+)/);
+    const num = match ? parseInt(match[1], 10) : Number.POSITIVE_INFINITY;
+    return { num, text: value.toLowerCase() };
+  };
+  
+  const left = extract(a);
+  const right = extract(b);
+  
+  if (left.num !== right.num) {
+    return left.num - right.num;
+  }
+  if (left.text < right.text) return -1;
+  if (left.text > right.text) return 1;
+  return 0;
+}
+
 /**
  * Leser alle bilder i en mappe og sorterer dem
  * @param {string} dirPath - Sti til mappen
@@ -74,7 +92,8 @@ function getChildrenDirs(dirPath) {
         webFriendlyName,
         path: webFriendlyName
       };
-    });
+    })
+    .sort((a, b) => compareByLeadingNumber(a.originalName, b.originalName));
 }
 
 /**
@@ -387,4 +406,3 @@ function main() {
 
 // Kjør scriptet
 main();
-

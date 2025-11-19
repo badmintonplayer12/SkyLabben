@@ -38,7 +38,9 @@ export function renderViewer(state, callbacks) {
   
   // Håndter tom steps-array
   const steps = state.currentProjectMeta?.steps || [];
-  const visibleChildren = (state.currentProjectMeta?.children || []).filter(c => !c.hidden);
+  const visibleChildren = (state.currentProjectMeta?.children || [])
+    .filter(c => !c.hidden)
+    .sort((a, b) => compareByLeadingNumber(a.name || a.id, b.name || b.id));
   
   // Legg til scrollable-stiler hvis det er children å vise
   if (steps.length === 0 && visibleChildren.length > 0) {
@@ -520,4 +522,28 @@ export function showCelebration(container) {
   setTimeout(() => {
     celebration.remove();
   }, 2500);
+}
+
+function compareByLeadingNumber(a, b) {
+  const extract = (value) => {
+    if (!value) {
+      return { num: Number.POSITIVE_INFINITY, text: '' };
+    }
+    const match = value.match(/^(\d+)/);
+    const num = match ? parseInt(match[1], 10) : Number.POSITIVE_INFINITY;
+    return {
+      num,
+      text: value.toLowerCase()
+    };
+  };
+  
+  const left = extract(a);
+  const right = extract(b);
+  
+  if (left.num !== right.num) {
+    return left.num - right.num;
+  }
+  if (left.text < right.text) return -1;
+  if (left.text > right.text) return 1;
+  return 0;
 }

@@ -1,6 +1,7 @@
 {
   "id": "8-bad",
   "name": "8-Bad",
+  "coverImage": "cover.png",
   "steps": [
     "140_1x.png",
     "141_1x.png",
