@@ -160,57 +160,57 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for LE
   - **🌐 TEST I NETTLESER**: Verifiser at browser cacher ressurser
 
 ### 2.4 Progresjonsvisning
-- [ ] **2.4.1** Vis progresjonsindikator i prosjektgalleri
+- [x] **2.4.1** Vis progresjonsindikator i prosjektgalleri
   - **Mål**: Vis hvor langt brukeren har kommet i hvert prosjekt i galleriet
   - **🌐 TEST I NETTLESER**: Verifiser at progresjonsindikator vises i prosjektgalleri
-- [ ] **2.4.2** Vis hvor langt man har kommet per prosjekt
+- [x] **2.4.2** Vis hvor langt man har kommet per prosjekt
   - **Mål**: Vis progresjon (f.eks. "3/10 steg") for hvert prosjekt
   - **🌐 TEST I NETTLESER**: Verifiser at korrekt progresjon vises for hvert prosjekt
-- [ ] **2.4.3** Mulighet for å nullstille progresjon
+- [x] **2.4.3** Mulighet for å nullstille progresjon
   - **Mål**: Knapp eller funksjonalitet for å nullstille lagret progresjon
   - **🌐 TEST I NETTLESER**: Test at nullstilling fungerer og oppdaterer visning
 
 ### 2.5 Barnevennlig UI
-- [ ] **2.5.1** Ikonbasert navigasjon
+- [x] **2.5.1** Ikonbasert navigasjon
   - **Mål**: Erstatt/suppler tekst med ikoner (hus, piler, stjerner) i viewer og galleri
   - **🌐 TEST I NETTLESER**: Verifiser at alle primære handlinger kan utføres uten å lese tekst
-- [ ] **2.5.2** Store trykkflater og spacing
+- [x] **2.5.2** Store trykkflater og spacing
   - **Mål**: Øk størrelse på knapper og klikksoner (≥64px) og legg til tilstrekkelig spacing
   - **🌐 TEST I NETTLESER**: Test på mobil/nettbrett at knapper er lette å treffe
-- [ ] **2.5.3** Visuell/lyd feedback
+- [x] **2.5.3** Visuell/lyd feedback
   - **Mål**: Legg til mikroanimasjoner og valgfri lyd når barnet navigerer, samt en enkel belønning ved fullført prosjekt
   - **🌐 TEST I NETTLESER**: Verifiser at feedback trigges ved interaksjon og kan skrus av/på
-- [ ] **2.5.4** Intro/hjelp for barn
+- [x] **2.5.4** Intro/hjelp for barn
   - **Mål**: Implementer en kort visuell onboarding (f.eks. maskot eller highlight) som viser hvordan man blar
   - **🌐 TEST I NETTLESER**: Test at introen kan avbrytes og kun vises ved behov
 
 ### 2.6 Tilgjengelighet og input
-- [ ] **2.6.1** Swipe-gestures i viewer
+- [x] **2.6.1** Swipe-gestures i viewer
   - **Mål**: Swipe venstre/høyre på bildet gjør samme som pilene
   - **🌐 TEST I NETTLESER**: Test på touch-enheter
-- [ ] **2.6.2** Alt-tekst og kontrastsjekk
+- [x] **2.6.2** Alt-tekst og kontrastsjekk
   - **Mål**: Sørg for alt-tekst på bilder og dokumenter kontrastkrav i CSS_guidelines
   - **🌐 TEST I NETTLESER**: Kjør Lighthouse/axe for tilgjengelighetsvarsler
 
 ### 2.7 Loading, feilhåndtering og belønning
-- [ ] **2.7.1** LEGO-inspirert loading-indikator
+- [x] **2.7.1** LEGO-inspirert loading-indikator
   - **Mål**: Vise animert kloss/spinner mens bilder lastes, deaktivere kontroller inntil bildet er klart
   - **🌐 TEST I NETTLESER**: Kunstig treghet (DevTools) for å verifisere at indikator vises
-- [ ] **2.7.2** Brukervennlige feilmeldinger
-  - **Mål**: Vennlig melding når bilde/meta mangler (“Oi! Fant ikke bildet – spør en voksen”)
+- [x] **2.7.2** Brukervennlige feilmeldinger
+  - **Mål**: Vennlig melding når bilde/meta mangler ("Oi! Fant ikke bildet – spør en voksen")
   - **🌐 TEST I NETTLESER**: Simuler 404 og sjekk at melding vises
-- [ ] **2.7.3** Fullføringsbelønning
+- [x] **2.7.3** Fullføringsbelønning
   - **Mål**: Konfetti/badge + state-markering når prosjekt er ferdig
   - **🌐 TEST I NETTLESER**: Naviger til siste steg og se at belønning trigges, og at det kan trigges kun én gang per prosjekt
 
 ### 2.8 Lyd, haptikk og voiceover
-- [ ] **2.8.1** Navigasjonslyd/haptikk
-  - **Mål**: Korte “klikk”-lyder og haptikk på pil/opp-knapp (kan skrus av/på)
+- [x] **2.8.1** Navigasjonslyd/haptikk
+  - **Mål**: Korte "klikk"-lyder og haptikk på pil/opp-knapp (kan skrus av/på)
   - **🌐 TEST I NETTLESER**: Verifiser toggle + fallback når API ikke støttes
-- [ ] **2.8.2** Steg-vis lydhint
+- [x] **2.8.2** Steg-vis lydhint
   - **Mål**: Støtte `audioSteps` fra meta.json og knapp for å spille av lyd per steg
   - **🌐 TEST I NETTLESER**: Test med sample-lyd, verifiser at feil håndteres
-- [ ] **2.8.3** Onboarding-stemme/figur
+- [x] **2.8.3** Onboarding-stemme/figur
   - **Mål**: Maskot/overlay som visuelt (og evt. auditivt) viser hvordan man starter
   - **🌐 TEST I NETTLESER**: Sørg for at overlay vises kun første gang og kan avbrytes
 

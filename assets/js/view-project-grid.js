@@ -74,10 +74,12 @@ export function renderProjectGrid(projects, onProjectClick) {
         progressIndicator.setAttribute('aria-label', `${lastStep + 1}/${totalSteps} steg`);
         progressIndicator.classList.add('project-tile__progress--visible');
       } else {
+        // Skjul hvis ingen progresjon eller ingen steg
         progressIndicator.style.display = 'none';
       }
-    }).catch(() => {
+    }).catch((error) => {
       // Hvis meta ikke kan lastes, skjul progresjonsindikator
+      console.warn(`Kunne ikke laste meta for progresjon: ${project.path}`, error);
       progressIndicator.style.display = 'none';
     });
     

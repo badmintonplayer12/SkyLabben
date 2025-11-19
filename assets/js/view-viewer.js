@@ -4,7 +4,9 @@
  * Renderer instruksjonsbilde med navigasjonskontroller.
  */
 
-import { getImageUrl, loadProjectMeta } from './data-loader.js';
+import { getImageUrl, getAudioUrl, loadProjectMeta } from './data-loader.js';
+import { getLastStepFor, resetProgressFor } from './state.js';
+import { playNavigationSound, isAudioEnabled, setAudioEnabled } from './audio-feedback.js';
 
 /**
  * Renderer instruksjonsviewer
@@ -50,11 +52,16 @@ export function renderViewer(state, callbacks) {
   const bottomBar = document.createElement('div');
   bottomBar.className = 'viewer__bottom';
   
-  // Opp-knapp
+  // Opp-knapp (ikon: hus for hjem/opp)
   const upButton = document.createElement('button');
-  upButton.className = 'viewer__button';
-  upButton.textContent = 'Opp';
-  upButton.addEventListener('click', callbacks.onGoUp);
+  upButton.className = 'viewer__button viewer__button--up';
+  upButton.innerHTML = '<span class="viewer__icon" aria-hidden="true">🏠</span>';
+  upButton.setAttribute('aria-label', 'Gå tilbake');
+  upButton.title = 'Gå tilbake';
+  upButton.addEventListener('click', () => {
+    playNavigationSound('up');
+    callbacks.onGoUp();
+  });
   
   // Progresjonslinje (skjul hvis ingen steg)
   const progressBar = document.createElement('input');
@@ -70,21 +77,31 @@ export function renderViewer(state, callbacks) {
     });
   }
   
-  // Pil-knapper
+  // Pil-knapper (store ikoner for barn)
   const prevButton = document.createElement('button');
-  prevButton.className = 'viewer__button';
-  prevButton.textContent = '←';
+  prevButton.className = 'viewer__button viewer__button--prev';
+  prevButton.innerHTML = '<span class="viewer__icon" aria-hidden="true">◀️</span>';
+  prevButton.setAttribute('aria-label', 'Forrige steg');
+  prevButton.title = 'Forrige steg';
   prevButton.disabled = steps.length === 0 || state.currentStepIndex === 0;
   if (steps.length > 0 && state.currentStepIndex > 0) {
-    prevButton.addEventListener('click', callbacks.onPrevStep);
+    prevButton.addEventListener('click', () => {
+      playNavigationSound('prev');
+      callbacks.onPrevStep();
+    });
   }
   
   const nextButton = document.createElement('button');
-  nextButton.className = 'viewer__button';
-  nextButton.textContent = '→';
+  nextButton.className = 'viewer__button viewer__button--next';
+  nextButton.innerHTML = '<span class="viewer__icon" aria-hidden="true">▶️</span>';
+  nextButton.setAttribute('aria-label', 'Neste steg');
+  nextButton.title = 'Neste steg';
   nextButton.disabled = steps.length === 0 || state.currentStepIndex === (steps.length - 1);
   if (steps.length > 0 && state.currentStepIndex < (steps.length - 1)) {
-    nextButton.addEventListener('click', callbacks.onNextStep);
+    nextButton.addEventListener('click', () => {
+      playNavigationSound('next');
+      callbacks.onNextStep();
+    });
   }
   
   // Steg-indikator
@@ -134,8 +151,32 @@ export function renderViewer(state, callbacks) {
         name.className = 'project-tile__name';
         name.textContent = child.name;
         
+        // Progresjonsindikator (lastes asynkront)
+        const progressIndicator = document.createElement('div');
+        progressIndicator.className = 'project-tile__progress';
+        
+        // Last meta for å få totalt antall steg og vis progresjon
+        loadProjectMeta(`${state.currentPath}/${child.path}`).then(childMeta => {
+          const childSteps = childMeta.steps || [];
+          const totalSteps = childSteps.length;
+          const lastStep = getLastStepFor(`${state.currentPath}/${child.path}`);
+          
+          if (totalSteps > 0 && lastStep > 0) {
+            const progressPercent = ((lastStep + 1) / totalSteps) * 100;
+            progressIndicator.style.width = `${progressPercent}%`;
+            progressIndicator.setAttribute('aria-label', `${lastStep + 1}/${totalSteps} steg`);
+            progressIndicator.classList.add('project-tile__progress--visible');
+          } else {
+            progressIndicator.style.display = 'none';
+          }
+        }).catch((error) => {
+          console.warn(`Kunne ikke laste meta for progresjon: ${state.currentPath}/${child.path}`, error);
+          progressIndicator.style.display = 'none';
+        });
+        
         tile.appendChild(img);
         tile.appendChild(name);
+        tile.appendChild(progressIndicator);
         
         tile.addEventListener('click', () => {
           if (callbacks.onProjectClick) {
@@ -232,6 +273,79 @@ export function renderViewer(state, callbacks) {
     imageContainer.appendChild(img);
   }
   
+  // Audio toggle-knapp (kun hvis det er steg)
+  if (steps.length > 0) {
+    const audioToggleButton = document.createElement('button');
+    audioToggleButton.className = 'viewer__button viewer__button--audio';
+    audioToggleButton.innerHTML = `<span class="viewer__icon" aria-hidden="true">${isAudioEnabled() ? '🔊' : '🔇'}</span>`;
+    audioToggleButton.setAttribute('aria-label', isAudioEnabled() ? 'Skru av lyd' : 'Skru på lyd');
+    audioToggleButton.title = isAudioEnabled() ? 'Skru av lyd' : 'Skru på lyd';
+    audioToggleButton.addEventListener('click', () => {
+      const newState = !isAudioEnabled();
+      setAudioEnabled(newState);
+      audioToggleButton.innerHTML = `<span class="viewer__icon" aria-hidden="true">${newState ? '🔊' : '🔇'}</span>`;
+      audioToggleButton.setAttribute('aria-label', newState ? 'Skru av lyd' : 'Skru på lyd');
+      audioToggleButton.title = newState ? 'Skru av lyd' : 'Skru på lyd';
+    });
+    bottomBar.appendChild(audioToggleButton);
+  }
+  
+  // Audio-knapp for steg-vis lydhint (hvis audioSteps finnes)
+  const audioSteps = state.currentProjectMeta?.audioSteps || [];
+  if (steps.length > 0 && audioSteps.length > 0 && state.currentStepIndex < audioSteps.length) {
+    const audioStep = audioSteps[state.currentStepIndex];
+    if (audioStep) {
+      const audioButton = document.createElement('button');
+      audioButton.className = 'viewer__button viewer__button--audio-step';
+      audioButton.innerHTML = '<span class="viewer__icon" aria-hidden="true">🎵</span>';
+      audioButton.setAttribute('aria-label', 'Spill av lydhint for dette steg');
+      audioButton.title = 'Spill av lydhint';
+      audioButton.addEventListener('click', () => {
+        const audio = new Audio(getAudioUrl(state.currentPath, audioStep));
+        audio.play().catch((error) => {
+          console.warn('Kunne ikke spille lyd:', error);
+          // Vis brukervennlig melding hvis lyd ikke kan spilles
+          const errorMsg = document.createElement('div');
+          errorMsg.className = 'viewer__empty-message';
+          errorMsg.textContent = 'Oi! Kunne ikke spille lyd – spør en voksen';
+          errorMsg.style.position = 'fixed';
+          errorMsg.style.top = '50%';
+          errorMsg.style.left = '50%';
+          errorMsg.style.transform = 'translate(-50%, -50%)';
+          errorMsg.style.zIndex = '1001';
+          errorMsg.style.background = 'var(--color-background)';
+          errorMsg.style.padding = 'var(--spacing-lg)';
+          errorMsg.style.borderRadius = 'var(--border-radius)';
+          errorMsg.style.boxShadow = 'var(--shadow)';
+          container.appendChild(errorMsg);
+          setTimeout(() => {
+            errorMsg.remove();
+          }, 3000);
+        });
+      });
+      bottomBar.appendChild(audioButton);
+    }
+  }
+  
+  // Nullstill-knapp (kun hvis det er steg)
+  if (steps.length > 0) {
+    const resetButton = document.createElement('button');
+    resetButton.className = 'viewer__button viewer__button--reset';
+    resetButton.textContent = '🔄';
+    resetButton.setAttribute('aria-label', 'Nullstill progresjon');
+    resetButton.title = 'Nullstill progresjon';
+    resetButton.addEventListener('click', () => {
+      if (confirm('Vil du nullstille progresjonen for dette prosjektet?')) {
+        resetProgressFor(state.currentPath);
+        // Naviger til første steg
+        if (callbacks.onStepChange) {
+          callbacks.onStepChange(0);
+        }
+      }
+    });
+    bottomBar.appendChild(resetButton);
+  }
+  
   bottomBar.appendChild(upButton);
   bottomBar.appendChild(prevButton);
   bottomBar.appendChild(progressBar);
@@ -293,11 +407,13 @@ export function renderViewer(state, callbacks) {
         // Swipe venstre (neste steg)
         if (deltaX < -minSwipeDistance && !nextButton.disabled && callbacks.onNextStep) {
           e.preventDefault();
+          playNavigationSound('next');
           callbacks.onNextStep();
         }
         // Swipe høyre (forrige steg)
         else if (deltaX > minSwipeDistance && !prevButton.disabled && callbacks.onPrevStep) {
           e.preventDefault();
+          playNavigationSound('prev');
           callbacks.onPrevStep();
         }
       }
@@ -320,4 +436,37 @@ export function renderViewer(state, callbacks) {
   }
   
   return container;
+}
+
+/**
+ * Viser belønning ved fullført prosjekt
+ * @param {HTMLElement} container - Container-elementet å legge belønningen i
+ */
+export function showCelebration(container) {
+  // Fjern eksisterende belønning hvis den finnes
+  const existing = container.querySelector('.viewer__celebration');
+  if (existing) {
+    existing.remove();
+  }
+  
+  const celebration = document.createElement('div');
+  celebration.className = 'viewer__celebration';
+  
+  // Lag konfetti-partikler
+  const emojis = ['🎉', '⭐', '🎊', '✨', '🏆'];
+  for (let i = 0; i < 20; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'viewer__celebration-particle';
+    particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    particle.style.left = `${Math.random() * 100}%`;
+    particle.style.animationDelay = `${Math.random() * 0.5}s`;
+    celebration.appendChild(particle);
+  }
+  
+  container.appendChild(celebration);
+  
+  // Fjern belønning etter animasjon
+  setTimeout(() => {
+    celebration.remove();
+  }, 2500);
 }

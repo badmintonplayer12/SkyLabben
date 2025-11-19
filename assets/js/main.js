@@ -8,7 +8,8 @@ import { init as initRouter, parseHash, updateHash, getParentPath } from './rout
 import { loadProjects, loadProjectMeta } from './data-loader.js';
 import { getState, updateState, getLastStepFor, setStepFor } from './state.js';
 import { renderProjectGrid } from './view-project-grid.js';
-import { renderViewer } from './view-viewer.js';
+import { renderViewer, showCelebration } from './view-viewer.js';
+import { hasSeenOnboarding, showOnboarding } from './onboarding.js';
 
 /**
  * Initialiserer applikasjonen
@@ -42,6 +43,13 @@ async function handleRoute(route) {
         updateHash({ type: 'project', path });
       });
       root.appendChild(grid);
+      
+      // Vis onboarding første gang
+      if (!hasSeenOnboarding()) {
+        showOnboarding(root, () => {
+          // Onboarding avsluttet, ingen ekstra handling nødvendig
+        });
+      }
     } catch (error) {
       console.error('Kunne ikke laste prosjekter:', error);
       root.innerHTML = `<div style="padding: 2rem; text-align: center; font-size: var(--font-size-large);">
@@ -78,12 +86,28 @@ async function handleRoute(route) {
           updateState({ currentStepIndex: newIndex });
           setStepFor(state.currentPath, newIndex);
           updateHash({ type: 'project', path: state.currentPath, stepIndex: newIndex });
+          
+          // Vis belønning hvis siste steg nåddes
+          if (newIndex === maxIndex && maxIndex > 0) {
+            setTimeout(() => {
+              showCelebration(viewer);
+            }, 300);
+          }
         },
         onStepChange: (stepIndex) => {
           updateState({ currentStepIndex: stepIndex });
           const { currentPath } = getState();
           setStepFor(currentPath, stepIndex);
           updateHash({ type: 'project', path: currentPath, stepIndex });
+          
+          // Vis belønning hvis siste steg nåddes
+          const state = getState();
+          const maxIndex = (state.currentProjectMeta?.steps.length || 1) - 1;
+          if (stepIndex === maxIndex && maxIndex > 0) {
+            setTimeout(() => {
+              showCelebration(viewer);
+            }, 300);
+          }
         },
         onGoUp: () => {
           const { currentPath } = getState();

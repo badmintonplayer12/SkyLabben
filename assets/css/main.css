@@ -14,6 +14,7 @@
   --font-size-base: 16px;
   --font-size-small: 14px;
   --font-size-large: 18px;
+  --font-size-xlarge: 32px;
   --font-size-h1: 24px;
   --font-size-h2: 20px;
   --line-height-base: 1.5;
@@ -200,6 +201,8 @@ button {
   align-items: center;
   justify-content: center;
   animation: spin 1.8s linear infinite;
+  /* LEGO-inspirert kloss-ikon */
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
 }
 
 @keyframes bounce {
@@ -224,24 +227,166 @@ button {
 
 .viewer__button {
   padding: var(--spacing-sm) var(--spacing-md);
-  min-height: 48px;
-  min-width: 48px;
+  min-height: 64px; /* Store tap-targets for barn (≥64px) */
+  min-width: 64px;
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
   background: var(--color-background);
   cursor: pointer;
   font-size: var(--font-size-base);
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.viewer__icon {
+  font-size: var(--font-size-xlarge);
+  line-height: 1;
+  display: inline-block;
 }
 
 .viewer__button:hover:not(:disabled) {
   background: var(--color-primary);
   color: white;
+  transform: scale(1.1);
+}
+
+.viewer__button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Belønning ved fullført prosjekt */
+.viewer__celebration {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: celebrationFadeIn 0.5s ease-out;
+}
+
+.viewer__celebration-particle {
+  position: absolute;
+  font-size: var(--font-size-xlarge);
+  animation: confettiFall 2s ease-out forwards;
+}
+
+@keyframes celebrationFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Onboarding overlay */
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.onboarding-overlay__content {
+  background: var(--color-background);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-xl);
+  max-width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.onboarding-overlay__mascot {
+  font-size: 80px;
+  margin-bottom: var(--spacing-lg);
+  animation: bounce 1.5s ease-in-out infinite;
+}
+
+.onboarding-overlay__instructions {
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-size-large);
+  color: var(--color-text);
+}
+
+.onboarding-overlay__instruction {
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.onboarding-overlay__icon {
+  font-size: var(--font-size-xlarge);
+  display: inline-block;
+}
+
+.onboarding-overlay__dismiss {
+  padding: var(--spacing-md) var(--spacing-xl);
+  min-height: 64px;
+  min-width: 120px;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--border-radius);
+  background: var(--color-primary);
+  color: white;
+  cursor: pointer;
+  font-size: var(--font-size-large);
+  font-weight: bold;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.onboarding-overlay__dismiss:hover {
+  background: #0052a3;
+  transform: scale(1.05);
+}
+
+.onboarding-overlay__dismiss:active {
+  transform: scale(0.95);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .viewer__button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.viewer__button--reset {
+  opacity: 0.7;
+  font-size: var(--font-size-large);
+}
+
+.viewer__button--reset:hover:not(:disabled) {
+  opacity: 1;
+  transform: rotate(180deg);
+  transition: transform 0.3s, opacity 0.2s;
 }
 
 .viewer__progress {

@@ -85,3 +85,20 @@ export function setStepFor(path, stepIndex) {
   progress[path] = stepIndex;
   saveProgress(progress);
 }
+
+/**
+ * Nullstiller progresjon for en spesifikk path
+ * @param {string} path - Prosjektpath
+ */
+export function resetProgressFor(path) {
+  const progress = loadProgress();
+  delete progress[path];
+  saveProgress(progress);
+}
+
+/**
+ * Nullstiller all progresjon
+ */
+export function resetAllProgress() {
+  saveProgress({});
+}
