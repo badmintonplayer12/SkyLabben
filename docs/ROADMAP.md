@@ -272,7 +272,7 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for LE
 - [x] **4.2.1** Opprett service-worker.js
   - **Mål**: Grunnleggende Service Worker med install/activate events
   - **🌐 TEST I NETTLESER**: Verifiser at Service Worker registreres i Application-tab
-- [ ] **4.2.2** Implementer caching-strategi for statiske ressurser
+- [x] **4.2.2** Implementer caching-strategi for statiske ressurser
   - **Mål**: Cache HTML, CSS, JS ved install (Cache First)
   - **🌐 TEST I NETTLESER**: Test offline-tilgang til statiske filer
 - [ ] **4.2.3** Implementer caching-strategi for bilder

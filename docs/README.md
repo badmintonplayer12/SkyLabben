@@ -73,7 +73,9 @@ Legg ferdige, kvadratiske PNG-er med disse navnene i mappen før du tester insta
 ### Service worker
 
 - `service-worker.js` ligger i rotmappen og registreres fra `assets/js/main.js`.
-- Foreløpig håndterer den bare `install`/`activate` og rydder bort gamle caches. Caching-strategier legges til i senere roadmap-steg.
+- Under `install` caches den alle statiske ressurser (HTML, CSS, JS-moduler, manifest og app-ikoner). Disse betjenes videre fra cache (Cache First).
+- Navigasjonsforespørsler (`mode: navigate`) bruker nettverket først, men faller tilbake til cached `index.html` dersom brukeren er offline.
+- Videre caching (bilder, JSON osv.) blir bygget ut i senere roadmap-steg.
 
 ## Bildstruktur og navngivning
 
