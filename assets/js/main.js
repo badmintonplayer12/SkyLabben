@@ -1,4 +1,4 @@
-/**
+ï»¿/**
  * Hovedkoordinator for LEGO Instruksjonsvisning-applikasjonen
  * 
  * Dette er applikasjonens entry point som koordinerer routing, state og views.
@@ -13,16 +13,18 @@ import { hasSeenOnboarding, showOnboarding } from './onboarding.js';
 
 /**
  * Initialiserer applikasjonen
- * Kalles én gang når siden laster
+ * Kalles Ã©n gang nÃ¥r siden laster
  */
 export function init() {
   initRouter((route) => {
     handleRoute(route);
   });
+
+  registerServiceWorker();
 }
 
 /**
- * Håndterer ruteendringer
+ * HÃ¥ndterer ruteendringer
  * @param {Route} route - Route-objekt fra router
  */
 async function handleRoute(route) {
@@ -37,8 +39,8 @@ async function handleRoute(route) {
   if (route.type === 'root') {
     const clearStatus = showStatus(root, {
       type: 'loading',
-      title: 'Laster prosjekter …',
-      message: 'Henter LEGO-modellene dine. Bare et lite øyeblikk!'
+      title: 'Laster prosjekter â€¦',
+      message: 'Henter LEGO-modellene dine. Bare et lite Ã¸yeblikk!'
     });
     try {
       const projects = await loadProjects();
@@ -59,16 +61,16 @@ async function handleRoute(route) {
       root.appendChild(createStatusElement({
         type: 'error',
         title: 'Oi! Kunne ikke laste prosjekter',
-        message: 'Sjekk nettforbindelsen eller prøv igjen om et øyeblikk.',
+        message: 'Sjekk nettforbindelsen eller prÃ¸v igjen om et Ã¸yeblikk.',
         details: error?.message,
-        actionLabel: 'Prøv igjen',
+        actionLabel: 'PrÃ¸v igjen',
         onAction: () => handleRoute(route)
       }));
     }
   } else if (route.type === 'project') {
     const clearStatus = showStatus(root, {
       type: 'loading',
-      title: 'Laster instruksjonene …',
+      title: 'Laster instruksjonene â€¦',
       message: 'Vi finner frem byggetrinnene dine.'
     });
     try {
@@ -140,7 +142,7 @@ async function handleRoute(route) {
       root.appendChild(createStatusElement({
         type: 'error',
         title: 'Fant ikke instruksjonene',
-        message: 'Sjekk at prosjektet finnes, eller gå tilbake og velg et annet.',
+        message: 'Sjekk at prosjektet finnes, eller gÃ¥ tilbake og velg et annet.',
         details: error?.message,
         actionLabel: 'Tilbake til galleri',
         onAction: () => updateHash({ type: 'root' })
@@ -198,8 +200,27 @@ function createStatusElement({ type = 'info', title, message, details, actionLab
   return wrapper;
 }
 
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) {
+    return;
+  }
+
+  const swUrl = './service-worker.js';
+
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(swUrl)
+      .then((registration) => {
+        console.info('Service worker registrert:', registration.scope);
+      })
+      .catch((error) => {
+        console.warn('Klarte ikke Ã¥ registrere service worker:', error);
+      });
+  });
+}
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
   init();
 }
+

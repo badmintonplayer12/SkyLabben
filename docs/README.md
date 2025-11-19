@@ -57,6 +57,23 @@ Prosjektet er primært laget for barn som ennå ikke kan lese flytende. UI-et sk
 - **Routing**: Hash-basert routing (`#/p/project1?step=3`)
 - **State management**: localStorage for progresjonslagring
 - **Dataformat**: JSON-filer (`meta.json` og `projects.json`)
+- **PWA-grunnlag**: `manifest.json` i rotmappen lenkes fra `index.html` og peker til app-ikoner i `assets/icons/`
+
+### App-ikoner
+
+Manifestet forventer to PNG-filer i `assets/icons/`:
+
+| Filnavn | Størrelse | Bruk |
+|---------|-----------|------|
+| `icon-192.png` | 192×192 px | Standard ikon for Android/Chrome installasjon |
+| `icon-512.png` | 512×512 px | Stor ikon (brukes også som maskable) |
+
+Legg ferdige, kvadratiske PNG-er med disse navnene i mappen før du tester installasjon eller Lighthouse PWA-sjekk.
+
+### Service worker
+
+- `service-worker.js` ligger i rotmappen og registreres fra `assets/js/main.js`.
+- Foreløpig håndterer den bare `install`/`activate` og rydder bort gamle caches. Caching-strategier legges til i senere roadmap-steg.
 
 ## Bildstruktur og navngivning
 

@@ -37,8 +37,8 @@ export function renderProjectGrid(projects, onProjectClick) {
   const searchInput = document.createElement('input');
   searchInput.type = 'search';
   searchInput.className = 'project-grid__search';
-  searchInput.placeholder = 'Søk etter prosjekt...';
-  searchInput.setAttribute('aria-label', 'Søk etter prosjekt');
+  searchInput.placeholder = 'SÃ¸k etter prosjekt...';
+  searchInput.setAttribute('aria-label', 'SÃ¸k etter prosjekt');
 
   const categoriesContainer = document.createElement('div');
   categoriesContainer.className = 'project-grid__categories';

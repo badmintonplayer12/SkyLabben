@@ -258,18 +258,18 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for LE
 ## Fase 4: Progressive Web App (PWA)
 
 ### 4.1 Web App Manifest
-- [ ] **4.1.1** Opprett manifest.json
+- [x] **4.1.1** Opprett manifest.json
   - **Mål**: Web App Manifest med app-navn, ikoner, start-URL, display-mode
   - **🌐 TEST I NETTLESER**: Verifiser at manifest.json lastes korrekt
-- [ ] **4.1.2** Legg til app-ikoner (flere størrelser)
+- [x] **4.1.2** Legg til app-ikoner (flere størrelser)
   - **Mål**: Ikoner for iOS, Android og desktop (192x192, 512x512, etc.)
   - **🌐 TEST I NETTLESER**: Verifiser at ikoner vises korrekt i browser
-- [ ] **4.1.3** Konfigurer manifest for installasjon
+- [x] **4.1.3** Konfigurer manifest for installasjon
   - **Mål**: display: "standalone", start_url, theme_color, background_color
   - **🌐 TEST I NETTLESER**: Test installasjonsprompt i nettleser
 
 ### 4.2 Service Worker
-- [ ] **4.2.1** Opprett service-worker.js
+- [x] **4.2.1** Opprett service-worker.js
   - **Mål**: Grunnleggende Service Worker med install/activate events
   - **🌐 TEST I NETTLESER**: Verifiser at Service Worker registreres i Application-tab
 - [ ] **4.2.2** Implementer caching-strategi for statiske ressurser

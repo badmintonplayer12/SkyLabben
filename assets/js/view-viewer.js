@@ -177,8 +177,9 @@ export function renderViewer(state, callbacks) {
       }
       return;
     }
-    if (container.requestFullscreen) {
-      container.requestFullscreen().catch(() => {});
+    const target = document.documentElement || document.body || container;
+    if (target?.requestFullscreen) {
+      target.requestFullscreen().catch(() => {});
     }
   };
   const openQrModal = async () => {
