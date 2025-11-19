@@ -23,6 +23,7 @@ export function init() {
 
   registerServiceWorker();
   initPWAInstall();
+  initOfflineIndicator();
 }
 
 /**
@@ -235,6 +236,43 @@ function registerServiceWorker() {
       .catch((error) => {
         console.warn('Klarte ikke å registrere service worker:', error);
       });
+  });
+}
+
+/**
+ * Initialiserer offline-indikator
+ * Viser/skjuler indikator basert på nettverksstatus
+ */
+function initOfflineIndicator() {
+  const indicator = document.getElementById('offline-indicator');
+  if (!indicator) {
+    return;
+  }
+
+  function updateOfflineStatus() {
+    const isOnline = navigator.onLine;
+    
+    if (isOnline) {
+      indicator.classList.remove('offline-indicator--visible');
+      indicator.setAttribute('aria-hidden', 'true');
+    } else {
+      indicator.classList.add('offline-indicator--visible');
+      indicator.setAttribute('aria-hidden', 'false');
+    }
+  }
+
+  // Sjekk initial status
+  updateOfflineStatus();
+
+  // Lytte på online/offline events
+  window.addEventListener('online', () => {
+    updateOfflineStatus();
+    console.info('Nettverk tilbake online');
+  });
+
+  window.addEventListener('offline', () => {
+    updateOfflineStatus();
+    console.warn('Nettverk offline');
   });
 }
 
