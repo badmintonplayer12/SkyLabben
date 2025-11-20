@@ -304,6 +304,25 @@ function registerServiceWorker() {
       });
     }
   });
+
+  // Sjekk for ventende SW også når appen får fokus / blir synlig (nyttig for PWA gjenopptak)
+  function checkForWaitingServiceWorker() {
+    if (!navigator.serviceWorker) return;
+    navigator.serviceWorker.getRegistration().then((registration) => {
+      if (!registration) return;
+      registration.update().catch(() => {});
+      if (registration.waiting && navigator.serviceWorker.controller) {
+        showUpdateOverlay(registration);
+      }
+    }).catch(() => {});
+  }
+
+  window.addEventListener('focus', checkForWaitingServiceWorker);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      checkForWaitingServiceWorker();
+    }
+  });
 }
 
 /**
