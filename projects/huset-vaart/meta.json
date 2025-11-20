@@ -54,6 +54,11 @@
       "id": "10-simon-sitt-rom",
       "name": "10-Simon sitt rom",
       "path": "10-simon-sitt-rom"
+    },
+    {
+      "id": "11-gang",
+      "name": "11-Gang",
+      "path": "11-gang"
     }
   ],
   "category": "Hjemmeprosjekt"
