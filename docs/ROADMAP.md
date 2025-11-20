@@ -330,6 +330,26 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for Sk
   - **🌐 TEST I NETTLESER**: Verifiser cache-størrelse i Application-tab
   - **Notat**: Cache-quota-håndtering implementert med LRU-strategi. Maks 50 MB for bilder, 20 MB for lydfiler. Eldste entries fjernes automatisk når kvoten overskrides.
 
+### 4.6 Klientoppdatering og cache-invalidering
+- [ ] **4.6.1** Felles versjon for SW og data-cache
+  - **Mål**: Koble `CACHE_VERSION` i `service-worker.js` og `assets/js/data-loader.js` til én felles versjonskilde (f.eks. `version.json`/`VERSION`/import) som deploy-scriptet oppdaterer (kort hash + dato er nok). Versjonen injiseres som `CACHE_VERSION` i begge filer slik at kode, bilder og JSON invalides ved hver deploy.
+  - **🌐 TEST I NETTLESER**: Etter versjonsbump og reload skal kun nye cache-navn vises i Application → Cache Storage, og `legoInstructions.metaCache` lokal-cache skal erstattes.
+- [ ] **4.6.2** Oppdateringsvarsel i UI
+  - **Mål**: Velg primær strategi for oppdagelse (f.eks. SW-driver: SW sender `SW_UPDATE_AVAILABLE` til clients). Fjern `self.skipWaiting()` fra install; legg den i message-handler som lytter på `SKIP_WAITING`. UI viser banner “Oppdater nå” når SW-meldingen mottas (og/eller når `registration.waiting`/`updatefound` oppdages), kaller `postMessage({ type: 'SKIP_WAITING' })` på `registration.waiting`, håndterer eksisterende `waiting` ved første load, og lytter på `controllerchange` med guard for å `reload()`. Ha fallback-knapp “Last på nytt” om `waiting` er null.
+  - **🌐 TEST I NETTLESER**: Endre SW-versjon, last siden (DevTools → Application → Update), verifiser at banner vises på eksisterende installasjon med aktiv SW, trykk “Oppdater nå” og se at ny versjon lastes og gamle cacher slettes. Inkognito skal få ny versjon direkte uten banner.
+- [ ] **4.6.3** Deploy-sjekkliste for invalidasjon
+  - **Mål**: Dokumenter kort rutine for deploy: kjør versjons-script, verifiser at `service-worker.js` og `assets/js/data-loader.js` får ny versjon, push til GitHub Pages. TTL for data-cache er kun backup (vurder 6–12 t).
+  - **🌐 TEST I NETTLESER**: Etter deploy: inkognito henter ny versjon direkte; eksisterende installasjon ser banner/oppdatering. DevTools: Application → Cache Storage viser kun nye cache-navn; Local Storage viser `legoInstructions.*` med ny versjon.
+
+#### 🌐 Forslag til test i nettleser (eksisterende installasjon)
+
+1. Kjør `node scripts/update-version.js 2024-09-02+test`, bygg og deploy/serve lokalt.
+2. Åpne siden som vanlig (med den gamle service worker-versjonen fremdeles aktiv). Bekreft i DevTools → Application → Cache Storage at cache-navnene fortsatt inneholder den gamle versjonen.
+3. Utfør en hard-reload uten å tømme cache. Når siden laster inn, skal oppdateringsbanneret vises. Klikk «Oppdater nå».
+4. Etter automatisk reload: DevTools → Application → Service Workers skal vise at den nye SW-en er aktiv. Cache Storage skal kun vise cache-navn som inkluderer `2024-09-02+test`, og Local Storage (`legoInstructions.*`) skal vise samme versjon.
+5. Verifiser at appen fungerer (navigasjon, bilder, progress) og at banneret ikke dukker opp igjen.
+6. Inkognito-test: åpne siden i et nytt inkognito-vindu. Ingen banner skal vises, og både cache-navn og Local Storage skal ha `2024-09-02+test` umiddelbart.
+
 ## Milepæler
 
 ### M1: MVP (Minimum Viable Product)

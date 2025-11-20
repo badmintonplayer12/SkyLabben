@@ -1,0 +1,15 @@
+#!/bin/sh
+# Pre-commit hook: bump versjon og stage nødvendige filer automatisk.
+# Krever Node installert. Aktiver med:
+#   git config core.hooksPath .githooks
+
+printf "Bumper versjon...\n"
+node scripts/update-version.js || {
+  echo "Feil under versjonsbump; avbryter commit."
+  exit 1
+}
+
+# Sørg for at versjonsfilene blir med i commiten
+git add service-worker.js assets/js/version.js
+
+exit 0

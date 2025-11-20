@@ -9,7 +9,7 @@ import { loadProjects, loadProjectMeta } from './data-loader.js';
 import { getState, updateState, getLastStepFor, setStepFor, setInstallPromptAvailable } from './state.js';
 import { renderProjectGrid } from './view-project-grid.js';
 import { renderViewer, showCelebration } from './view-viewer.js';
-import { hasSeenOnboarding, showOnboarding } from './onboarding.js';
+import { hasSeenOnboarding, showOnboarding, showOverlayMessage } from './onboarding.js';
 import { initInstallPromptListener } from './pwa-install.js';
 
 /**
@@ -227,15 +227,82 @@ function registerServiceWorker() {
   }
 
   const swUrl = './service-worker.js';
+  let hasReloadedFromUpdate = false;
+  let updateOverlay = null;
+
+  function removeUpdateOverlay() {
+    if (updateOverlay && typeof updateOverlay.remove === 'function') {
+      updateOverlay.remove();
+    }
+    updateOverlay = null;
+  }
+
+  function showUpdateOverlay(registration) {
+    if (updateOverlay) return;
+    updateOverlay = showOverlayMessage(document.body, {
+      icon: '⬆️',
+      lines: [
+        'Ny versjon er tilgjengelig.',
+        'Oppdater for å få siste forbedringer.'
+      ],
+      primaryLabel: 'Oppdater nå',
+      onPrimary: () => {
+        const waiting = registration.waiting;
+        if (waiting) {
+          waiting.postMessage({ type: 'SKIP_WAITING' });
+        } else {
+          window.location.reload();
+        }
+      },
+      secondaryLabel: 'Senere',
+      onSecondary: () => removeUpdateOverlay(),
+      allowBackdropDismiss: false
+    });
+  }
+
+  function listenForWaitingServiceWorker(registration) {
+    if (!registration) return;
+    if (registration.waiting) {
+      showUpdateOverlay(registration);
+      return;
+    }
+    registration.addEventListener('updatefound', () => {
+      const newWorker = registration.installing;
+      if (!newWorker) return;
+      newWorker.addEventListener('statechange', () => {
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          showUpdateOverlay(registration);
+        }
+      });
+    });
+  }
 
   window.addEventListener('load', () => {
     navigator.serviceWorker.register(swUrl)
       .then((registration) => {
         console.info('Service worker registrert:', registration.scope);
+        listenForWaitingServiceWorker(registration);
       })
       .catch((error) => {
         console.warn('Klarte ikke å registrere service worker:', error);
       });
+  });
+
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (hasReloadedFromUpdate) return;
+    hasReloadedFromUpdate = true;
+    removeUpdateOverlay();
+    window.location.reload();
+  });
+
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data?.type === 'SW_UPDATE_AVAILABLE') {
+      navigator.serviceWorker.getRegistration().then((registration) => {
+        if (registration) {
+          showUpdateOverlay(registration);
+        }
+      });
+    }
   });
 }
 
@@ -281,4 +348,3 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
-

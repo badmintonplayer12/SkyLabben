@@ -5,6 +5,7 @@ Denne guiden hjelper deg med å konvertere eksisterende prosjekter med mellomrom
 **Anbefalt**: Bruk automatiske scripts for trygg konvertering:
 - `scripts/convert-to-web-friendly.js` - Konverterer mapper til web-vennlig format
 - `scripts/update-cover-images.js` - Genererer/oppdaterer cover-bilder
+- `scripts/update-version.js` - Bumper versjon for service worker og data-cache (bruk etter innholdsoppdatering for å tvinge klientoppdatering)
 
 Se seksjoner "Automatisk konvertering med Node.js-script" og "Cover-bilder" nedenfor.
 

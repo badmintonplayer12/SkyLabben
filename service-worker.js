@@ -1,4 +1,5 @@
-const CACHE_VERSION = 'skylabben-sw-v3'; // Økt versjon for å trigge cache-oppdatering
+// CACHE_VERSION oppdateres av scripts/update-version.js
+const CACHE_VERSION = '2025-11-20+103820-33c37e2';
 
 const PRECACHE_PATHS = [
   './',
@@ -16,6 +17,7 @@ const PRECACHE_PATHS = [
   './assets/js/onboarding.js',
   './assets/js/favorites.js',
   './assets/js/pwa-install.js',
+  './assets/js/version.js',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png'
 ];
@@ -127,7 +129,7 @@ self.addEventListener('install', (event) => {
       caches.open(IMAGE_CACHE),
       caches.open(JSON_CACHE),
       caches.open(AUDIO_CACHE)
-    ]).then(() => self.skipWaiting())
+    ])
   );
 });
 
@@ -145,8 +147,21 @@ self.addEventListener('activate', (event) => {
             return caches.delete(cacheName);
           })
       );
-    }).then(() => self.clients.claim())
+    }).then(async () => {
+      await self.clients.claim();
+      const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      clients.forEach((client) => {
+        client.postMessage({ type: 'SW_UPDATE_AVAILABLE' });
+      });
+    })
   );
+});
+
+self.addEventListener('message', (event) => {
+  if (!event.data) return;
+  if (event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('fetch', (event) => {

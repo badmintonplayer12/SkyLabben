@@ -77,6 +77,15 @@ Legg ferdige, kvadratiske PNG-er med disse navnene i mappen før du tester insta
 - Navigasjonsforespørsler (`mode: navigate`) bruker nettverket først, men faller tilbake til cached `index.html` dersom brukeren er offline.
 - Videre caching (bilder, JSON osv.) blir bygget ut i senere roadmap-steg.
 
+## Oppdatering og cache-invalidering
+
+For å sikre at klienten får nyeste kode, bilder og JSON ved deploy (GitHub Pages):
+- **Felles versjon**: Bruk én versjonsverdi (f.eks. commit-hash eller dato) for deploy. Legg den i `version.json` eller som konstant.
+- **Service worker**: Sett `CACHE_VERSION` i `service-worker.js` til den samme versjonsverdien. Ny versjon sletter gamle `*-static/images/json/audio`-cacher i `activate`.
+- **Data-cache**: Sett `CACHE_VERSION` i `assets/js/data-loader.js` til samme versjon, slik at localStorage-cache av `projects.json`/`meta.json` invalides.
+- **Oppdateringsvarsel (anbefalt)**: La service worker sende melding når ny versjon er `waiting`, og vis et banner i UI med knapp som sender `SKIP_WAITING` til `registration.waiting` → lytter på `controllerchange` og kaller `window.location.reload()`.
+- **Deploy-rutine**: Oppdater versjonsverdien før push; deploy til Pages. Etter publisering: brukeren må åpne siden (evt. se banner) for å få ny SW/kode; cachen ryddes automatisk.
+
 ## Bildstruktur og navngivning
 
 ### Bildnavn

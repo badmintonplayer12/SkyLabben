@@ -4,11 +4,13 @@
  * Henter projects.json og meta.json for prosjekter/underprosjekter.
  */
 
+import { APP_VERSION } from './version.js';
+
 const resolvedBase = window.__APP_BASE_URL__ || window.location.href.split('#')[0];
 const APP_BASE_URL = new URL('./', resolvedBase).href; // bevarer repo-mappen selv uten trailing slash
 const PROJECTS_JSON_URL = new URL('projects.json', APP_BASE_URL).href;
 const BASE_URL = new URL('projects/', APP_BASE_URL).href;
-const CACHE_VERSION = '1.0'; // Øk dette når cache-struktur endres
+const CACHE_VERSION = APP_VERSION; // Felles versjon for SW og localStorage-cache
 const META_CACHE_KEY = 'legoInstructions.metaCache';
 const PROJECTS_CACHE_KEY = 'legoInstructions.projectsCache';
 const CACHE_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 timer

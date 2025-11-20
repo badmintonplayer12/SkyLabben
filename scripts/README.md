@@ -2,6 +2,22 @@
 
 Dette mappen inneholder hjelpescripts for prosjektet.
 
+## update-version.js
+
+Bumper versjonsstrengen som brukes av service worker og data-cache.
+
+### Bruk
+- Automatisk generert versjon (dato+tid+hash):  
+  `node scripts/update-version.js`
+- Egendefinert versjon:  
+  `node scripts/update-version.js 2024-09-01+abc123`
+
+### Git hook (valgfritt)
+Et pre-commit-hook ligger i `.githooks/pre-commit` og kan aktiveres slik at versjon bumpes på hver commit:
+```
+git config core.hooksPath .githooks
+```
+
 ## convert-to-web-friendly.js
 
 Automatisk konvertering av prosjektmapper til web-vennlig format.
