@@ -4,11 +4,5 @@
     "name": "Huset Vårt",
     "path": "huset-vaart",
     "category": "Hjemmeprosjekt"
-  },
-  {
-    "id": "test-prosjekt",
-    "name": "Test Prosjekt",
-    "path": "test-prosjekt",
-    "category": "Demo"
   }
 ]
