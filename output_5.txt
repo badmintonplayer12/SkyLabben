@@ -7,6 +7,8 @@ Folder Structure
     projects.json
     service-worker.js
     temp.ps1
+.githooks/
+    pre-commit
 assets/
     css/
         main.css
@@ -25,8 +27,10 @@ assets/
         router.js
         share.js
         state.js
+        version.js
         view-project-grid.js
         view-viewer.js
+        visibility.js
 docs/
     AI_GUIDE.md
     Analyse av LEGO instruksjonsvisningssystem.md
@@ -80,6 +84,116 @@ projects/
             188_1x.png
             189_1x.png
             190_1x.png
+            cover.png
+            meta.json
+        11-gang/
+            192_1x.png
+            193_1x.png
+            194_1x.png
+            195_1x.png
+            196_1x.png
+            197_1x.png
+            198_1x.png
+            199_1x.png
+            200_1x.png
+            201_1x.png
+            202_1x.png
+            203_1x.png
+            204_1x.png
+            205_1x.png
+            206_1x.png
+            207_1x.png
+            208_1x.png
+            209_1x.png
+            210_1x.png
+            211_1x.png
+            212_1x.png
+            213_1x.png
+            214_1x.png
+            215_1x.png
+            216_1x.png
+            217_1x.png
+            218_1x.png
+            219_1x.png
+            220_1x.png
+            221_1x.png
+            222_1x.png
+            223_1x.png
+            224_1x.png
+            225_1x.png
+            226_1x.png
+            227_1x.png
+            228_1x.png
+            229_1x.png
+            230_1x.png
+            231_1x.png
+            232_1x.png
+            233_1x.png
+            234_1x.png
+            235_1x.png
+            236_1x.png
+            237_1x.png
+            238_1x.png
+            239_1x.png
+            240_1x.png
+            241_1x.png
+            242_1x.png
+            243_1x.png
+            244_1x.png
+            245_1x.png
+            246_1x.png
+            247_1x.png
+            248_1x.png
+            249_1x.png
+            250_1x.png
+            251_1x.png
+            252_1x.png
+            253_1x.png
+            254_1x.png
+            255_1x.png
+            256_1x.png
+            257_1x.png
+            258_1x.png
+            259_1x.png
+            cover.png
+            meta.json
+        12-tegnerom/
+            260_1x.png
+            261_1x.png
+            262_1x.png
+            263_1x.png
+            264_1x.png
+            265_1x.png
+            266_1x.png
+            267_1x.png
+            268_1x.png
+            269_1x.png
+            270_1x.png
+            271_1x.png
+            272_1x.png
+            273_1x.png
+            274_1x.png
+            275_1x.png
+            276_1x.png
+            277_1x.png
+            278_1x.png
+            279_1x.png
+            280_1x.png
+            281_1x.png
+            282_1x.png
+            283_1x.png
+            284_1x.png
+            285_1x.png
+            286_1x.png
+            287_1x.png
+            288_1x.png
+            289_1x.png
+            290_1x.png
+            291_1x.png
+            292_1x.png
+            293_1x.png
+            294_1x.png
+            295_1x.png
             cover.png
             meta.json
         2-alma-sitt-rom/
@@ -261,12 +375,11 @@ projects/
             173_1x.png
             cover.png
             meta.json
-    test-prosjekt/
-        meta.json
 scripts/
     convert-to-web-friendly.js
     README.md
     update-cover-images.js
+    update-version.js
 
 
 File Contents
@@ -8957,12 +9070,6 @@ File type: .json
     "name": "Huset Vårt",
     "path": "huset-vaart",
     "category": "Hjemmeprosjekt"
-  },
-  {
-    "id": "test-prosjekt",
-    "name": "Test Prosjekt",
-    "path": "test-prosjekt",
-    "category": "Demo"
   }
 ]
 
@@ -8974,7 +9081,8 @@ File End
 
 service-worker.js
 File type: .js
-const CACHE_VERSION = 'skylabben-sw-v3'; // Økt versjon for å trigge cache-oppdatering
+// CACHE_VERSION oppdateres av scripts/update-version.js
+const CACHE_VERSION = '2025-11-21+091205-9f71516';
 
 const PRECACHE_PATHS = [
   './',
@@ -8992,6 +9100,8 @@ const PRECACHE_PATHS = [
   './assets/js/onboarding.js',
   './assets/js/favorites.js',
   './assets/js/pwa-install.js',
+  './assets/js/visibility.js',
+  './assets/js/version.js',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png'
 ];
@@ -9103,7 +9213,7 @@ self.addEventListener('install', (event) => {
       caches.open(IMAGE_CACHE),
       caches.open(JSON_CACHE),
       caches.open(AUDIO_CACHE)
-    ]).then(() => self.skipWaiting())
+    ])
   );
 });
 
@@ -9121,8 +9231,21 @@ self.addEventListener('activate', (event) => {
             return caches.delete(cacheName);
           })
       );
-    }).then(() => self.clients.claim())
+    }).then(async () => {
+      await self.clients.claim();
+      const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      clients.forEach((client) => {
+        client.postMessage({ type: 'SW_UPDATE_AVAILABLE' });
+      });
+    })
   );
+});
+
+self.addEventListener('message', (event) => {
+  if (!event.data) return;
+  if (event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('fetch', (event) => {
@@ -9267,6 +9390,30 @@ File End
 temp.ps1
 File type: .ps1
 Get-Content docs/README.md | Select-Object -Index 220..230
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+.githooks\pre-commit
+File type: no extension
+#!/bin/sh
+# Pre-commit hook: bump versjon og stage nødvendige filer automatisk.
+# Krever Node installert. Aktiver med:
+#   git config core.hooksPath .githooks
+
+printf "Bumper versjon...\n"
+node scripts/update-version.js || {
+  echo "Feil under versjonsbump; avbryter commit."
+  exit 1
+}
+
+# Sørg for at versjonsfilene blir med i commiten
+git add service-worker.js assets/js/version.js
+
+exit 0
 
 
 --------------------------------------------------
@@ -9894,6 +10041,59 @@ button {
   transform: scale(0.95);
 }
 
+.onboarding-overlay__actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.onboarding-overlay__secondary {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  min-height: 44px;
+  min-width: 100px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: var(--font-size-medium);
+}
+
+.onboarding-overlay__secondary:hover {
+  background: var(--color-surface);
+}
+
+.visibility-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+  font-size: var(--font-size-small);
+  color: var(--color-text);
+}
+
+.visibility-toggle input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.mode-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-left: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: #ffe9b5;
+  color: #5c4200;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-small);
+  border: 1px solid #f3c770;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -10256,11 +10456,13 @@ File type: .js
  * Henter projects.json og meta.json for prosjekter/underprosjekter.
  */
 
+import { APP_VERSION } from './version.js';
+
 const resolvedBase = window.__APP_BASE_URL__ || window.location.href.split('#')[0];
 const APP_BASE_URL = new URL('./', resolvedBase).href; // bevarer repo-mappen selv uten trailing slash
 const PROJECTS_JSON_URL = new URL('projects.json', APP_BASE_URL).href;
 const BASE_URL = new URL('projects/', APP_BASE_URL).href;
-const CACHE_VERSION = '1.0'; // Øk dette når cache-struktur endres
+const CACHE_VERSION = APP_VERSION; // Felles versjon for SW og localStorage-cache
 const META_CACHE_KEY = 'legoInstructions.metaCache';
 const PROJECTS_CACHE_KEY = 'legoInstructions.projectsCache';
 const CACHE_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 timer
@@ -10500,7 +10702,7 @@ import { loadProjects, loadProjectMeta } from './data-loader.js';
 import { getState, updateState, getLastStepFor, setStepFor, setInstallPromptAvailable } from './state.js';
 import { renderProjectGrid } from './view-project-grid.js';
 import { renderViewer, showCelebration } from './view-viewer.js';
-import { hasSeenOnboarding, showOnboarding } from './onboarding.js';
+import { hasSeenOnboarding, showOnboarding, showOverlayMessage } from './onboarding.js';
 import { initInstallPromptListener } from './pwa-install.js';
 
 /**
@@ -10718,15 +10920,101 @@ function registerServiceWorker() {
   }
 
   const swUrl = './service-worker.js';
+  let hasReloadedFromUpdate = false;
+  let updateOverlay = null;
+
+  function removeUpdateOverlay() {
+    if (updateOverlay && typeof updateOverlay.remove === 'function') {
+      updateOverlay.remove();
+    }
+    updateOverlay = null;
+  }
+
+  function showUpdateOverlay(registration) {
+    if (updateOverlay) return;
+    updateOverlay = showOverlayMessage(document.body, {
+      icon: '⬆️',
+      lines: [
+        'Ny versjon er tilgjengelig.',
+        'Oppdater for å få siste forbedringer.'
+      ],
+      primaryLabel: 'Oppdater nå',
+      onPrimary: () => {
+        const waiting = registration.waiting;
+        if (waiting) {
+          waiting.postMessage({ type: 'SKIP_WAITING' });
+        } else {
+          window.location.reload();
+        }
+      },
+      secondaryLabel: 'Senere',
+      onSecondary: () => removeUpdateOverlay(),
+      allowBackdropDismiss: false
+    });
+  }
+
+  function listenForWaitingServiceWorker(registration) {
+    if (!registration) return;
+    if (registration.waiting) {
+      showUpdateOverlay(registration);
+      return;
+    }
+    registration.addEventListener('updatefound', () => {
+      const newWorker = registration.installing;
+      if (!newWorker) return;
+      newWorker.addEventListener('statechange', () => {
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          showUpdateOverlay(registration);
+        }
+      });
+    });
+  }
 
   window.addEventListener('load', () => {
     navigator.serviceWorker.register(swUrl)
       .then((registration) => {
         console.info('Service worker registrert:', registration.scope);
+        listenForWaitingServiceWorker(registration);
       })
       .catch((error) => {
         console.warn('Klarte ikke å registrere service worker:', error);
       });
+  });
+
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (hasReloadedFromUpdate) return;
+    hasReloadedFromUpdate = true;
+    removeUpdateOverlay();
+    window.location.reload();
+  });
+
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data?.type === 'SW_UPDATE_AVAILABLE') {
+      navigator.serviceWorker.getRegistration().then((registration) => {
+        if (registration) {
+          showUpdateOverlay(registration);
+        }
+      });
+    }
+  });
+
+  // Sjekk for ventende SW også når appen får fokus / blir synlig (nyttig for PWA gjenopptak)
+  function checkForWaitingServiceWorker() {
+    if (!navigator.serviceWorker) return;
+    navigator.serviceWorker.getRegistration().then((registration) => {
+      if (!registration) return;
+      registration.update().catch(() => {});
+      if (registration.waiting && navigator.serviceWorker.controller) {
+        showUpdateOverlay(registration);
+      }
+    }).catch(() => {});
+  }
+
+  window.addEventListener('focus', checkForWaitingServiceWorker);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      checkForWaitingServiceWorker();
+    }
   });
 }
 
@@ -10774,7 +11062,6 @@ if (document.readyState === 'loading') {
 }
 
 
-
 --------------------------------------------------
 File End
 --------------------------------------------------
@@ -10815,73 +11102,138 @@ export function markOnboardingAsSeen() {
 }
 
 /**
+ * Viser et generisk overlay med ikon, tekstlinjer og handlingsknapper.
+ * Gjenbruker eksisterende onboarding-stiler for konsistent utseende.
+ * @param {HTMLElement} container - Container-elementet å legge overlay i
+ * @param {Object} options - Konfigurasjon
+ * @param {string} [options.icon] - Ikon/emoji
+ * @param {string[]} [options.lines] - Tekstlinjer som vises i overlay
+ * @param {string} [options.primaryLabel] - Tekst for primærknapp
+ * @param {function(): void} [options.onPrimary] - Callback for primærknapp
+ * @param {string} [options.secondaryLabel] - Tekst for sekundærknapp (valgfritt)
+ * @param {function(): void} [options.onSecondary] - Callback for sekundærknapp (valgfritt)
+ * @param {boolean} [options.allowBackdropDismiss=true] - Om klikk på bakgrunn lukker overlay
+ * @param {function(): void} [options.onDismiss] - Callback ved lukking (uansett årsak)
+ * @returns {{remove: function(): void}} - Hjelper for å fjerne overlay
+ */
+export function showOverlayMessage(container, {
+  icon = 'ℹ️',
+  lines = [],
+  primaryLabel = 'OK',
+  onPrimary,
+  secondaryLabel,
+  onSecondary,
+  allowBackdropDismiss = true,
+  onDismiss
+} = {}) {
+  const existing = container.querySelector('.onboarding-overlay');
+  if (existing) {
+    existing.remove();
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'onboarding-overlay';
+
+  const content = document.createElement('div');
+  content.className = 'onboarding-overlay__content';
+
+  const mascot = document.createElement('div');
+  mascot.className = 'onboarding-overlay__mascot';
+  mascot.textContent = icon || '';
+
+  const instructions = document.createElement('div');
+  instructions.className = 'onboarding-overlay__instructions';
+
+  lines.forEach((line) => {
+    const instruction = document.createElement('div');
+    instruction.className = 'onboarding-overlay__instruction';
+    instruction.textContent = line;
+    instructions.appendChild(instruction);
+  });
+
+  const actions = document.createElement('div');
+  actions.className = 'onboarding-overlay__actions';
+
+  const primaryButton = document.createElement('button');
+  primaryButton.className = 'onboarding-overlay__dismiss';
+  primaryButton.type = 'button';
+  primaryButton.textContent = primaryLabel || 'OK';
+  primaryButton.addEventListener('click', () => {
+    if (typeof onPrimary === 'function') {
+      onPrimary();
+    }
+    overlay.remove();
+    if (typeof onDismiss === 'function') {
+      onDismiss();
+    }
+  });
+  actions.appendChild(primaryButton);
+
+  if (secondaryLabel) {
+    const secondaryButton = document.createElement('button');
+    secondaryButton.className = 'onboarding-overlay__secondary';
+    secondaryButton.type = 'button';
+    secondaryButton.textContent = secondaryLabel;
+    secondaryButton.addEventListener('click', () => {
+      if (typeof onSecondary === 'function') {
+        onSecondary();
+      }
+      overlay.remove();
+      if (typeof onDismiss === 'function') {
+        onDismiss();
+      }
+    });
+    actions.appendChild(secondaryButton);
+  }
+
+  if (allowBackdropDismiss) {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.remove();
+        if (typeof onDismiss === 'function') {
+          onDismiss();
+        }
+      }
+    });
+  }
+
+  content.appendChild(mascot);
+  content.appendChild(instructions);
+  content.appendChild(actions);
+  overlay.appendChild(content);
+  container.appendChild(overlay);
+
+  return {
+    remove: () => {
+      if (overlay.parentNode) {
+        overlay.parentNode.removeChild(overlay);
+      }
+    }
+  };
+}
+
+/**
  * Viser onboarding-overlay
  * @param {HTMLElement} container - Container-elementet å legge overlay i
  * @param {function(): void} onDismiss - Callback når onboarding avsluttes
  */
 export function showOnboarding(container, onDismiss) {
-  // Fjern eksisterende onboarding hvis den finnes
-  const existing = container.querySelector('.onboarding-overlay');
-  if (existing) {
-    existing.remove();
-  }
-  
-  const overlay = document.createElement('div');
-  overlay.className = 'onboarding-overlay';
-  
-  const content = document.createElement('div');
-  content.className = 'onboarding-overlay__content';
-  
-  // Maskot/ikon (bruker emoji for enkelhet)
-  const mascot = document.createElement('div');
-  mascot.className = 'onboarding-overlay__mascot';
-  mascot.textContent = '🧱';
-  
-  // Instruksjoner (visuell, minimal tekst)
-  const instructions = document.createElement('div');
-  instructions.className = 'onboarding-overlay__instructions';
-  
-  const instruction1 = document.createElement('div');
-  instruction1.className = 'onboarding-overlay__instruction';
-  instruction1.innerHTML = '<span class="onboarding-overlay__icon">◀️</span><span class="onboarding-overlay__icon">▶️</span> Trykk på pilene for å bla';
-  
-  const instruction2 = document.createElement('div');
-  instruction2.className = 'onboarding-overlay__instruction';
-  instruction2.innerHTML = '<span class="onboarding-overlay__icon">🏠</span> Trykk på huset for å gå tilbake';
-  
-  instructions.appendChild(instruction1);
-  instructions.appendChild(instruction2);
-  
-  // Avbryt-knapp
-  const dismissButton = document.createElement('button');
-  dismissButton.className = 'onboarding-overlay__dismiss';
-  dismissButton.textContent = 'Start!';
-  dismissButton.setAttribute('aria-label', 'Start');
-  dismissButton.addEventListener('click', () => {
-    markOnboardingAsSeen();
-    overlay.remove();
-    if (onDismiss) {
-      onDismiss();
-    }
-  });
-  
-  // Klikk utenfor overlay for å avbryte
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) {
+  showOverlayMessage(container, {
+    icon: '🧱',
+    lines: [
+      'Trykk på pilene for å bla',
+      'Trykk på huset for å gå tilbake'
+    ],
+    primaryLabel: 'Start!',
+    onPrimary: () => markOnboardingAsSeen(),
+    allowBackdropDismiss: true,
+    onDismiss: () => {
       markOnboardingAsSeen();
-      overlay.remove();
-      if (onDismiss) {
+      if (typeof onDismiss === 'function') {
         onDismiss();
       }
     }
   });
-  
-  content.appendChild(mascot);
-  content.appendChild(instructions);
-  content.appendChild(dismissButton);
-  overlay.appendChild(content);
-  
-  container.appendChild(overlay);
 }
 
 
@@ -11437,6 +11789,18 @@ File End
 --------------------------------------------------
 
 
+assets\js\version.js
+File type: .js
+// Felles versjonskilde for service worker og data-cache
+// Oppdateres av scripts/update-version.js (kort hash + dato er nok)
+export const APP_VERSION = '2025-11-21+091205-9f71516';
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
 assets\js\view-project-grid.js
 File type: .js
 /**
@@ -11449,6 +11813,7 @@ import { getImageUrl, loadProjectMeta } from './data-loader.js';
 import { getLastStepFor } from './state.js';
 import { getFavoriteProjects, toggleFavoriteProject } from './favorites.js';
 import { shareUrl } from './share.js';
+import { getMode, getOverrides, setOverride, isVisibleForKidsNow, getOverrideKey } from './visibility.js';
 
 /**
  * Renderer prosjektgalleri
@@ -11460,14 +11825,16 @@ export function renderProjectGrid(projects, onProjectClick) {
   const container = document.createElement('div');
   container.className = 'project-grid';
 
-  const visibleProjects = projects.filter(project => !project.hidden);
+  let mode = getMode();
+  let overrides = getOverrides();
+  const baseProjects = mode === 'parent' ? projects : projects.filter(project => !project.hidden);
   const metaCache = new Map();
   let favoriteSet = new Set(getFavoriteProjects());
   let selectedCategory = 'Alle';
 
   const categories = Array.from(
     new Set(
-      visibleProjects
+      baseProjects
         .map(project => project.category || 'Uten kategori')
         .filter(Boolean)
     )
@@ -11545,7 +11912,7 @@ export function renderProjectGrid(projects, onProjectClick) {
 
   function applyFilters() {
     const query = searchInput.value.trim().toLowerCase();
-    let filtered = visibleProjects.filter(project => {
+    let filtered = baseProjects.filter(project => {
       if (!query) return true;
       return (project.name || '').toLowerCase().includes(query);
     });
@@ -11554,6 +11921,19 @@ export function renderProjectGrid(projects, onProjectClick) {
       filtered = filtered.filter(project => favoriteSet.has(project.path));
     } else if (selectedCategory !== 'Alle') {
       filtered = filtered.filter(project => (project.category || 'Uten kategori') === selectedCategory);
+    }
+
+    if (mode === 'child') {
+      filtered = filtered.filter(project => {
+        return isVisibleForKidsNow(
+          {
+            id: project.id || project.path,
+            approvedByDefault: project.approvedByDefault,
+            releaseAt: project.releaseAt
+          },
+          overrides
+        );
+      });
     }
 
     renderTiles(filtered);
@@ -11655,6 +12035,33 @@ export function renderProjectGrid(projects, onProjectClick) {
     tile.appendChild(name);
     tile.appendChild(progressIndicator);
 
+    if (mode === 'parent') {
+      const toggleWrapper = document.createElement('label');
+      toggleWrapper.className = 'visibility-toggle';
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.addEventListener('click', (event) => {
+        event.stopPropagation();
+      });
+      const label = document.createElement('span');
+      label.textContent = 'Synlig for barn på denne enheten';
+
+      const key = getOverrideKey({ projectId: project.id || project.path });
+      const currentOverride = key ? overrides[key] : undefined;
+      const defaultVisible = project.approvedByDefault !== false;
+      checkbox.checked = currentOverride === undefined ? defaultVisible : currentOverride === 'visible';
+
+      checkbox.addEventListener('change', () => {
+        const newValue = checkbox.checked ? 'visible' : 'hidden';
+        overrides = setOverride(key, newValue);
+        applyFilters();
+      });
+
+      toggleWrapper.appendChild(checkbox);
+      toggleWrapper.appendChild(label);
+      tile.appendChild(toggleWrapper);
+    }
+
     tile.addEventListener('click', () => {
       onProjectClick(project.path);
     });
@@ -11721,6 +12128,7 @@ import { playNavigationSound, isAudioEnabled, setAudioEnabled } from './audio-fe
 import { generateQRCodeForStep } from './qr-code.js';
 import { shareUrl } from './share.js';
 import { consumePrompt, isStandalone } from './pwa-install.js';
+import { getMode, setMode, getOverrides, setOverride, isVisibleForKidsNow, getOverrideKey, getRandomAdultChallenge } from './visibility.js';
 
 /**
  * Oppretter en innstillingsmeny for viewer
@@ -11868,11 +12276,51 @@ function createSettingsMenu() {
 export function renderViewer(state, callbacks) {
   const container = document.createElement('div');
   container.className = 'viewer';
+  const currentMode = getMode();
+  let overrides = getOverrides();
+  const isParentMode = currentMode === 'parent';
+  const parentOverrideKey = getOverrideKey({ projectId: state.currentProjectMeta?.id || state.currentPath });
+  const defaultParentVisible = state.currentProjectMeta?.approvedByDefault !== false;
+
+  const resolveChecked = (key, defaultVisible) => {
+    const overrideValue = key ? overrides[key] : undefined;
+    return overrideValue === undefined ? defaultVisible : overrideValue === 'visible';
+  };
+
+  const createVisibilityToggleElement = (labelText, key, defaultVisible) => {
+    const wrapper = document.createElement('label');
+    wrapper.className = 'visibility-toggle';
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = resolveChecked(key, defaultVisible);
+    checkbox.addEventListener('change', () => {
+      const newValue = checkbox.checked ? 'visible' : 'hidden';
+      overrides = setOverride(key, newValue);
+    });
+    const label = document.createElement('span');
+    label.textContent = labelText;
+    wrapper.appendChild(checkbox);
+    wrapper.appendChild(label);
+    return wrapper;
+  };
   
   // Header
   const header = document.createElement('div');
   header.className = 'viewer__header';
   header.textContent = state.currentProjectMeta?.name || '';
+  if (isParentMode) {
+    const modeBadge = document.createElement('span');
+    modeBadge.className = 'mode-indicator';
+    modeBadge.textContent = 'Foreldremodus aktiv';
+    header.appendChild(modeBadge);
+
+    const projectToggle = createVisibilityToggleElement(
+      'Synlig for barn på denne enheten',
+      parentOverrideKey,
+      defaultParentVisible
+    );
+    header.appendChild(projectToggle);
+  }
   
   // Image container
   const imageContainer = document.createElement('div');
@@ -11880,8 +12328,21 @@ export function renderViewer(state, callbacks) {
   
   // Håndter tom steps-array
   const steps = state.currentProjectMeta?.steps || [];
-  const visibleChildren = (state.currentProjectMeta?.children || [])
-    .filter(c => !c.hidden)
+  const children = state.currentProjectMeta?.children || [];
+  const visibleChildren = children
+    .filter(c => isParentMode ? true : !c.hidden)
+    .filter((child) => {
+      if (isParentMode) return true;
+      return isVisibleForKidsNow(
+        {
+          id: state.currentProjectMeta?.id || state.currentPath,
+          childId: child.id,
+          approvedByDefault: child.approvedByDefault,
+          releaseAt: child.releaseAt
+        },
+        overrides
+      );
+    })
     .sort((a, b) => compareByLeadingNumber(a.name || a.id, b.name || b.id));
   const toggleFullscreen = () => {
     if (document.fullscreenElement) {
@@ -11946,6 +12407,28 @@ export function renderViewer(state, callbacks) {
   const bottomBar = document.createElement('div');
   bottomBar.className = 'viewer__bottom';
   const settingsMenu = createSettingsMenu();
+
+  const handleModeToggle = () => {
+    if (isParentMode) {
+      setMode('child');
+      window.location.reload();
+      return;
+    }
+    const challenge = getRandomAdultChallenge();
+    const response = window.prompt(challenge.question);
+    if (response !== null && parseInt(response, 10) === challenge.answer) {
+      setMode('parent');
+      window.location.reload();
+    } else {
+      alert('Feil svar. Foreldremodus ikke aktivert.');
+    }
+  };
+
+  settingsMenu.addItem({
+    getIcon: () => (isParentMode ? '👶' : '🔒'),
+    getLabel: () => (isParentMode ? 'Til barnemodus' : 'Foreldremodus'),
+    onClick: handleModeToggle
+  });
   
   // Opp-knapp (ikon: hus for hjem/opp)
   const upButton = document.createElement('button');
@@ -12072,6 +12555,19 @@ export function renderViewer(state, callbacks) {
         tile.appendChild(img);
         tile.appendChild(name);
         tile.appendChild(progressIndicator);
+
+        if (isParentMode) {
+          const childKey = getOverrideKey({
+            projectId: state.currentProjectMeta?.id || state.currentPath,
+            childId: child.id || child.path
+          });
+          const childDefaultVisible = child.approvedByDefault !== false;
+          const toggle = createVisibilityToggleElement('Synlig for barn på denne enheten', childKey, childDefaultVisible);
+          toggle.addEventListener('click', (event) => {
+            event.stopPropagation();
+          });
+          tile.appendChild(toggle);
+        }
         
         tile.addEventListener('click', () => {
           if (callbacks.onProjectClick) {
@@ -12500,6 +12996,135 @@ function compareByLeadingNumber(a, b) {
   if (left.text < right.text) return -1;
   if (left.text > right.text) return 1;
   return 0;
+}
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+assets\js\visibility.js
+File type: .js
+const MODE_KEY = 'legoInstructions.mode';
+const OVERRIDES_KEY = 'legoInstructions.visibilityOverrides';
+
+/**
+ * Henter modus (child|parent) fra localStorage, default child
+ * @returns {'child'|'parent'}
+ */
+export function getMode() {
+  try {
+    const stored = localStorage.getItem(MODE_KEY);
+    return stored === 'parent' ? 'parent' : 'child';
+  } catch (e) {
+    return 'child';
+  }
+}
+
+/**
+ * Setter modus i localStorage
+ * @param {'child'|'parent'} mode
+ */
+export function setMode(mode) {
+  try {
+    localStorage.setItem(MODE_KEY, mode === 'parent' ? 'parent' : 'child');
+  } catch (e) {
+    console.warn('Kunne ikke lagre modus:', e);
+  }
+}
+
+/**
+ * Henter overrides for synlighet fra localStorage
+ * @returns {Record<string, 'visible'|'hidden'>}
+ */
+export function getOverrides() {
+  try {
+    const stored = localStorage.getItem(OVERRIDES_KEY);
+    if (!stored) return {};
+    const parsed = JSON.parse(stored);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return parsed;
+    }
+    return {};
+  } catch (e) {
+    console.warn('Kunne ikke lese overrides:', e);
+    return {};
+  }
+}
+
+/**
+ * Setter eller fjerner override for en gitt nøkkel
+ * @param {string|null} key
+ * @param {'visible'|'hidden'|null} value
+ * @returns {Record<string, 'visible'|'hidden'>} Oppdatert overrides
+ */
+export function setOverride(key, value) {
+  if (!key) {
+    return getOverrides();
+  }
+  const overrides = getOverrides();
+  if (value === null || value === undefined) {
+    delete overrides[key];
+  } else {
+    overrides[key] = value === 'hidden' ? 'hidden' : 'visible';
+  }
+  try {
+    localStorage.setItem(OVERRIDES_KEY, JSON.stringify(overrides));
+  } catch (e) {
+    console.warn('Kunne ikke lagre overrides:', e);
+  }
+  return overrides;
+}
+
+/**
+ * Lager override-nøkkel for prosjekt/child
+ * @param {Object} params
+ * @param {string} params.projectId
+ * @param {string} [params.childId]
+ * @returns {string|null}
+ */
+export function getOverrideKey({ projectId, childId }) {
+  if (!projectId) return null;
+  return childId
+    ? `project:${projectId}:child:${childId}`
+    : `project:${projectId}`;
+}
+
+/**
+ * Pure synlighetsfunksjon for barnemodus
+ * Prioritet: override → approvedByDefault (default true) → ignorér releaseAt (forberedt)
+ * @param {Object} project - Prosjekt/child-objekt (minimum id, approvedByDefault?, releaseAt?)
+ * @param {Record<string, 'visible'|'hidden'>} overrides
+ * @param {Date} [now] - Ikke brukt ennå (forberedt for releaseAt)
+ * @returns {boolean}
+ */
+export function isVisibleForKidsNow(project, overrides = {}, now = new Date()) {
+  const key = getOverrideKey({ projectId: project?.id, childId: project?.childId });
+  const overrideValue = key ? overrides[key] : undefined;
+  if (overrideValue === 'visible') return true;
+  if (overrideValue === 'hidden') return false;
+
+  // For fremtidig bruk: releaseAt kan parsers, men brukes ikke nå
+  // const releaseAt = project?.releaseAt ? new Date(project.releaseAt) : null;
+  // if (releaseAt && releaseAt instanceof Date && !isNaN(releaseAt)) { ... }
+
+  const approved = project?.approvedByDefault;
+  return approved === false ? false : true;
+}
+
+/**
+ * Velger et enkelt matte-spørsmål for voksen-sjekk
+ * @returns {{question: string, answer: number}}
+ */
+export function getRandomAdultChallenge() {
+  const challenges = [
+    { question: 'Bare for voksne. Hva er 8 + 5?', answer: 13 },
+    { question: 'Bare for voksne. Hva er 14 - 7?', answer: 7 },
+    { question: 'Bare for voksne. Hva er 6 + 9?', answer: 15 },
+    { question: 'Bare for voksne. Hva er 12 - 4?', answer: 8 }
+  ];
+  return challenges[Math.floor(Math.random() * challenges.length)];
 }
 
 
@@ -14394,6 +15019,18 @@ Prosjektet bruker to hovedtyper JSON-filer:
   - Skjulte underprosjekter er fortsatt tilgjengelige via direkte URL
   - Brukes for Ã¥ skjule uferdige eller private underprosjekter
 
+#### `approvedByDefault` (valgfritt, default `true`)
+- **Type**: Boolean
+- **Beskrivelse**: Standard synlighet i barnemodus ved publikasjon.
+- **Regler**:
+  - `true` eller utelatt: vises for barn (med mindre override lokalt skjuler det).
+  - `false`: skjules for barn som standard (vises i foreldremodus, kan åpnes via direkte URL).
+  - Overrider kan settes per enhet via `visibilityOverrides` (localStorage).
+
+#### `releaseAt` (valgfritt, ikke i bruk ennå)
+- **Type**: String (ISO 8601 UTC), f.eks. `"2025-12-24T18:00:00Z"`
+- **Beskrivelse**: Fremtidig tidsstyring. Feltet kan finnes i data, men koden ignorerer det foreløpig (forberedt for senere).
+
 ### Eksempler
 
 #### Prosjekt uten underprosjekter
@@ -15017,6 +15654,7 @@ export function parseHash(hash) {
 **Rolle**: State management og localStorage-integrasjon
 
 **Viktig**: state.js inneholder ett modul-globalt `let appState`-objekt. `updateState()` muterer dette og returnerer den nye staten. Eventuell re-render styres av main.js.
+- Modus/overrides for barn/forelder håndteres i egen modul (`visibility.js`); state.js holder kun progresjon og runtime-state for viewer.
 
 **Eksporterte funksjoner**:
 
@@ -15132,6 +15770,8 @@ export function loadProgress() {
  * @property {string} coverImage
  * @property {string[]} steps
  * @property {Array<{id: string, name: string, path: string}>} children
+ * @property {boolean} [approvedByDefault] - default true hvis mangler
+ * @property {string} [releaseAt] - ISO UTC, ignorert nå
  */
 
 /**
@@ -15668,6 +16308,14 @@ Denne guiden hjelper deg med å konvertere eksisterende prosjekter med mellomrom
 **Anbefalt**: Bruk automatiske scripts for trygg konvertering:
 - `scripts/convert-to-web-friendly.js` - Konverterer mapper til web-vennlig format
 - `scripts/update-cover-images.js` - Genererer/oppdaterer cover-bilder
+- `scripts/update-version.js` - Bumper versjon for service worker og data-cache (bruk etter innholdsoppdatering for å tvinge klientoppdatering)
+
+## Skjule nye prosjekter for barn (inntil forelder skrur på)
+
+Standard er at prosjekter vises for barn. Hvis et nytt prosjekt skal være skjult i barnemodus til forelder aktiverer det:
+- I `projects.json`: sett `approvedByDefault: false` på prosjektet.
+- I prosjektets `meta.json`: sett `approvedByDefault: false` (og på ev. children som også skal skjules).
+- Forelder kan senere slå prosjektet på via togglen i foreldremodus (lagres lokalt i `legoInstructions.visibilityOverrides`).
 
 Se seksjoner "Automatisk konvertering med Node.js-script" og "Cover-bilder" nedenfor.
 
@@ -16168,6 +16816,13 @@ Manifestet forventer to PNG-filer i `assets/icons/`:
 | `icon-512.png` | 512×512 px | Stor ikon (brukes også som maskable) |
 
 Legg ferdige, kvadratiske PNG-er med disse navnene i mappen før du tester installasjon eller Lighthouse PWA-sjekk.
+
+### Foreldremodus og synlighet
+
+- Modus per enhet: `legoInstructions.mode` (`child` default, `parent` etter voksen-quiz i settings).
+- Per-enhet synlighet: `legoInstructions.visibilityOverrides` (nøkler f.eks. `project:<id>` / `project:<id>:child:<childId>`).
+- Datafelt: `approvedByDefault` (default true hvis felt mangler). `releaseAt` kan finnes, men ignoreres nå (ISO UTC-format).
+- Synlighetslogikk: `visibility.js` (`isVisibleForKidsNow`) – override vinner, ellers `approvedByDefault`.
 
 ### Service worker
 
@@ -16822,14 +17477,86 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for Sk
 
 ### 4.6 Klientoppdatering og cache-invalidering
 - [ ] **4.6.1** Felles versjon for SW og data-cache
-  - **Mål**: Koble `CACHE_VERSION` i `service-worker.js` og `assets/js/data-loader.js` til en felles versjonsverdi (f.eks. commit-hash), slik at kode, bilder og JSON invalides ved hver deploy.
+  - **Mål**: Koble `CACHE_VERSION` i `service-worker.js` og `assets/js/data-loader.js` til én felles versjonskilde (f.eks. `version.json`/`VERSION`/import) som deploy-scriptet oppdaterer (kort hash + dato er nok). Versjonen injiseres som `CACHE_VERSION` i begge filer slik at kode, bilder og JSON invalides ved hver deploy.
   - **🌐 TEST I NETTLESER**: Etter versjonsbump og reload skal kun nye cache-navn vises i Application → Cache Storage, og `legoInstructions.metaCache` lokal-cache skal erstattes.
 - [ ] **4.6.2** Oppdateringsvarsel i UI
-  - **Mål**: SW sender melding når ny versjon er `waiting`; UI viser banner med “Oppdater nå” som kaller `postMessage({ type: 'SKIP_WAITING' })` på `registration.waiting` og lytter på `controllerchange` for å `reload()`.
-  - **🌐 TEST I NETTLESER**: Endre SW-versjon, last siden (sett DevTools → Application → Update), verifiser at banner vises, trykk “Oppdater nå” og se at ny versjon lastes og gamle cacher slettes.
+  - **Mål**: Velg primær strategi for oppdagelse (f.eks. SW-driver: SW sender `SW_UPDATE_AVAILABLE` til clients). Fjern `self.skipWaiting()` fra install; legg den i message-handler som lytter på `SKIP_WAITING`. UI viser banner “Oppdater nå” når SW-meldingen mottas (og/eller når `registration.waiting`/`updatefound` oppdages), kaller `postMessage({ type: 'SKIP_WAITING' })` på `registration.waiting`, håndterer eksisterende `waiting` ved første load, og lytter på `controllerchange` med guard for å `reload()`. Ha fallback-knapp “Last på nytt” om `waiting` er null.
+  - **🌐 TEST I NETTLESER**: Endre SW-versjon, last siden (DevTools → Application → Update), verifiser at banner vises på eksisterende installasjon med aktiv SW, trykk “Oppdater nå” og se at ny versjon lastes og gamle cacher slettes. Inkognito skal få ny versjon direkte uten banner.
 - [ ] **4.6.3** Deploy-sjekkliste for invalidasjon
-  - **Mål**: Dokumenter kort rutine for deploy: oppdater versjonsverdien, push til GitHub Pages, verifiser at SW og data-cache har ny versjon.
-  - **🌐 TEST I NETTLESER**: Etter deploy, åpne siden i inkognito og eksisterende installasjon; begge skal hente ny versjon uten manuelt slettede cacher.
+  - **Mål**: Dokumenter kort rutine for deploy: kjør versjons-script, verifiser at `service-worker.js` og `assets/js/data-loader.js` får ny versjon, push til GitHub Pages. TTL for data-cache er kun backup (vurder 6–12 t).
+  - **🌐 TEST I NETTLESER**: Etter deploy: inkognito henter ny versjon direkte; eksisterende installasjon ser banner/oppdatering. DevTools: Application → Cache Storage viser kun nye cache-navn; Local Storage viser `legoInstructions.*` med ny versjon.
+
+#### 🌐 Forslag til test i nettleser (eksisterende installasjon)
+
+1. Kjør `node scripts/update-version.js 2024-09-02+test`, bygg og deploy/serve lokalt.
+2. Åpne siden som vanlig (med den gamle service worker-versjonen fremdeles aktiv). Bekreft i DevTools → Application → Cache Storage at cache-navnene fortsatt inneholder den gamle versjonen.
+3. Utfør en hard-reload uten å tømme cache. Når siden laster inn, skal oppdateringsbanneret vises. Klikk «Oppdater nå».
+4. Etter automatisk reload: DevTools → Application → Service Workers skal vise at den nye SW-en er aktiv. Cache Storage skal kun vise cache-navn som inkluderer `2024-09-02+test`, og Local Storage (`legoInstructions.*`) skal vise samme versjon.
+5. Verifiser at appen fungerer (navigasjon, bilder, progress) og at banneret ikke dukker opp igjen.
+6. Inkognito-test: åpne siden i et nytt inkognito-vindu. Ingen banner skal vises, og både cache-navn og Local Storage skal ha `2024-09-02+test` umiddelbart.
+
+### 4.7 Foreldremodus og synlighet (barn/forelder)
+- [ ] **4.7.1** Ny modul for modus/overstyringer/synlighet
+  - **Mål**: Lag `assets/js/visibility.js` (eller tilsvarende liten fil) med:
+    - `getMode()/setMode()` som leser/lagrer `legoInstructions.mode` (default `child`).
+    - `getOverrides()/setOverride()` for `legoInstructions.visibilityOverrides`, returnerer alltid et objekt ({} hvis tomt).
+    - `isVisibleForKidsNow(project, overrides, now = new Date())` (pure, ingen DOM/sideeffekter) med prioritet: override → `approvedByDefault` (default true) → ignorér `releaseAt` nå, men parse hvis tilstede (for senere bruk).
+  - **🌐 TEST I NETTLESER**: Konsoll/JS-test: isVisibleForKidsNow håndterer manglende `approvedByDefault` som true, og override vinner.
+- [ ] **4.7.2** Matteoppgave-barriere for foreldremodus
+  - **Mål**: Implementer enkel voksen-sjekk (tilfeldig 1 av flere regnestykker hentet fra liten array) når modus byttes `child` → `parent`. Ved riktig svar: setMode('parent') og rerender; feil: vis feilmelding og bli i `child`.
+  - **🌐 TEST I NETTLESER**: Prøv riktig/feil svar; verifiser at mode lagres i localStorage.
+- [ ] **4.7.3** Settings-knapp for modus
+  - **Mål**: I settings-menyen (viewer) legg til knapp “Foreldremodus” (viser matteoppgave) og “Til barnemodus” når aktiv. Ingen egen side. Knappen bruker `getMode()/setMode()` fra visibility-modulen.
+  - **🌐 TEST I NETTLESER**: Bytt begge veier, bekreft at UI endrer seg (toggles vises/forsvinner).
+- [ ] **4.7.4** Filtrering i barnemodus
+  - **Mål**: I prosjektgalleriet filtrer prosjekter med `isVisibleForKidsNow` når mode=`child` (ingen duplikatlogikk). Default `approvedByDefault` true hvis felt mangler.
+  - **🌐 TEST I NETTLESER**: Prosjekt med `approvedByDefault: false` skal skjules i child, vises i parent.
+- [ ] **4.7.5** Toggles i galleri (parent-mode)
+  - **Mål**: I `view-project-grid.js`, vis per-prosjekt toggle “Synlig for barn på denne enheten” når mode=`parent`; lagre til overrides (per id), samme nøkkel som i viewer. Ingen toggles i child-mode; skjul toggle hvis prosjekt mangler id.
+  - **🌐 TEST I NETTLESER**: Slå av/på prosjekt, reload siden, bekreft at override huskes og at barnet ser/ikke ser prosjektet.
+- [ ] **4.7.6** Toggles i viewer (parent-mode)
+  - **Mål**: I `view-viewer.js`, vis toggle for hovedprosjekt + toggles for children i parent-mode; bruk et konsekvent nøkkelformat (f.eks. `project:${projectId}` og `project:${projectId}:child:${childId}`) delt som helper i visibility.js. I child-mode: filtrer children med `isVisibleForKidsNow`.
+  - **🌐 TEST I NETTLESER**: Parent: toggle child av/på, reload, se at det persisterer; Child: barn ser kun tillatte children.
+ - [x] **4.7.7** Indikator for foreldremodus (valgfritt)
+  - **Mål**: Lite merke “Foreldremodus aktiv” når mode=`parent`.
+  - **🌐 TEST I NETTLESER**: Slå av/på og se at merket følger modus.
+- [x] **4.7.8** Dokumentasjon og datafelt
+  - **Mål**: Oppdater DATA_FORMAT/README med `approvedByDefault` (default true) og `releaseAt` (kan være tilstede, men ignoreres nå; format = ISO UTC). Beskriv overrides-nøkkelvalg.
+  - **📄**: Oppdater ROADMAP/IMPLEMENTATION med ny modul og bruk av `isVisibleForKidsNow`.
+- [ ] **4.7.9** PWA/gjenopptak-test
+  - **Mål**: Verifiser at modusskifter/overrides fungerer i installert PWA, også ved resume fra bakgrunn (focus/visibilitychange). Modus/overrides skal fungere offline (kun localStorage).
+  - **🌐 TEST I NETTLESER**: Installer PWA, sett override i parent-mode, minimer og åpne igjen; barnemodus skal respektere override uten nett.
+
+### 4.8 Settings-meny på forsiden (galleri)
+- [ ] **4.8.1** Legg til settings-knapp ved søkefeltet
+  - **Mål**: Plasser en liten settings-knapp på høyre side av `project-grid__controls` (ved siden av søk/kategorier). Knappen åpner et lite panel/dropdown; lukk ved klikk utenfor/ESC.
+  - **🌐 TEST I NETTLESER**: Åpne/ lukk panelet; verifiser at det ikke forstyrrer søk/filtre.
+- [ ] **4.8.2** Foreldremodus-knapp i panelet
+  - **Mål**: Bruk `getMode/setMode/getRandomAdultChallenge` fra `visibility.js`; i child → voksen-quiz før parent; i parent → “Til barnemodus”. Etter endring: re-kjør `applyFilters()` i galleriet slik at synlighet oppdateres. Ingen duplikatlogikk utover det som allerede ligger i `visibility.js`.
+  - **🌐 TEST I NETTLESER**: Bytt begge veier, bekreft filtrering (approvedByDefault/overrides) endres uten reload.
+- [ ] **4.8.3** Del app
+  - **Mål**: Legg “Del app”-handling i panelet (bruk `shareUrl` med root-URL uten hash). Skal fungere i både nettleser og PWA.
+  - **🌐 TEST I NETTLESER**: Klikk del, verifiser Web Share eller clipboard fallback.
+- [ ] **4.8.4** Fullskjerm
+  - **Mål**: Fullskjerm-toggle i panelet; oppdater label/ikon på `fullscreenchange`.
+  - **🌐 TEST I NETTLESER**: Gå inn/ut av fullskjerm fra forsiden.
+- [ ] **4.8.5** Installer app (valgfri i panelet)
+  - **Mål**: Hvis `isInstallPromptAvailable` er true og ikke standalone, vis “Installer app”; bruk `consumePrompt()` og skjul ellers. Ikke implementer ny logikk, gjenbruk pwa-install.
+  - **🌐 TEST I NETTLESER**: Når prompt finnes, trykk og se at installprosessen starter; skjul ellers.
+- [ ] **4.8.6** Stil og overlapp
+  - **Mål**: Panel forankres til høyre i controls, høy z-index over grid; gjenbruk eksisterende knappestil (gear-ikon) eller egen `project-grid__settings`. Minimal CSS, ikke refaktorere viewer-stiler.
+  - **🌐 TEST I NETTLESER**: Panelet vises riktig, ikke hindrer søk/kategorier, lukker på klikk utenfor.
+
+#### 🌐 Detaljert test for PWA/offline og gjenopptak
+1) Installer PWA (Add to Home/Install).
+2) Åpne appen (online). Bytt til foreldremodus (voksen-quiz), sett en override i galleri (skru av et prosjekt).
+3) Lukk appen helt. Sett enheten offline. Åpne PWA igjen:
+   - Forvent: modus fortsatt parent, override fortsatt lagret (prosjekt skjult for barnemodus).
+4) Bytt til barnemodus mens offline:
+   - Forvent: galleriet filtrerer bort skjult prosjekt. Toggles og voksen-knapper skjules.
+5) Sett enheten online igjen, minimer PWA, åpne igjen:
+   - Forvent: modus/overrides uendret. Ingen nettkrav for synlighet.
+6) Hvis du bumpet versjon før testen: se at oppdateringsdialog kan dukke opp ved gjenopptak (focus/visibilitychange) når ny SW er waiting.
 
 ## Milepæler
 
@@ -17055,6 +17782,16 @@ File type: .json
       "id": "10-simon-sitt-rom",
       "name": "10-Simon sitt rom",
       "path": "10-simon-sitt-rom"
+    },
+    {
+      "id": "11-gang",
+      "name": "11-Gang",
+      "path": "11-gang"
+    },
+    {
+      "id": "12-tegnerom",
+      "name": "12-Tegnerom",
+      "path": "12-tegnerom"
     }
   ],
   "category": "Hjemmeprosjekt"
@@ -17661,6 +18398,1704 @@ File type: .json
   ],
   "children": []
 }
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\192_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	xUÕ¹ÿñ $a
+£2 8kZm{µV;:Tk¯ýwÔÖ:´O{Ûêµêµ¶zµuhi¯RZ¥jU@D¦" È SÌBÂÿ}7¬¸³sÎÎðÝÏöÙ{¯µöÚB~g­tT6Ã            @.AÎs@ @ @ @ @ @ G@o@ @ @ @ @ @ _%_."           (ñ=            à+@ äËÃE@ @ @ @ @ @ %¾@ @ @ @ @ @ ||y¸            @ Ä÷            ¯ /@ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\193_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ´TÕÁ?ìs/MéRE¢Ø£&±h¢Q£¨ÑÄDcbIôõK3%¯4*þ5öX£±ÑÅ.R¤¨4Azþí=¯CàæÞáÞ)·ñµÆ9çìrsµæÇÞ»hSØ @  @  @ 2ËØo7 @  @  @ @É@  @  @  Q@ ÇA @  @  @ g  @  @  @ £@)# @  @  @ %Ï  @  @  @@FRF	 @  @  @ J @  @  @ ¥< @  @  @ < @  @  @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\194_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝxTUþÿñB¨  ÒK"R(Rèê®tý+RD]×EWeWÅ²?ÛºÈ¢®°ëDEP±ÐQ¢ RCè5@ JüÏ÷Èa!s35IÞ÷yÉÜrî¹¯;Æç¹|Ï*ÐbA @ @ @ @ @ @À@´õ¬F @ @ @ @ @ @À(ñE@ @ @ @ @ @ p Präa#            ß@ @ @ @ @ @ G%G6"           (ñ@ @ @ @ @ @ p Präa#            ß@ @ @ @ @ @ G%G6"        ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\195_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|Uõýÿñs3Y$aÂYÊFÔZîþªþÜÎ¶ÖU}ô_Zë¨
+úS ¸l²¤dïHHÈÞëÿùrâ%ÜÜÜä&yÇ#ÞqÎùsßÐ÷ý|¿¶jY@ @ @ @ @ @ ê¨ã}ÞF @ @ @ @ @ @À Pâ            àT@É)+@ @ @ @ @ @ ø            8 PrÊÃJ@ @ @ @ @ @ %>            Nò°@ @ @ @ @ @@Ï            S%§<¬D @ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\196_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	¸U½?ðÃ$3L2"( æ½CeZ7´á^Ë®ÞòjZ=åÚc	¥9iZONÈè(Ê<Èpeö¿Ö®Mã9³çl>ïól÷ð¾k½ëý¼Kwù­Uçã°%6 @  @  @ Tò¹	 @  @  @ ¤J¾ @  @  @ Jyì$@  @  @ (ù @  @  @ d(eä±  @  @  @@ ä;@  @  @  Q@ ÇN @  @  @ ï  @  @  @@FRF;	 @  @  @ J¾ @  @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\197_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	xTÕýÿñ3I	Ùd%¬²*;¨µ©T«hY*î­V©uoû¸oµZÐ¿BÅ7*»l²	È¾E -äÿýÞæ¦CÈÜÌÜ$á}'ÌÜ{Î=÷u<}îÇï9\Ù            >¢||ÎÇ            XJ|@ @ @ @ @ @ yØ            @ Äw @ @ @ @ @ @ÀQ@É            J|@ @ @ @ @ @ yØ            @ Äw @ @ @ @ @ @ÀQ@É        ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\198_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝxTeÚÿñ3Iè	5!i¡#-÷Õ×ÞÖ²
+bwußuweÕU×¿^kÙ]AÄFP)ºRVP-¢Té½Cj$äßg90'3%3Éw®ksÎóç|Î½®ùíý<By<@ @ @ @ @ @ (F ªílF @ @ @ @ @ @À Pâ            àQ@É#;@ @ @ @ @ @ ø            x PòÈÃN@ @ @ @ @ @ %¾            <ò°@ @ @ @ @ @@ï            G%<ìD @ @ @ @...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\199_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|Uõýÿño6	Y²!e[ÖVQP©[ºZ­ÚaÕÖYÿõ×ª¿ºµ ø«Å­Å[EDCÂ@À@àÿ}ËÜÜÜñ:G¸ã¬ïyk{î}ïçrÄN	@ @ @ @ @ @ rRËy·@ @ @ @ @ @ pJ|@ @ @ @ @ @ ü
+(ùåa&            @ @ @ @ @ @ ¿J~y            @ Äg @ @ @ @ @ @À¯ _f"           (ñ@ @ @ @ @ @ ð+@ ä          ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\200_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|õýÿño 	K  räR®à"Wµjý[E+j­\jëñ«¿Ö¶?ï¶^íï'XÅ¢¢ ÖZjåò@åTnÂ
+á&p$ÿÏgdpYÉÎÎlv¼æñ{ÌÌw¾óUw÷½ï7¡DÃ            @e<ÏÓ            XJ¼@ @ @ @ @ @ yX            @ Äk @ @ @ @ @ @ÀQ@É            J¼@ @ @ @ @ @ yX            @ Äk @ @ @ @ @ @ÀQ@É       ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\201_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|ÕÝÿñ°/°/²	a-²ÈÖò¨UTªÔ¢¸Ö­}ZÔ¶¢¶ÅªýWôQ©TD­¢¢¢¨U65
+²U
+;}
+ùÿ~#'^®7;wæ&7Ég^¯Ë]fæÌ÷ÜèÌýÎ9')W&Ã            @>Éù|ÎÇ            8J|@ @ @ @ @ @ \\y            @ Äw @ @ @ @ @ @ÀU@É            J|@ @ @ @ @ @ \\y            @ Äw @ @ @ @ @ @ÀU@É        ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\202_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|õýÿño!\á¾AADE9ä°µj-ÚÖõ> ÁzUþZZ±ÿE((
+È¡ÅQ´r_j8pC¸!pø>S&,ëîfwg6;¼æñX÷ï|ç9£Îä=ßï7é´L	@ @ @ @ @ @  ¥üÎÏ            XJ            !Bò0@ @ @ @ @ @@s @ @ @ @ @ @ ¤ RHf"           (q             P
+ÉÃL@ @ @ @ @ @ %Î@ @ @ @ @ @ J!y        ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\203_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝõýÿñïqÀI9é½4A@´C½bÃcKþ1Æ&!þÄ¬ V4R¥ÈIQ¤R<:rGû>£_\Ö½½ÝÙÝ¹»×<ÇÞîÌ|ç;ÏYùÞ{¾ßoZ¡,@ @ @ @ @ @ "Êñ9#            à(ñE@ @ @ @ @ @ *@             J|@ @ @ @ @ @ ¢
+(Eåa%            ß@ @ @ @ @ @ ¨JQyX            @ Äw @ @ @ @ @ @ ª RTV"        ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\204_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝÕÝÿñ³td^¤³(
+H¢(EHQ£Ä¨Áú7*úD&1Kô1F`TQAAé¢  Mtp¥wöÿû¼{¹;{§Ü¶û×kswïÌ9óKs¿sÎÉ*Å°             P@¹bÞçm@ @ @ @ @ @ %>            ®J®<¬D @ @ @ @ @  Pâ3            à*@ äÊÃJ@ @ @ @ @ @ %>            ®J®<¬D @ @ @ @ @  Pâ3            à*@ äÊÃJ@ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\205_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝTÕÝÿñ³K/+EÒEVLTT°c7>(ØbÔ¨}LÑDh¢QQj°BJ4HQ®4ô¥×ÿïwå¬³ÃÌìÜ2»3»ûz³3÷ÞsÏ}Ï¨÷Ì÷sÒËbX@ @ @ @ @ @ "å}ÞF @ @ @ @ @ @À Pâ            S@)&+@ @ @ @ @ @ ø            Ä PÉÃJ@ @ @ @ @ @ %¾            1bò°@ @ @ @ @ @@ï            @L¥<¬D @ @ @ @...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\206_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝõýÿñïÝÑ¹ãNzUÊQ¤H·POýÅMþJPÑEM"&1jb×5Á X £ÅBb£	ÈT^"pwôöÿ|Æ²,»s;eïöî^óxlöv§}ç¹Ù÷|?ß¤£2&@ @ @ @ @ @ ¢$Gy·@ @ @ @ @ @ °ø"            8
+(9ò0@ @ @ @ @ @@ï            £ #3@ @ @ @ @ @ ø            8
+(9ò0@ @ @ @ @ @@ï            £ #3@ @ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\207_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝÕýÿñ³,E²4)¢ÒDT¦°jô;ÄbXbOÑØk(jì±@,QñG@!þU@QPQ¤R,tv&E`ÿßÏYåîì½3wwïÂ{g½efÎyÝ+÷ÞósNV¡-@ @ @ @ @ @ ªð<O#            à	(ñF@ @ @ @ @ @  P
+åa%            ï@ @ @ @ @ @ P¥PV"           (ñ@ @ @ @ @ @  P
+åa%            ï@ @ @ @ @ @ P¥PV"         ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\208_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|åýÇñIB`á@8ÂM¸;xU<ÐúG<KUP[OªÖªØjkkëQ«¢ZRQ" hÂ©pß7á&$9þ¿ß¡KÈNvg&É&ùìëµî13Ï<ó$óÝßóäÉÍà            Pïó6            %>            J<,D @ @ @ @ @  Pâ3            `)@ dÉÃB@ @ @ @ @ @ %>            J<,D @ @ @ @ @  Pâ3            `)@ dÉÃB@ @ @ @ @...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\209_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|TUúÿñB'	Ð{Gz éÁUWVA×Eaw]AÄ®»öÊº¿ÕU÷¯è
+,
+ÁØé5TéBI ¡Àÿy®Üì$N&3sïäs_¯83·{î{f7á~ç9'ê,@ @ @ @ @ @ |Jä³Õ            XJ|@ @ @ @ @ @ |
+(ùäa#            @ @ @ @ @ @ J>yØ            @ Äg @ @ @ @ @ @À§ O6"           (ñ@ @ @ @ @ @ ð)@ ä           ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\210_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|Tõ¹ÿñ_HÈB²° Ê" *ÒÖ
+UQ¯J[Q+ ÚU¯m¯­u«½µµÞÕº²¨ZÁl« ¬Ê¾ Y ;	äÿ<NI&gLÂç¼^é,çß9ç=Cç;ÏóªÅ°             P@«çi@ @ @ @ @ @ ,%Þ            ^¼ò°@ @ @ @ @ @@÷            W%¯<¬D @ @ @ @ @  Pâ=            àU@É++@ @ @ @ @ @ x            x PòÊÃJ@ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\211_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	Õ½þñ33À(00¸!²#q	&²E qK¢É(n1b¢1Û½Orõ>*äz `p
+rE¢²Ê¦¬*²(û2ìÿóÌMOM¯3=3ßz¦gº«NU}º»óöï¬£v1,             ]Âã<             Pâ            *@ ÊÃ            J¼@ @ @ @ @ @ BByx@ @ @ @ @ @@÷            @¨ R(O"           (ñ@ @ @ @ @ @  P
+åáI@ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\212_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	ÅÝÿñ^!"+ r.ÆHÔÑGÁ}%F<0Q£1æøÇ+O×£h(B 1 A¢£r(" rz,×
+Ë¡ üßÊÖ¦fgçèÝýôë5ÌîLwuÏ{ªgØúvUì²%`A @ @ @ @ @ @ z<ÎÃ            8%*           @B¥<<            @ D@ @ @ @ @ @ H(@ '@ @ @ @ @ @ ¨            	òð$            u @ @ @ @ @ @ ¡ RBD @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\213_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|ÕÕýÿñÂ$,EY2T$8Ak-âèßâD­»û×j}´®·ë h«hd
+(C
+""#²Àÿó>ÍI¿Ääæ®$7Éëûx\îÍýîç	çýýµÛ&Ç            @1Õy§@ @ @ @ @ @ ðJ¼@ @ @ @ @ @ b
+(Åäa&            ï@ @ @ @ @ @ J1y            @ Ä{ @ @ @ @ @ @ ¦ RLf"           (ñ@ @ @ @ @ @ )@           ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\214_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	ÕÙöñ3¬;¨FE`wó&W\³ Ï¸ÇãrßÄ%É%1ÌbT$** I¸DEAd_Ùa¾ç>r&EÓÓÓûtÏüëºÚîé®:Uõ«bÀs÷sNÉN[            UÔ«â}ÞF @ @ @ @ @ @À(q#            $ PJÈÃ            JÜ            	òð!            ÷            @B¥<|            @ Ä=            P@)!"       ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\215_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	TÕ¹îñÕ244Î ¢q@èvfÐÜ+$zÄh¸5QOÔ<sMLN&FA4FDDIã£"æID@hfé~ïÕÙÕÕ5vUuÿ÷óTªºöÞk¯ýÛÕÙo}kìµÅ±             P@jÞçm@ @ @ @ @ @ ¼ @ @ @ @ @ @ J	yX            @ Äg @ @ @ @ @ @ ¡ RBV"           (ñ@ @ @ @ @ @ H(@             J|@ @ @ @ @ @ 
+(%äa%     ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\216_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝTåÙÿñg)K¥IïEÒ$ ÈÚr)
+ÆDÄÆÞ_&FcþFc
+ý5± &*=
+Æ`A¤)" Hï½,½îò¿ÞaÝi»³»ßs])§Î¸ä:¿¹ï'ã M	@ @ @ @ @ @ |Êåó9#            àø"            D PÊÃL@ @ @ @ @ @ %¾            Q¢ò0@ @ @ @ @ @@ï            @T¥¨<ÌD @ @ @ @ @  Pâ;            U@)*3@ @ @ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\217_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	ÅÁþñ¹{Q<'âªÑ7^Aèx%¯Fsx½*ä}cÞ|ñ@¢AäðH¼¢&@NY.åPYnå>[Aà_OImafv¦gfwýõç3Îìtwuõwf{±®ªjìbX@ @ @ @ @ @ !P=Æû¼             Pâ            W@).+@ @ @ @ @ @ ø            Ä PËÃJ@ @ @ @ @ @ %¾            qâò°@ @ @ @ @ @@ï            @\¥¸<¬D @ @ @...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\218_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	Åýþñ^V@d¹T@NE@DAX5&jÄ#?ÅÿoM¼ïÑ$&DÑ$âxßÏx$j E@KAnA@îc¹þß§¤6½Ãìì\;3»ûé×kÝéîêê÷=k=]Uy;l	X@ @ @ @ @ @ (G V9¯ó2            N@           @L¥<¬D @ @ @ @ @  Pâ3            S@)&+@ @ @ @ @ @ ø            Ä PÉÃJ@ @ @ @ @ @ %>            1bò°@ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\219_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝTÕÝÿñ³  HYE@`A@Di
+
+²`yÔ(F£ØMDA}ÛßDMh¬±a0[Ä.ei¢ôºHÔÿï{ãÙÌ3Ã´ÝY>÷õ¦Ü{Ï=÷=ãÌz¾÷³ÏÇ            @JQ^çe@ @ @ @ @ @ %>            1bò°@ @ @ @ @ @@Ï            @L¥<¬D @ @ @ @ @  Pâ3            S@)&+@ @ @ @ @ @ ø            Ä PÉÃJ@ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\220_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	Õùþý3  ËEDDÁec%jâ¾k\ÿFcEæMÀ¸ÁA\"&®DeEEqAE\A@AVYßç.ç=MwOwWõL÷Ì·®«é¥ªNúTkM×]ç¢í69&@ @ @ @ @ @ ÔIò9#            (ñE@ @ @ @ @ @ H)@             J|@ @ @ @ @ @ R
+(¥äa&            ß@ @ @ @ @ @ J)y            @ Äw @ @ @ @ @ @ ¥ RJf"       ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\221_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	Õ½þñÃöAEYuDTA@Ü ñ¹yâIL è+jVÍ½jôhâÍfQ¯
+¸+®¹* *DuXDÿï=rÆ¢éîé¥z¦ùÖó´=Ó]uªúSmç­ß9
+¶ÚâX@ @ @ @ @ @ H!Ð0Åë¼             Pâ            V@)-o"           (ñ@ @ @ @ @ @ H+@ 7@ @ @ @ @ @ ø            ¤ PJËÃ            J|@ @ @ @ @ @ Ò
+(¥åáM@ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\222_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	TÕ÷ñÍ¢ÈÒ¨¨ l· ÆõÌD$F'êD\É$1y&}gtÆÉ;Ù&.ã$. F%Æ]c¢ ¨8" ((kB¿ÿßÓ})ª«k¹Uu«û{§¬êª[çû¹×ÛÍùÝsNZ[            
+´là}ÞF @ @ @ @ @ @À(q"            d PÊÈÃ            J            2òð!            ç            @F¥<|            @ Ä9            Q@)#"    ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\223_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝTÕýÿÿ³TA&* ("¨ÈbAU¿ÉW£Æ
+XÐ¨XR~1¶Äo4ß¯QóO;ö%¢AD©¢bA@QÐU¤-.M@øÞ×=ËÝavØ¹Óv_÷ñL»åÜçÌyÏç¢­¶8@ @ @ @ @ @ jhPÃë¼            @ @ Ä@ @ @ @ @ @ ¡ RBÞD @ @ @ @ @  Pâ3            P@)!o"           (ñ@ @ @ @ @ @ H(@ 7@ @ @ @ @ @ ø            $ PJÈÃ       ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\224_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	ÅÁþñVED\P£ æo¢¯
+*â«¢&QyÕÃ3#h¢(j&A£#Ê}­°rßçÂrèrýëéPkï03;÷Î,¿þ|é£ºúÛ£3ÛOWU¥Ãv2L            ¨b>³@ @ @ @ @ @ ðø              P
+ËÃB@ @ @ @ @ @ %>            aÂò°@ @ @ @ @ @@Ï            @X¥°<,D @ @ @ @ @  Pâ3            V@),@ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\225_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	Õ½þñ3¬²@EÄÈàF¢I4&Æí1î«ÆÜxÍcþFÍMk\â h0&7ê5"
+qCEdGYAàÿ{IMÓÝÓûô0ßz¶ª:Uõ©ê!©·çì²É1!            @ ^Ïù@ @ @ @ @ @ /@ Ä            T@))3@ @ @ @ @ @ ¸@ @ @ @ @ @ 
+(%åa&            ×            @R¥¤<ÌD @ @ @ @ @  Pâ@ @ @ @ @ @ H*@        ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\226_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	Õ½÷ñ3  ÀÈ  ²	""EÀTÄÄDãë%7Ñ{×-®k¢F0QD4â$â6#
+"  " Â°¨ïÿw2gR4==½TO÷ßz¡ª:Uýéeóëÿ9%Ûlq,            T!P¯û¹@ @ @ @ @ @ /@ Ä@ @ @ @ @ @ ¥ RJV"           (ñ@ @ @ @ @ @ H)@             J¼@ @ @ @ @ @ R
+(¥äa%            ¯@ @ @ @ @ @ J)yX      ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\227_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	Õ½þñ3ì Ã""¢¨l"QjP@crãDÄ}»Moþ1ËM4&1Ä¸\¯
+(#¢¸*ID\À
+eeMàÿ{sÆ¢éé}ºg¾õ<ÞªNU}ªrÞþS´ÛÇ            @5
+ªù@ @ @ @ @ @ ðJÜ            qâòð%            ÷            @\¥¸<|            @ Ä=            W@)._"           (q            Ä PËÃ       ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\228_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|Tå½ÿñ'	$l!aUÂa,*²¨õVªâRPÑZVio«µ­Û½ý»ÝZmi¶(((Å©¸]d1lÊ°Â@ö$ÿßïÈaLf9I>çõg9ç<ç9ïs00ßü'¦TÃ            @±e|ÎÇ            XJÜ            ^¼ò°@ @ @ @ @ @@{ @ @ @ @ @ @À« WV"           (q            x PòÊÃJ@ @ @ @ @ @ %î@ @ @ @ @ @ ¯J^yX       ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\229_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝxeÚÿñ' @èBE¤7A:èª«b£­º®¢¸bYõ¿îZv]ÔwõµöBØUH÷Å(²¬´  MT¤÷zHèüï{ÌCÈää;×u<çÌÌóÌÌgv¯óã~°\Y            nÂÝ¬g5                        £ #@ @ @ @ @ @ x@ @ @ @ @ @ yØ            @ Ä3            à(@ äÈÃF@ @ @ @ @ @ %@ @ @ @ @ @ G%G6"         ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\230_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|TUúÿñ%^4Cè ]:D°¡+ö
+¢?°»ë¢îk-?E×]Ý¿úÛµ£(Á,¨
+VBS¤ô¢RJ%¡äÿ<WnÆÉdfîd&|îë5N¹÷{Î{Ý½_sb
+d3l            ![Äç|            %@ Ä@ @ @ @ @ @À¯ _v"           (ñ@ @ @ @ @ @ ð+@ ä            Jü@ @ @ @ @ @ ü
+(ùåa'            ¿@ @ @ @ @ @ ¿J~yØ         ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\231_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝUÕ¡6à=ÌC"u±#ÒD@0F£&Ökï±\4jÔ¨1Éi&{-b¬ÁX°Fc
+E)RÄB/2¡Où×>føG3sÎ0íÝO§ì½Ú»7ñyø\ke#r @  @  @ Ø@íüîg @  @  @ 	  @  @  @ ©@)) @  @  @ %Ï  @  @  @@RRR'	 @  @  @ J @  @  @ ¤¥¤<N @  @  @ < @  @  @ IJIy$@  @  @ (y @  @  @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\232_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|UõýÿñodÈöP6"q°ÅÁÕê¯µE±í¿Î¶¶UÛj[¨«j­£lTT Ke	=I HÿÏ÷ÈÜäÞ{nr^çñ¸ÜqÎùïyÞ/òxÜ·ï×ã¼l
+@ @ @ @ @ @ Z<kù@ @ @ @ @ @ 0            6lò°@ @ @ @ @ @@1            `S@É&;@ @ @ @ @ @             6lò°@ @ @ @ @ @@1            `S@É&;@ @ @ @ @...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\233_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	\TåâÿñgX$QQwEÅ}WÄÓÔ´L3MÛË4ëÞöîííÝ_uÿiy[,­,Í%3Ë6s7ÜRDwDA}ÿ?ÏäxG93às^¯ifÎ9ÏrÞç¯øò<¡Dn
+@ @ @ @ @ @ r\ÊÙÏn@ @ @ @ @ @ J<            ,òp@ @ @ @ @ @@g @ @ @ @ @ @À¢ E"           (ñ            X P²ÈÃA@ @ @ @ @ @ %@ @ @ @ @ @ Jy8           ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\234_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|TUúÿñ3I ´@è$ô*UºR]°b(²(¢ÿuu×ÕÕµ¯»?Û®°VEQTT@°ôÒ	B
+	¤ÒþÏsS	|îkÃÌÜrî¹ï"{¿óãÈÅ°             P@HëY            %@ Ä@ @ @ @ @ @À¥ K6"           (ñ@ @ @ @ @ @ p)@ ä            J|@ @ @ @ @ @ \
+(¹äa#            @ @ @ @ @ @ J.yØ           ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\235_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝxTUþÿñ!=Ð{z'ÄDAA°»í¯þÜu]¬»«®»º,»6Q¤÷^¡¤ !!ôÿ÷\dHf&É$yß}ÂÌÜ{Ï¹ç¾æÏÏ~Ïq(M±!            Pc9ûÙ            !@ Ä            `V@É,@ @ @ @ @ @ x@ @ @ @ @ @ Ì
+(åá             Ï            Y%³<D @ @ @ @ @  Pâ@ @ @ @ @ @ 0+@ d           ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\236_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|eþÇñI§ z
+MJC=ÅTì(¨g÷=ôÔÿ©w
+PQ8P³
+)	B/RJB¤þ¿K.ìîÌMö3¯WÜÝyyæ=«÷zí÷~ÏT(Á            @)Á¥ìg7            %¾            ¦J¦<D @ @ @ @ @  Pâ;            `*@ dÊÃA@ @ @ @ @ @ %¾            ¦J¦<D @ @ @ @ @  Pâ;            `*@ dÊÃA@ @ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\237_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxì	ÕÕ¿uE"¨,FEDEÄ(?TÜq	bK£&1ùâíyâú©qC\Q¢¸ÿPTâ(* (DdgØeÿ_áÅ¢ééé®®ê®yëyzªº[÷¾÷võôùÝsN½-¶x,   @    @    @ ¨@ýjö³   @    @    @ >%  @    @    @ @FJñp   @    @    @ A1 @    @    @    RF<   @    @    @ @Pb@    @    @    d$ ! @    @    @     @    @    @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\238_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìTÕõÿïî²KïuW)* ÒDAXb
+*(¦fÔõª¦©Q£FÅ®`ÛÏJUDi""EéeiKYv÷ÎÃ»>Ù)ofÞÌ~^2¾zï»÷sï¼eÎ÷s²*d1,   @    @    @ A ;ÄqC    @    @    @À! ÄD   @    @    @ K A),NB    @    @     (1  @    @    @  Â@P
+   @    @    @ JÌ@    @    @    °Ââá$  @    @    @  s    @    @    @ ,...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\239_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxì½	¸Å¹ÿ_Ã.ûÊ(ÛUsÅ-.D17qYLn41ÆäÞäF41jÔcÄ+5þÔ«Å "¢²ª²) l²öþï·±°æÌî3sÎ§çéîª®þTÍLU}ë}ß²=¶96@    @    @    TB N%Ç9@    @    @     
+   @    @    @ #¥x8	@    @    @    D   @    @    @ ÈH A)#NB    @    @     (Ñ  @    @    @  2@PÊ   @    @    @ J´@    @    @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\240_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|TÕýÿÿ%aßVÙÙ";|¿­ËWpG- VP¬¶ÕÒÖÖþÕZm±Ë¯µJmEE@@[h©âRvMQ6!ìöHØHþÏÕCq2{'3¼î£Ãl÷{îóLìÜyßsNR±,@ @ @ @ @ @ *ð:/#            à(ñA@ @ @ @ @ @ *@ 7@ @ @ @ @ @ ø             P
+ÊÃ            J|@ @ @ @ @ @ 
+(åáM@ @ @ @ @ @ %>            Aòð&      ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\241_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxì	TÅÕ¿kXAD@6QDTDóãWÔà¢1~ùHükYÜcFj"jÜF%WTPDöM6aXdø_\ÚÞ§{æ­çiºû.uÏ}ë]U¿:çlµâ(   @    @    @ ¨@J¶³   @    @    @    @    @    @ @BJ	ñ°   @    @    @ Ag    @    @    @ !¥xØ	@    @    @    Ä3 @    @    @    RB<ì   @    @    @ @Pâ   @    @    @ HH...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\242_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|Tå¹Çñ7	[dVÙDAUvÖªmEqÁpAÔ­Ko«¸oÕVí­û. 
+-îZ	«MP¶°CHØÜç9râf&³ÙßùÜq&g}Ï÷¼ÜÎÿyß7®D&Ã            xó            %@ DE@ @ @ @ @ @ ð*@ ä            JÔ@ @ @ @ @ @ ¯J^yX            @ D@ @ @ @ @ @ ð*@ ä            JÔ@ @ @ @ @ @ ¯J^yX          ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\243_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝåýöñgYô&ÒEAAcþFcW,±bIQójÄÄÄD%¨Xb ±E¢+HU;(*ºtXzgßßýYÃîÙÓ÷ìîw®ëpÚg>s¹ShcB @ @ @ @ @ @ *%|ÎÇ            x%~            Q¢òð%            ¿@ @ @ @ @ @ ¨JQyø@ @ @ @ @ @@ß            @T¥¨<|            @ Äo @ @ @ @ @ @ ª RT¾D @ @ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\244_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝTÕùÿñ³¥,KW`©Â(R¤IÐ_B±ÄØÿKbD#h0R"½÷¥ÃÂîîÂòg½»³SîÔýÜ¼i·û>³ff¾srJÃ            @9©å<ÎÃ            8J¼@ @ @ @ @ @ ü
+(ùåáI@ @ @ @ @ @ %^            ~üòð$            ¯@ @ @ @ @ @ ¿J~yx@ @ @ @ @ @@×            _%¿<<         ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\245_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìTÕù¿ÏRUXX¤)QD@]*ü51E5Q¬1ÄóÆc£ Q4F#Q*IPc	E#]D:²  ¬ô&üßï	g½3³SîÌÎì>çó½;·ò;3÷ïyß·b%G   @    @    @ @
+MRìg7  @    @    @  <%n@    @    @    ´Òâá   @    @    @  ÷   @    @    @ @ZJiñp   @    @    @ A{    @    @    @ -¥´x8@    @    @    Ä= @    @    @   ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\246_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|\e½ÿñ33Ù÷4{Ú¦iº·.¶ìK)×«^ðÂ½÷ºqëÅ+«ô²øRÜ@@
+(*²(t£PZèN÷&m4MÒìû$3ÿßïè©q2=ôs^¯a³=çýLÊó=Ïó8¼2L            #àæs>F @ @ @ @ @ @À Pâ            P@) 3@ @ @ @ @ @ ø             P
+ÈÃL@ @ @ @ @ @ %¾            ò0@ @ @ @ @ @@ï            @@¥<ÌD @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\247_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|Tõ½ÿÿoHHI !¬	°#D¤h]pA´­R«kï­Ö_ÿ]ì­×Ú^[{[{{«¶â.E´àRÙ}%5$B $ðÿ|9p2CæÌL23yÇc:9Û÷<¿÷|?ß²@ @ @ @ @ @ ¼4óò<O#            `	(ñB@ @ @ @ @ @ ð)@ ä            J¼@ @ @ @ @ @ |
+(ùäa%            ¯@ @ @ @ @ @ J>yX            @ Äk @ @ @ @ @ @À§ OV"    ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\248_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxì½¼Uå÷ÿÐz¢PTTÄ5ó£±`ÔhI,obÊ?±Ä7&cbX±ã:bF,1¥ÙAPAªp©Räò_¿-nç²Ï>õ~÷çsî>g§|çìs÷úíµV½í¶8@    @    @    ÔB ~-ÛÙ@    @    @        @    @    @ %¥xØ	@    @    @    Ä   @    @    @ HI A)%vB    @    @     (1  @    @    @  R@PJ   @    @    @ JÌ@    @    @   ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\249_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxì½TÕÙÿ¶°Kß¥.E@+DñUc4QÑ±DSþSL±åMù%&QòM¨±aDvEéE^K²»ÿç9»g¹{rggfùd¸íÔÏ¹³Î=ßû<OF¹$C   @    @    @ @
+2k8Ïi@    @    @    XJÜ   @    @    @ a	 (ÅÃE@    @    @    %î@    @    @    °Ââá"  @    @    @  ÷   @    @    @ @XJañp   @    @    @ A{    @    @    @ ,...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\250_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝTÕÝÿñ³ ¢ÔDÀ,HS¥¨
+K{òÄ^b,IôIþ-¼4Ol±Ä5±ä
+bAD#*¥IY:°ÿß÷Ã3³³3sïìÎ,ûz³;3÷ÞsßwvÏ÷þÎ)©°Å±             P@Jça@ @ @ @ @ @ ¼ o@ @ @ @ @ @ ´Jiyx@ @ @ @ @ @@÷            @Z¥´<<            @ Ä{ @ @ @ @ @ @ ­ RZD @ @ @ @ @  Pâ=            V@)-O"       ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\251_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝTõ½ÿÿ/EPz[)ÒYDB[ÅFÄ_ÔÆ«ÄþnDÐèM4^£¹æÆ¨7åx¶ÄDý+ð³Ä(Æ
+ÂÒ^Þáÿyùrãîì3³3Ãë<ãìîò=Ïï8»÷ù|¿ÕØâX@ @ @ @ @ @ ¨@ z?çÇ            J¼@ @ @ @ @ @ â
+(ÅåáE@ @ @ @ @ @ %Þ            qâòð"            ï@ @ @ @ @ @ ¸Jqyx@ @ @ @ @ @@÷            @\¥¸<¼      ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\252_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|TÕýÿÿ@ a1 Ê¢.lÚÚ¢ÕVÜÛ* vS»üõû°ßZmkûkmÝZµZA´"ÖZ@ÐVÙETÊ" Ka
+k @aÿ>ßaH&³ÜÙ×}<ÆÌÜåÜç¹B¸ïùrBÃ            @uªx·@ @ @ @ @ @ °J\            òð!            ×            @@¥<|            @ Ä5            P@) "           (q
+             P
+ÈÃ      ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\253_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|Tå½ÿñ'!I° "»¢HPÛ**.mq­Poû÷V»Þëíb­¶·ö¾ên]¨à"*â®¬nÈvK²±äÿû=Ã!$ÌLÂçØa&sÎyÎsÞgXz¾ó{°*Y            µ×ò>o#            `ø             x PòÈÃJ@ @ @ @ @ @ %>            <ò°@ @ @ @ @ @@Ï            G%<¬D @ @ @ @ @  Pâ3            àQ@É#+@ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\254_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|TÕýÿÿ%°5	®È¢¢lÚE¡¸µ¥®­¨mîýÛoµµ¶µßÖÚºu±  .¨õ«@q°RÙa
+k °ÿçsð¤ãLfîÌ$3Éë>Ã,w;÷yîû~ÎI8)aB @ @ @ @ @ @ 
+U|ÎÇ            X%¾            ò0@ @ @ @ @ @@ï            @@¥<ÌD @ @ @ @ @  Pâ;            P@) 3@ @ @ @ @ @ ø             P
+ÈÃL@ @ @ @...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\255_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝÕ½ÿñ³ zW@Aì ¹&°D±¡¹17Ñ4éåÆ®`AÔW®JH³Eaéº)Ë.R÷ÿû>CqwvÊ3u?Ïë5Îì<í<ï3ì¬çûs*mq,            T#P§÷y@ @ @ @ @ @ @@           @L¥<¬D @ @ @ @ @  Pâ3            S@)&+@ @ @ @ @ @ ø            Ä PÉÃJ@ @ @ @ @ @ %>            1bò°@ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\256_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|\gïñ3E£Þ»¬fYîN\Ò;a¹I 	¡$d§]ör	ea½,¡eÃRÂ¥¥!!¤±BK'î]¶$[½÷:å>Ïc!FS¤ü;ÏdFsÚ{¾ïØVÎ÷µùd1X@ @ @ @ @ @ @À>Áû¼            )@ Ä@ @ @ @ @ @   R@V"           (ñ@ @ @ @ @ @ (@             J|@ @ @ @ @ @ 
+(äa%            @ @ @ @ @ @ JyX        ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\257_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|TÕýÿÿì	;!¬²)È"[pkÝpÇ
+ý¶²Yûs©õo[ÛZµÚ>l¿µ­nõ«@ÝeßMö-$¬a°$aKòÿ|.8ÉdæÎÉLxÝG§3»û<ÄûÏ9	Å²@ @ @ @ @ @ ÊH,ã}ÞF @ @ @ @ @ @À Pâ            P@) +@ @ @ @ @ @ ø             P
+ÈÃJ@ @ @ @ @ @ %>            ò°@ @ @ @ @ @@Ï            @@¥<¬D @ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\258_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|TÕÝÿñö%(¬
+"B@d[*U[qÁ¥¬}l->U_UÑ¶VªGEE´âZêò ¸ (²²Ê¾C !ùÿ~·ü¯cf2sïÉäs_¯8¹Û¹ï{ÚóÍïbY            QªDù@ @ @ @ @ @ px@ @ @ @ @ @ b
+(Åäa%            Ï            @L¥<¬D @ @ @ @ @  Pâ@ @ @ @ @ @ )@             J<            1bò°@ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\259_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|eþÇñ'¡BHÒ#Q,gëíNÅ+ê¡zçù×»S@ÑÅ;=³½Þ{BHHÿï7:¹%Ùlvw&É|æõÚÛÍÎÌ3Ï¼wÿ.ÿùÎïyÂÎÈbX@ @ @ @ @ @ (B ¼÷y@ @ @ @ @ @ K@/           O%<¬D @ @ @ @ @  Pâ;            àS@É'+@ @ @ @ @ @ ø            ø PòÉÃJ@ @ @ @ @ @ %¾            >|ò°@ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\cover.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    à   º³K³   	oFFs         Ú*¶Î    IDATxì½é$Ifæîqæ]UÝU=Øé.f	Bü ÿB
+a)Â^ÌáîôÌt×}efÜîF=Líp÷Ìê®ÊèÕ¯º#=<ü077ÓOUMMÍ¾xñÂ(
+B¡xXÇ.B¡P(ÿ¡¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ¬P(
+Å ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\11-gang\meta.json
+File type: .json
+{
+  "id": "11-gang",
+  "name": "11-Gang",
+  "coverImage": "cover.png",
+  "steps": [
+    "192_1x.png",
+    "193_1x.png",
+    "194_1x.png",
+    "195_1x.png",
+    "196_1x.png",
+    "197_1x.png",
+    "198_1x.png",
+    "199_1x.png",
+    "200_1x.png",
+    "201_1x.png",
+    "202_1x.png",
+    "203_1x.png",
+    "204_1x.png",
+    "205_1x.png",
+    "206_1x.png",
+    "207_1x.png",
+    "208_1x.png",
+    "209_1x.png",
+    "210_1x.png",
+    "211_1x.png",
+    "212_1x.png",
+    "213_1x.png",
+    "214_1x.png",
+    "215_1x.png",
+    "216_1x.png",
+    "217_1x.png",
+    "218_1x.png",
+    "219_1x.png",
+    "220_1x.png",
+    "221_1x.png",
+    "222_1x.png",
+    "223_1x.png",
+    "224_1x.png",
+    "225_1x.png",
+    "226_1x.png",
+    "227_1x.png",
+    "228_1x.png",
+    "229_1x.png",
+    "230_1x.png",
+    "231_1x.png",
+    "232_1x.png",
+    "233_1x.png",
+    "234_1x.png",
+    "235_1x.png",
+    "236_1x.png",
+    "237_1x.png",
+    "238_1x.png",
+    "239_1x.png",
+    "240_1x.png",
+    "241_1x.png",
+    "242_1x.png",
+    "243_1x.png",
+    "244_1x.png",
+    "245_1x.png",
+    "246_1x.png",
+    "247_1x.png",
+    "248_1x.png",
+    "249_1x.png",
+    "250_1x.png",
+    "251_1x.png",
+    "252_1x.png",
+    "253_1x.png",
+    "254_1x.png",
+    "255_1x.png",
+    "256_1x.png",
+    "257_1x.png",
+    "258_1x.png",
+    "259_1x.png"
+  ],
+  "children": []
+}
+
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\260_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝåÿñQÝÞ{_¯w½î6¶1ÅÆ6¸@
+©ÀüC:I.ËÝB.@ $rF
+Hr$pIæÐlcmÀ½nï½ïjµêÿß³ #Ë+­ÚÛy½6fç÷h¬¯çÑydÑX@ @ @ @ @ @   °Õ            L
+(ñF@ @ @ @ @ @ *@             J¼@ @ @ @ @ @ 
+(åa#            ï@ @ @ @ @ @  JAyØ            @ Ä{ @ @ @ @ @ @ ¨ RP6"        ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\261_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	UeÝð33À°ï,". ® ¹¤æR¦¨¥âVZo©YæR½eË»àRî©en,
+¢(. ²¸  ²È3ð>ÏÍKÃ8s{g¸3|Ïç3Þ{Ï9Ïsó=×ü|î¯ÿó¬[b#@  @  @  P@a%ûí&@  @  @  (ù" @  @  @ d(eäq  @  @  @@ ä;@  @  @  Q@ ÇA @  @  @ ï  @  @  @@FRF	 @  @  @ J¾ @  @  @ Jy$@  @  @ (ù @  @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\262_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝxTUúÇñ:ªHS×.X)dWÅÝÑÕÅºW±+]Öe» "]%	éÿ÷½:8dÉ;ÉÌä{'Îdî½çû¹xùùT*Á            @Á|ÎÇ            J@ @ @ @ @ @ JyØ            @ Ä@ @ @ @ @ @ p(@ ä            J@ @ @ @ @ @ JyØ            @ Ä@ @ @ @ @ @ p(@ ä          ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\263_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝxTeÚÿñ'	I(	Þ¤&ªte]AÅXÿT°lÑ]WÑ×¶}-k/«H@DÁUVäPQ`¥÷ZH)$Èÿ¾LBf23çL2I¾çºÆ)çç<ç3ÃÄëüæ~°Y            Â=¼ÎË            XJ|@ @ @ @ @ @ ¼
+(yåa%            @ @ @ @ @ @ ¯J^yX            @ Äg @ @ @ @ @ @À« WV"           (ñ@ @ @ @ @ @ ð*@ ä         ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\264_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	\UeþÇñÝWÜE4sÉ­6­V¶§i.íÓâXSÙ63-Ób5kZéL¶¥"*¢ä+)Ê¢*ûÿ÷æ2ËÝ|ÎëuçÞ{ç<ç}ÿüß¯¿çq+E±             P{ëY            !@ Ä            `Q@É"@ @ @ @ @ @ x@ @ @ @ @ @ ,
+(Yäa#            Ï            E%<lD @ @ @ @ @  Pâ@ @ @ @ @ @ °(@ d          ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\265_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|ÕÕýÿñsoÙ;FÈ
+Ù ¶U´®:pV­£ý×öW[kk}Tm­£°nDQqÔQQö=d$Eö÷þ?ç1$Üä&¼¾mrïý~¿ç|Ï÷y/èã¾ýc²Ê¦Ø@ @ @ @ @ @ hGÀÜÎ~v#            `(ñA@ @ @ @ @ @ °)@ d            J|@ @ @ @ @ @ l
+(Ùäá             @ @ @ @ @ @ J6y8            @ Äg @ @ @ @ @ @À¦ M"         ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\266_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	\UeþÇñ]WPQ÷5Ü7´eRÓÊ,µÝ´´ùÏ´MSÖLce5SÓæ´X*­ÚbeMeVû[® ¦"
+* ²þÏ­ë ^.w9.ð9ó¢{ï9ÏyÎsÞ÷8Óðõ÷<¥²)6@ @ @ @ @ @ *ð¬`?»@ @ @ @ @ @ 0	(ñ             X P²ÊÃA@ @ @ @ @ @ %@ @ @ @ @ @ «JVy8            @ Ä3            `U@É*@ @ @ @ @ @ x@ @ @ @ @ @ ¬
+(Yåá          ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\267_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|UåýÇñçföa¡leVÜ¸+nÁÙZÿVë¨Wëª¨µN°Z7me,Ad
+a½îÿ÷;pà&Ü\îÎMò9m¼÷sqÞ÷äu¾yÇáÍ°!            P@T9ûÙ            %@ Ä@ @ @ @ @ @À£ G"           (ñ@ @ @ @ @ @ ð(@ ä            J|@ @ @ @ @ @ <
+(yäá             @ @ @ @ @ @ Jy8            @ Ä...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\268_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|TUÚÇñ  Ô@ !!t²\DúÚÛ¾»ëYdu±¬kÝµíâºêZY_XDDB	A)PB©ôö>gJb2¹3Lßhrï=÷ÜïåóÉßç9ÕòÐx             Pg=ó1            %¾            V¬ò°@ @ @ @ @ @@ï            U%«<lD @ @ @ @ @  Pâ;            `U@É*@ @ @ @ @ @ ø            X P²ÊÃF@ @ @ @ @...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\269_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	TÕ7ðB6eG@dÙAÜEqÉ¸E1åÌ¨¸LòMt&&&£Æ$3Ñ1Ñèè$NÔÆ$¸EYTÙeW@hÖ ÍòÝÛß§ítUõ^õBýÞ9=UõÞ]ï%çÿÜûíGÆA  @  @  @ }ê8ï4 @  @  @ *  @  @  @ §@)' @  @  @ %Ï  @  @  @@NRN	 @  @  @ J @  @  @ ¥<. @  @  @ < @  @  @ 9J9y\$@  @  @ (y @  @...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\270_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|TÕÝøÿ3Y	I vÙÙd}ÔVm­ØºÔ­­Rµ>­ZÛ§öqµÚ?íÿ)jëKÕZ[qVöE6AÙwYBHÈBö}~ßsfn2	ÉÌÜd|®ÎÜíÜsÎ}Ï×ùæãpÊ¢X@ @ @ @ @ @ hD ªãF @ @ @ @ @ @ÀPâ            àSON"           Pâ;            àSON"           Pâ;            àSON"           Pâ;            àSON"       ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\271_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	xTÕÁ?þÉQ Ê"R7VQpmÅºô}]ÀúVë¯*­­ÚÖªÕöÑÚZÿ¶ïëVjÕºÖ*PÅ.**\q	P­Ê.H1ÈÿÜH¤ãÌL2ä3ÏCçæÞ{¶Ï½ÔçÉsN^MøÄ| @  @  @ |@þw  @  @  @@­@É@  @  @  T@ ÇE @  @  @ w  @  @  @ ©@)) @  @  @ %ï  @  @  @@RRR	 @  @  @ JÞ @  @  @ ¤¥¤<. @  @  @ ¼ @  @...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\272_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	¸U¡7ðYD$dBsFlvÈ´[8U÷¦àÔ`uïÝºåTÞÇê¦v+B¥ÇÊ§ÔêÆ¨ 2)" çÀaß»vn¿-6ûìáwïý{¿çÜ³Ï~×ZïZ¿µ|/þÏZoÝñ¹ @  @  @ ìE å^¾÷5 @  @  @ @ÉB @  @  @ È* PÊÊã& @  @  @@É @  @  @ È* PÊÊã& @  @  @@É @  @  @ È* PÊÊã& @  @  @@É @  @  @ È* PÊÊã& @  @  @@É @  @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\273_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|ÕÕýÿñs3É"$$$FØ È=lÕ¸m]­´u´bmµÖÖAUÔZµÕÖY«è_ëª«T´2dïÂ
+dïÜ{ÿÏ÷æ$$×ää&y}5¹÷~Çùïó^rïã¼ï9ÇæÅ°             Ð@HëY            %@ Ä@ @ @ @ @ @À£ G6"           (ñ@ @ @ @ @ @ ð(@ ä            J¼@ @ @ @ @ @ <
+(yäa#            ¯@ @ @ @ @ @ JyØ         ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\274_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝUe½?þ5f¸ÊpäÄGý%Z"v±,ÿ^êPvòøÏß?Ëêheçd_fu2=©eÚÅ
+EýY©Gå¢`G
+cD2@AÃ\÷ÿY{®Ð°aöìÙ3óÞ8í=k­çYÏz¯½^ûã÷yráy @  @  @ Ø@î¶ÛL  @  @  @ ) Pò  @  @  @ ¤(¥ä±  @  @  @@ ä @  @  @ H) PJÉc' @  @  @@É3@  @  @  R@ ÇN @  @  @ g  @  @  @ ¥@)% @  @  @ %Ï  @...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\275_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	\U?ðìÆ,$@B@P
+
+*Â9£à¸o30þEÙUÃ":¨À .d$ÈÙÙºÎ¾þï­¡°êîZº^w>ï²ªë½»¼Ï+çùß½Ív#q @  @  @ Ø@ó=|ïk @  @  @  @  @  @@NRN'	 @  @  @ J~ @  @  @ 9J9y$@  @  @ (ù
+ @  @  @ ä(åäq  @  @  @@ ä7@  @  @  S@ ÇI @  @  @ ß  @  @...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\276_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ`Õ¹·ñ³êÍdÉErï6Ø¸
+m!tìPLK¡ !=¹|äI $:ÐB	Á÷
+¶Á½WÉ²%YV_µýÞw¤Wòj%mÓJzæ^yw§ùÍH(ó×{Ã%aB @ @ @ @ @ @ 	&æ3@ @ @ @ @ @ K@@ @ @ @ @ @À« W"           (q            x PòÊÃB@ @ @ @ @ @ %î@ @ @ @ @ @ ¯J^yX            @ Ä=            àU@É+@ @ @ @ @ @...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\277_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	\U/þ[½¤°Eè@ØdU>QWáél(£}O::óÐÏqptÄ
+Deu IÂb`$I:lf Ù	$ÝUõ?§ªowu§»Ò]]Ý]Uý-?å­ª{Ï¹ç|oÑéÏýõ9'Ä  @  @  @À M|îc @  @  @ / @  @  @@YRY;	 @  @  @ J¾ @  @  @ eJeyì$@  @  @ (ù @  @  @ (å±  @  @  @@ ä;@  @  @  PV@ TÇN @  @  @ ï ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\278_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ¸U?ð¹©Ü4.ÊE¼@*8eÝmL3ËiT$µ]¦ÿM.^ÊL-É.cZZrSAAEE¹
+w8ð_kOÛ9Ña³÷»÷>ç=ðyç´/ï»Öû{?k×óÄ÷YkµØÄA  @  @  @`/íå{_ @  @  @ È	ü @  @  @ 
+
+
+ò8I  @  @   Pò @  @  @ (( P*Èã$ @  @  @@Éo  @  @  @  @©  @  @  @ %¿ @  @  @ ¥<N @  @  @ ü @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\279_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|TÕÝÿñ3,$!-ì¬@ÝªV­ú¸µjÖ¶ÖjµÕºUýk[÷åqëcëZkÝ×º°Ê}@ì{23ÿßïL&$!I2	«»{ï{ä¾ÎwÎ9L	@ @ @ @ @ @ f"YÎb@ @ @ @ @ @ ¬ @ @ @ @ @ @ ¿J~yX            @ Äg @ @ @ @ @ @À¯ _V"           (ñ@ @ @ @ @ @ ð+@ ä            J|@ @ @ @ @ @ ü
+(ùåa%        ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\280_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝxTeú÷ñ3 ôÞAzïÁ®»ØVQ± *EÑ¿®®eYÛª½²
+*êëê*  bPD!((-A©¡%$$Ì{ßg2qafÎ$3	ßÃfæç<ç3CÂu~¹ÇæÅ`A @ @ @ @ @ @ 2Ö³@ @ @ @ @ @ S@           W%¯<lD @ @ @ @ @  Pâ3            àU@É+@ @ @ @ @ @ ø            x PòÊÃF@ @ @ @ @ @ %>            ^¼ò°@ @ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\281_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝyUÅ?àÓ¬" ;È²*
+JX\PL1:q& nqÍL&{2j&3Ä%Á!QuÆÄ$$È&*
+ l" Ýl²6üªî/×§ÅîKß¥»o7ïyÎí>§Nª÷\óç[U²?  @  @  @@ª8ï4 @  @  @ @É  @  @  @ £@)# @  @  @ %ß @  @  @ ¥<. @  @  @ | @  @  @ 2
+2ò¸H  @  @   Pò @  @  @ È( PÊÈã" @  @  @@Éw  @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\282_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|TUÚÇñ3©tE  5"UºÝUX\Ë*E°­®»Öµ`Ûµ½öEQ@E°à;%4é½WÐ@BK÷y.Ü8	É0ð»»qÊ½÷s¿sHò¹ÿsNÙ            %Dð>o#            `	(Ñ@ @ @ @ @ @ Ü
+(¹åa'            } @ @ @ @ @ @À­ [v"           (Ñ@ @ @ @ @ @ Ü
+(¹åa'            } @ @ @ @ @ @À­ [v"           (Ñ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\283_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|åýÇñÙÜÜIH8Â
+áÃnh«r©EDÅ£Ö»Vë_­Ö£j=Z«õ¨Tm¡(""*(XnC@@T @î;ÙÿïÝ	,Ýd7ù¬®»Ùyæ÷I^óÍïy,Vyh<@ @ @ @ @ @ ¨A  Ïù@ @ @ @ @ @ ]@@ @ @ @ @ @À© S"           (q
+            8 PrÊÃB@ @ @ @ @ @ %®@ @ @ @ @ @ §JNyX            @ Ä5            àT@É)@ @ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\284_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	UÅ/ðÃ®²¨,Êª¨QÀ
+p&ó^Lb|&Æ1*IÆIæcV³uÆ%C\²a'1It""**¨²Í
+¯êN®_»oßåt÷íÛ¿ó}=·ûª:U¿º~ßÿWUm+q @  @  @ ¨G m=÷Ý&@  @  @  (ù" @  @  @ ä(åäñ  @  @  @@ ä;@  @  @  S@ ÇC @  @  @ ï  @  @  @@NRN	 @  @  @ J¾ @  @  @ 9J9y<$@  @  @ (ù @  ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\285_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|eþÇñI!¡"½#J^c=»ÂyRN¬g9ÏÞqêwgû« `£à	*¨(èYÐA:ÞJ $ÿßotâ²$ÝÙÍ|æõÚÛÝyyæ½|½ö{¿çÈÍ`C @ @ @ @ @ @  Èö³@ @ @ @ @ @ S@/           O%<D @ @ @ @ @  Pâ;            àS@É'@ @ @ @ @ @ ø            ø PòÉÃA@ @ @ @ @ @ %¾            >|òp@ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\286_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|eþÇñIï
+%@H@H÷ÔgOSÏ+zÞéyçùWÏvzõì
+OÄ.]Hï@¨) %½òÿ=°Ùìîì&ä3÷»;3Ï3Ï¼gáï+_ÏãS#Æ            @=¾õìg7            º _@ @ @ @ @ @ »Jvy8            @ Äw @ @ @ @ @ @À® ]"           (ñ@ @ @ @ @ @ °+@ d            J|@ @ @ @ @ @ ì
+(Ùåá           ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\287_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝÕ¡7ðwYXz¢ (XPD)*
+5Ñh&5¨×ØK4&1F-&ÑäÆv#Ñ1%~×»RD4¢¢Xè ©ß9»¸âî°;3»;ëþæù63ó÷÷÷¾\gþß9§`Sx%^ @  @  @ Ê¨WÎq	 @  @  @ ¤J @  @  @ ´¥´<
+	 @  @  @ J @  @  @ ´¥´<
+	 @  @  @ J @  @  @ ´¥´<
+	 @  @  @ J @  @  @ ´¥´<
+	 @  @  @ J @  @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\288_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|TÕÝÿñ¶@@	e1ÊÚZÐ
+>¶Pìbi±j[}ÇVô©¸bpò-£%¬B@! üÏïÊIqæÎ;wIøÜ×k:¹÷{îûÚ×|çwN\¹Þ            Ajy·@ @ @ @ @ @ °ø             Ø
+(Ùò°@ @ @ @ @ @@Ï            ­ -;@ @ @ @ @ @ ø            Ø
+(Ùò°@ @ @ @ @ @@Ï            ­ -;@ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\289_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝxTUúÇñ$ÒÐB RB -ÑUvQAÁ(vÜµ`û£îêZvU,(.X(¢(XP¤ ôH
+BIH)@HÈÿ=£ÃÌÜ{g2I¾÷Yvfn9çÜÏôyæç{_l            üìg7            %¾            Nòp@ @ @ @ @ @@ï            S%§<D @ @ @ @ @  Pâ;            àT@É)@ @ @ @ @ @ ø            8 PrÊÃA@ @ @ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\290_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|uÞÇñI§$ÞÞ¥Þ"vOQ±¡¢§¨¨ØËYÎ³ç§÷XÅ(z4õT	EDj(ôç÷[ÖÍfwg6ÙM>ózáîNùÏÞ3Üó¼æËïÿ(Å`A @ @ @ @ @ @ ÈbÖ³@ @ @ @ @ @             W%¯<lD @ @ @ @ @  Pâ@ @ @ @ @ @ ð*@ ä            J<            ^¼ò°@ @ @ @ @ @@g @ @ @ @ @ @À« W6"           ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\291_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	xTÕýÿñ3ÙØöE°o"k ,DýU\AªÔE@p©õW+h­[ÿÚºTÅ"J° Xp+û¢ì²ï¶vü¿ß[/bæfÖd&yßçI'sï=çûºú<óñ{+_6Ã            (ûÙ            %@ Ä@ @ @ @ @ @ÀQ@É            J|@ @ @ @ @ @ y8            @ Äg @ @ @ @ @ @ÀQ@É            J|@ @ @ @ @ @ y8         ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\292_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ|TUÞÿñ3é!@ ÞÒ;*,`EAWA±»õ¿ê®»]ÝGÝµ7lX;:
+H	Bz uæÿ;&!¦ÜI&ÉçîfæsÏyß3y|ÝoÎ¹&,@ @ @ @ @ @ üjXÏj@ @ @ @ @ @ ¬Jt@ @ @ @ @ @ JyØ            @ D@ @ @ @ @ @ p(@ ä            Jô@ @ @ @ @ @ JyØ            @ D@ @ @ @ @ @ p(@ ä            ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\293_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	|TÕÝÿñ3Kö,$$BØAMÁÜw¥jmkëÒZê£ÿºÕªmÕVÛZVëZ¬âÒÇ}cGö}$²gÙþ¿3a0d-ÉLò¹í83÷Þsî9ï{Á×k¾sNÙ            mÛØÏn@ @ @ @ @ @ \J<            <òp@ @ @ @ @ @@g @ @ @ @ @ @À£ G"           (ñ            x PòÈÃA@ @ @ @ @ @ %@ @ @ @ @ @ Jy8         ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\294_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝ	\U7ðÈ
+$Æì!;	ÂgDq\ÅQBÈã~¸ ê0:(20:Àâ@ 5!	ÙÈNÙ÷ïÞú,¾&tW×òº»ºú÷Î)«ê½{ï»÷w+çHÿÏ½¯Å¡p$ @  @  @ µ´¬å¼Ó @  @  @ 2%? @  @  @ ¥<. @  @  @ ü @  @  @ r
+rò¸H  @  @   Pò @  @  @ È) PÊÉã" @  @  @@Éo  @  @  @ §@)' @  @  @ %¿ @ ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\295_1x.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    ¨   ~)R    IDATxìÝyTÕ7îË¾¯"H³Ê."â ¨q¢FM2u¢¯ïDpK2£yßÌhÌ¢1ëL£	&£¯I1hâ
+¨ "¸ì ²(ìûú;§Æë¯ÝEuUuw5<÷óéÜª{Ïv[É|sÎ©·7  @  @  @@%õ+¹î2 @  @  @ @É  @  @  @ «@)+ @  @  @ %¿ @  @  @ ¬¥¬<n @  @  @ ü @  @  @ ²
+²ò¸I  @  @   Pò @  @  @ È* PÊÊã& @  @  @@Éo  @  ...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\cover.png
+File type: .png
+[Binary/Non-UTF8 file - showing first 500 chars]
+PNG
+
+   
+IHDR    à   º³K³   	oFFs         Ú*¶Î    IDATxì½isI&ægH É®î®>Çvgf5f[¤ÉlÍôE¦ÿ®/óA»µÕôÝU]Eä»ÞÓÃ#3,EñLDFF{xüñç=í7ß|cFe/Z¬1þ¶fí§kìË·ãô-GïýÄÓcþÈ$û©;0Ê(£ühùè­yno;Ff)r4G eQÞOIìÁæ£/GåÊÀ£2Ê°ùvR®80>éQ¢ <Ê(£ü$ã´Qx'(ÉOÝQFeÿiMÙ£òSËÀ£2Êç"~ÄàQ <Ê(£|F2bðO#<ìðþòñe´2Ê(£<iñ}IF/öO&# 2Ê( þXR`´Ç1ÿIdTA2Ê(xºOHFôýIddÀ£2Êg*Ç£ä&c/VF eQÞS´ÉÇ¿?yõÇo½·Æ&ËQ¾DxQFy9ÒYÚø7½xúùøÂíJÔDTInôxÞAFð(£òÎò IÖ~ÒÉõÕ£Õø'...
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+projects\huset-vaart\12-tegnerom\meta.json
+File type: .json
+{
+  "id": "12-tegnerom",
+  "name": "12-Tegnerom",
+  "coverImage": "cover.png",
+  "steps": [
+    "260_1x.png",
+    "261_1x.png",
+    "262_1x.png",
+    "263_1x.png",
+    "264_1x.png",
+    "265_1x.png",
+    "266_1x.png",
+    "267_1x.png",
+    "268_1x.png",
+    "269_1x.png",
+    "270_1x.png",
+    "271_1x.png",
+    "272_1x.png",
+    "273_1x.png",
+    "274_1x.png",
+    "275_1x.png",
+    "276_1x.png",
+    "277_1x.png",
+    "278_1x.png",
+    "279_1x.png",
+    "280_1x.png",
+    "281_1x.png",
+    "282_1x.png",
+    "283_1x.png",
+    "284_1x.png",
+    "285_1x.png",
+    "286_1x.png",
+    "287_1x.png",
+    "288_1x.png",
+    "289_1x.png",
+    "290_1x.png",
+    "291_1x.png",
+    "292_1x.png",
+    "293_1x.png",
+    "294_1x.png",
+    "295_1x.png"
+  ],
+  "children": []
+}
+
 
 
 --------------------------------------------------
@@ -20330,22 +22765,6 @@ File End
 --------------------------------------------------
 
 
-projects\test-prosjekt\meta.json
-File type: .json
-{
-  "id": "test-prosjekt",
-  "name": "Test Prosjekt",
-  "steps": [],
-  "children": [],
-  "category": "Demo"
-}
-
-
---------------------------------------------------
-File End
---------------------------------------------------
-
-
 scripts\convert-to-web-friendly.js
 File type: .js
 /**
@@ -20792,6 +23211,22 @@ File type: .md
 
 Dette mappen inneholder hjelpescripts for prosjektet.
 
+## update-version.js
+
+Bumper versjonsstrengen som brukes av service worker og data-cache.
+
+### Bruk
+- Automatisk generert versjon (dato+tid+hash):  
+  `node scripts/update-version.js`
+- Egendefinert versjon:  
+  `node scripts/update-version.js 2024-09-01+abc123`
+
+### Git hook (valgfritt)
+Et pre-commit-hook ligger i `.githooks/pre-commit` og kan aktiveres slik at versjon bumpes på hver commit:
+```
+git config core.hooksPath .githooks
+```
+
 ## convert-to-web-friendly.js
 
 Automatisk konvertering av prosjektmapper til web-vennlig format.
@@ -21161,6 +23596,66 @@ if (require.main === module) {
 
 module.exports = { updateCoverImage, scanAndUpdate };
 
+
+
+--------------------------------------------------
+File End
+--------------------------------------------------
+
+
+scripts\update-version.js
+File type: .js
+#!/usr/bin/env node
+
+/**
+ * Oppdaterer versjonsstrengen brukt av service worker og data-cache.
+ * Kjør manuelt ved behov: `node scripts/update-version.js` eller med egen versjon `node scripts/update-version.js 2024-09-01+abc123`.
+ * Standard versjon inkluderer sekunder: YYYY-MM-DD+HHMMSS-<hash> (for enklere dev-bump).
+ */
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+function formatVersion(input) {
+  if (input && typeof input === 'string' && input.trim()) {
+    return input.trim();
+  }
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  let hash = 'local';
+  try {
+    hash = execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] })
+      .toString()
+      .trim();
+  } catch (e) {
+    // Ignorer hvis vi ikke er i et git-repo
+  }
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}+${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}-${hash}`;
+}
+
+function replaceInFile(filePath, regex, replacement) {
+  const source = fs.readFileSync(filePath, 'utf8');
+  if (!regex.test(source)) {
+    throw new Error(`Fant ikke mønster i ${filePath}`);
+  }
+  const updated = source.replace(regex, replacement);
+  fs.writeFileSync(filePath, updated, 'utf8');
+}
+
+const repoRoot = path.resolve(__dirname, '..');
+const version = formatVersion(process.argv[2]);
+
+const versionFile = path.join(repoRoot, 'assets/js/version.js');
+const swFile = path.join(repoRoot, 'service-worker.js');
+
+try {
+  replaceInFile(versionFile, /export const APP_VERSION = '[^']+';/, `export const APP_VERSION = '${version}';`);
+  replaceInFile(swFile, /const CACHE_VERSION = '[^']+';/, `const CACHE_VERSION = '${version}';`);
+  console.log(`Oppdatert versjon til ${version}`);
+} catch (error) {
+  console.error(error.message);
+  process.exit(1);
+}
 
 
 --------------------------------------------------

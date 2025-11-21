@@ -70,6 +70,13 @@ Manifestet forventer to PNG-filer i `assets/icons/`:
 
 Legg ferdige, kvadratiske PNG-er med disse navnene i mappen før du tester installasjon eller Lighthouse PWA-sjekk.
 
+### Foreldremodus og synlighet
+
+- Modus per enhet: `legoInstructions.mode` (`child` default, `parent` etter voksen-quiz i settings).
+- Per-enhet synlighet: `legoInstructions.visibilityOverrides` (nøkler f.eks. `project:<id>` / `project:<id>:child:<childId>`).
+- Datafelt: `approvedByDefault` (default true hvis felt mangler). `releaseAt` kan finnes, men ignoreres nå (ISO UTC-format).
+- Synlighetslogikk: `visibility.js` (`isVisibleForKidsNow`) – override vinner, ellers `approvedByDefault`.
+
 ### Service worker
 
 - `service-worker.js` ligger i rotmappen og registreres fra `assets/js/main.js`.

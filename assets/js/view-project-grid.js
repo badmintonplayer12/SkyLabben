@@ -8,6 +8,8 @@ import { getImageUrl, loadProjectMeta } from './data-loader.js';
 import { getLastStepFor } from './state.js';
 import { getFavoriteProjects, toggleFavoriteProject } from './favorites.js';
 import { shareUrl } from './share.js';
+import { getMode, getOverrides, setOverride, isVisibleForKidsNow, getOverrideKey, setMode, getRandomAdultChallenge } from './visibility.js';
+import { isInstallAvailable, consumePrompt, isStandalone } from './pwa-install.js';
 
 /**
  * Renderer prosjektgalleri
@@ -19,14 +21,16 @@ export function renderProjectGrid(projects, onProjectClick) {
   const container = document.createElement('div');
   container.className = 'project-grid';
 
-  const visibleProjects = projects.filter(project => !project.hidden);
+  let mode = getMode();
+  let overrides = getOverrides();
+  const getBaseProjects = () => (mode === 'parent' ? projects : projects.filter(project => !project.hidden));
   const metaCache = new Map();
   let favoriteSet = new Set(getFavoriteProjects());
   let selectedCategory = 'Alle';
 
   const categories = Array.from(
     new Set(
-      visibleProjects
+      getBaseProjects()
         .map(project => project.category || 'Uten kategori')
         .filter(Boolean)
     )
@@ -44,17 +48,179 @@ export function renderProjectGrid(projects, onProjectClick) {
   const categoriesContainer = document.createElement('div');
   categoriesContainer.className = 'project-grid__categories';
 
-  controls.appendChild(searchInput);
-  controls.appendChild(categoriesContainer);
+  const settingsContainer = document.createElement('div');
+  settingsContainer.className = 'project-grid__settings';
+  const settingsButton = document.createElement('button');
+  settingsButton.type = 'button';
+  settingsButton.className = 'viewer__button viewer__button--settings';
+  settingsButton.setAttribute('aria-label', 'Innstillinger');
+  settingsButton.title = 'Innstillinger';
+  settingsButton.textContent = '⚙️';
+  settingsContainer.appendChild(settingsButton);
+
+  const searchRow = document.createElement('div');
+  searchRow.className = 'project-grid__search-row';
+  searchRow.appendChild(searchInput);
+  searchRow.appendChild(settingsContainer);
+  controls.appendChild(searchRow);
+
+  const filtersRow = document.createElement('div');
+  filtersRow.className = 'project-grid__filters';
+  filtersRow.appendChild(categoriesContainer);
+  controls.appendChild(filtersRow);
+
+  const header = document.createElement('div');
+  header.className = 'project-grid__header app-header';
+  header.appendChild(controls);
 
   const tilesContainer = document.createElement('div');
   tilesContainer.className = 'project-grid__tiles';
 
-  container.appendChild(controls);
+  container.appendChild(header);
   container.appendChild(tilesContainer);
 
   const FAVORITES_FILTER = '__favorites__';
   const categoryButtons = new Map();
+  let settingsPanel = null;
+  const rootUrl = (() => {
+    const baseUrl = window.location.origin + window.location.pathname;
+    return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+  })();
+
+  const closeSettingsPanel = () => {
+    if (settingsPanel && settingsPanel.parentNode) {
+      settingsPanel.parentNode.removeChild(settingsPanel);
+    }
+    settingsPanel = null;
+    document.removeEventListener('pointerdown', handleOutside);
+    document.removeEventListener('keydown', handleEsc);
+  };
+
+  const handleOutside = (e) => {
+    if (settingsPanel && !settingsPanel.contains(e.target) && e.target !== settingsButton) {
+      closeSettingsPanel();
+    }
+  };
+
+  const handleEsc = (e) => {
+    if (e.key === 'Escape') {
+      closeSettingsPanel();
+    }
+  };
+
+  const isFullscreen = () => !!document.fullscreenElement;
+  const toggleFullscreen = () => {
+    if (isFullscreen()) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    } else {
+      const target = document.documentElement || document.body;
+      if (target.requestFullscreen) {
+        target.requestFullscreen().catch(() => {});
+      }
+    }
+  };
+
+  const handleModeToggle = () => {
+    const current = getMode();
+    if (current === 'parent') {
+      setMode('child');
+      mode = getMode();
+      applyFilters();
+      closeSettingsPanel();
+      return;
+    }
+    const challenge = getRandomAdultChallenge();
+    const response = window.prompt(challenge.question);
+    if (response !== null && parseInt(response, 10) === challenge.answer) {
+      setMode('parent');
+      mode = getMode();
+      applyFilters();
+      closeSettingsPanel();
+    } else {
+      alert('Feil svar. Foreldremodus ikke aktivert.');
+    }
+  };
+
+  const createPanelButton = (label, onClick, icon) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'project-grid__settings-item';
+    if (icon) {
+      const iconSpan = document.createElement('span');
+      iconSpan.className = 'project-grid__settings-icon';
+      iconSpan.textContent = icon;
+      btn.appendChild(iconSpan);
+    }
+    const labelSpan = document.createElement('span');
+    labelSpan.textContent = label;
+    btn.appendChild(labelSpan);
+    btn.addEventListener('click', () => {
+      onClick();
+      closeSettingsPanel();
+    });
+    return btn;
+  };
+
+  const openSettingsPanel = () => {
+    if (settingsPanel) {
+      closeSettingsPanel();
+      return;
+    }
+    settingsPanel = document.createElement('div');
+    settingsPanel.className = 'project-grid__settings-panel';
+
+    const modeButton = createPanelButton(
+      mode === 'parent' ? 'Til barnemodus' : 'Foreldremodus',
+      handleModeToggle,
+      mode === 'parent' ? '👶' : '🔒'
+    );
+    settingsPanel.appendChild(modeButton);
+
+    const shareButton = createPanelButton('Del app', async () => {
+      await shareUrl({
+        url: rootUrl,
+        title: 'SkyLabben',
+        text: 'SkyLabben - LEGO-instruksjonsviser',
+        container: document.body
+      });
+    }, '🔗');
+    settingsPanel.appendChild(shareButton);
+
+    const fullscreenButton = createPanelButton(
+      isFullscreen() ? 'Avslutt fullskjerm' : 'Fullskjerm',
+      toggleFullscreen,
+      '⛶'
+    );
+    settingsPanel.appendChild(fullscreenButton);
+
+    if (isInstallAvailable() && !isStandalone()) {
+      const installButton = createPanelButton('Installer app', async () => {
+        try {
+          await consumePrompt();
+        } catch (e) {
+          console.warn('Kunne ikke vise install prompt:', e);
+        }
+      }, '⬇️');
+      settingsPanel.appendChild(installButton);
+    }
+
+    settingsContainer.appendChild(settingsPanel);
+    document.addEventListener('pointerdown', handleOutside);
+    document.addEventListener('keydown', handleEsc);
+    document.addEventListener('fullscreenchange', () => {
+      if (settingsPanel) {
+        const anyFull = isFullscreen();
+        fullscreenButton.querySelector('span:nth-child(2)').textContent = anyFull ? 'Avslutt fullskjerm' : 'Fullskjerm';
+      }
+    });
+  };
+
+  settingsButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openSettingsPanel();
+  });
 
   function createCategoryButton(label, value) {
     const button = document.createElement('button');
@@ -104,7 +270,7 @@ export function renderProjectGrid(projects, onProjectClick) {
 
   function applyFilters() {
     const query = searchInput.value.trim().toLowerCase();
-    let filtered = visibleProjects.filter(project => {
+    let filtered = getBaseProjects().filter(project => {
       if (!query) return true;
       return (project.name || '').toLowerCase().includes(query);
     });
@@ -113,6 +279,19 @@ export function renderProjectGrid(projects, onProjectClick) {
       filtered = filtered.filter(project => favoriteSet.has(project.path));
     } else if (selectedCategory !== 'Alle') {
       filtered = filtered.filter(project => (project.category || 'Uten kategori') === selectedCategory);
+    }
+
+    if (mode === 'child') {
+      filtered = filtered.filter(project => {
+        return isVisibleForKidsNow(
+          {
+            id: project.id || project.path,
+            approvedByDefault: project.approvedByDefault,
+            releaseAt: project.releaseAt
+          },
+          overrides
+        );
+      });
     }
 
     renderTiles(filtered);
@@ -214,6 +393,33 @@ export function renderProjectGrid(projects, onProjectClick) {
     tile.appendChild(name);
     tile.appendChild(progressIndicator);
 
+    if (mode === 'parent') {
+      const toggleWrapper = document.createElement('label');
+      toggleWrapper.className = 'visibility-toggle';
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.addEventListener('click', (event) => {
+        event.stopPropagation();
+      });
+      const label = document.createElement('span');
+      label.textContent = 'Synlig for barn på denne enheten';
+
+      const key = getOverrideKey({ projectId: project.id || project.path });
+      const currentOverride = key ? overrides[key] : undefined;
+      const defaultVisible = project.approvedByDefault !== false;
+      checkbox.checked = currentOverride === undefined ? defaultVisible : currentOverride === 'visible';
+
+      checkbox.addEventListener('change', () => {
+        const newValue = checkbox.checked ? 'visible' : 'hidden';
+        overrides = setOverride(key, newValue);
+        applyFilters();
+      });
+
+      toggleWrapper.appendChild(checkbox);
+      toggleWrapper.appendChild(label);
+      tile.appendChild(toggleWrapper);
+    }
+
     tile.addEventListener('click', () => {
       onProjectClick(project.path);
     });
@@ -226,35 +432,6 @@ export function renderProjectGrid(projects, onProjectClick) {
     button.setAttribute('aria-pressed', String(isFavorite));
     button.textContent = isFavorite ? '?' : '?';
   }
-
-  function createShareButton() {
-    const shareButton = document.createElement('button');
-    shareButton.type = 'button';
-    shareButton.className = 'project-grid__share';
-    shareButton.setAttribute('aria-label', 'Del SkyLabben');
-    shareButton.innerHTML = '<span class="project-grid__share-icon">🔗</span><span class="project-grid__share-text">Del app</span>';
-    
-    shareButton.addEventListener('click', async () => {
-      // Root URL - fjern hash hvis den finnes
-      const baseUrl = window.location.origin + window.location.pathname;
-      const url = baseUrl.endsWith('/') ? baseUrl : baseUrl + '/';
-      await shareUrl({ 
-        url, 
-        title: 'SkyLabben', 
-        text: 'SkyLabben - LEGO-instruksjonsviser',
-        container: document.body
-      });
-    });
-    
-    return shareButton;
-  }
-
-  // Footer med delingsknapp
-  const footer = document.createElement('div');
-  footer.className = 'project-grid__footer';
-  const shareButton = createShareButton();
-  footer.appendChild(shareButton);
-  container.appendChild(footer);
 
   applyFilters();
   return container;

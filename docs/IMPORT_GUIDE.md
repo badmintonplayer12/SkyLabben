@@ -7,6 +7,13 @@ Denne guiden hjelper deg med å konvertere eksisterende prosjekter med mellomrom
 - `scripts/update-cover-images.js` - Genererer/oppdaterer cover-bilder
 - `scripts/update-version.js` - Bumper versjon for service worker og data-cache (bruk etter innholdsoppdatering for å tvinge klientoppdatering)
 
+## Skjule nye prosjekter for barn (inntil forelder skrur på)
+
+Standard er at prosjekter vises for barn. Hvis et nytt prosjekt skal være skjult i barnemodus til forelder aktiverer det:
+- I `projects.json`: sett `approvedByDefault: false` på prosjektet.
+- I prosjektets `meta.json`: sett `approvedByDefault: false` (og på ev. children som også skal skjules).
+- Forelder kan senere slå prosjektet på via togglen i foreldremodus (lagres lokalt i `legoInstructions.visibilityOverrides`).
+
 Se seksjoner "Automatisk konvertering med Node.js-script" og "Cover-bilder" nedenfor.
 
 ## Hvorfor web-vennlige mapper?

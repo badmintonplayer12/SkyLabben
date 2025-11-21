@@ -240,6 +240,7 @@ export function parseHash(hash) {
 **Rolle**: State management og localStorage-integrasjon
 
 **Viktig**: state.js inneholder ett modul-globalt `let appState`-objekt. `updateState()` muterer dette og returnerer den nye staten. Eventuell re-render styres av main.js.
+- Modus/overrides for barn/forelder håndteres i egen modul (`visibility.js`); state.js holder kun progresjon og runtime-state for viewer.
 
 **Eksporterte funksjoner**:
 
@@ -355,6 +356,8 @@ export function loadProgress() {
  * @property {string} coverImage
  * @property {string[]} steps
  * @property {Array<{id: string, name: string, path: string}>} children
+ * @property {boolean} [approvedByDefault] - default true hvis mangler
+ * @property {string} [releaseAt] - ISO UTC, ignorert nå
  */
 
 /**

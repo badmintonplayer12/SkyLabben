@@ -372,15 +372,60 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for Sk
 - [ ] **4.7.6** Toggles i viewer (parent-mode)
   - **Mål**: I `view-viewer.js`, vis toggle for hovedprosjekt + toggles for children i parent-mode; bruk et konsekvent nøkkelformat (f.eks. `project:${projectId}` og `project:${projectId}:child:${childId}`) delt som helper i visibility.js. I child-mode: filtrer children med `isVisibleForKidsNow`.
   - **🌐 TEST I NETTLESER**: Parent: toggle child av/på, reload, se at det persisterer; Child: barn ser kun tillatte children.
-- [ ] **4.7.7** Indikator for foreldremodus (valgfritt)
+ - [x] **4.7.7** Indikator for foreldremodus (valgfritt)
   - **Mål**: Lite merke “Foreldremodus aktiv” når mode=`parent`.
   - **🌐 TEST I NETTLESER**: Slå av/på og se at merket følger modus.
-- [ ] **4.7.8** Dokumentasjon og datafelt
+- [x] **4.7.8** Dokumentasjon og datafelt
   - **Mål**: Oppdater DATA_FORMAT/README med `approvedByDefault` (default true) og `releaseAt` (kan være tilstede, men ignoreres nå; format = ISO UTC). Beskriv overrides-nøkkelvalg.
   - **📄**: Oppdater ROADMAP/IMPLEMENTATION med ny modul og bruk av `isVisibleForKidsNow`.
 - [ ] **4.7.9** PWA/gjenopptak-test
   - **Mål**: Verifiser at modusskifter/overrides fungerer i installert PWA, også ved resume fra bakgrunn (focus/visibilitychange). Modus/overrides skal fungere offline (kun localStorage).
   - **🌐 TEST I NETTLESER**: Installer PWA, sett override i parent-mode, minimer og åpne igjen; barnemodus skal respektere override uten nett.
+
+### 4.8 Settings-meny på forsiden (galleri)
+- [ ] **4.8.1** Legg til settings-knapp ved søkefeltet
+  - **Mål**: Plasser en liten settings-knapp på høyre side av `project-grid__controls` (ved siden av søk/kategorier). Knappen åpner et lite panel/dropdown; lukk ved klikk utenfor/ESC. Gjenbruk samme meny-mønster (aria/ESC/klikk-utenfor) som viewer-settings.
+  - **🌐 TEST I NETTLESER**: Åpne/ lukk panelet; verifiser at det ikke forstyrrer søk/filtre.
+- [ ] **4.8.2** Foreldremodus-knapp i panelet
+  - **Mål**: Bruk `getMode/setMode/getRandomAdultChallenge` fra `visibility.js`; i child → voksen-quiz før parent; i parent → “Til barnemodus”. Etter endring: re-kjør `applyFilters()` i galleriet slik at synlighet oppdateres. Ingen duplikatlogikk utover det som allerede ligger i `visibility.js`. Bruk samme quiz/feilmelding som i viewer-settings for lik UX.
+  - **🌐 TEST I NETTLESER**: Bytt begge veier, bekreft filtrering (approvedByDefault/overrides) endres uten reload.
+- [ ] **4.8.3** Del app
+  - **Mål**: Flytt eksisterende “Del app” fra `project-grid__footer` inn i panelet (bruk `shareUrl` med root-URL uten hash). Skal fungere i både nettleser og PWA. Fjern footer-knappen.
+  - **🌐 TEST I NETTLESER**: Klikk del, verifiser Web Share eller clipboard fallback.
+- [ ] **4.8.4** Fullskjerm
+  - **Mål**: Fullskjerm-toggle i panelet; oppdater label/ikon på `fullscreenchange` (også når brukeren avslutter via system/ESC).
+  - **🌐 TEST I NETTLESER**: Gå inn/ut av fullskjerm fra forsiden.
+- [ ] **4.8.5** Installer app (valgfri i panelet)
+  - **Mål**: Hvis `isInstallPromptAvailable` er true og ikke standalone, vis “Installer app”; bruk `consumePrompt()` og skjul ellers. Ikke implementer ny logikk, gjenbruk pwa-install, med samme tekst/ikon som i viewer-settings.
+  - **🌐 TEST I NETTLESER**: Når prompt finnes, trykk og se at installprosessen starter; skjul ellers.
+- [ ] **4.8.6** Stil og overlapp
+  - **Mål**: Panel forankres til høyre i controls, høy z-index over grid; gjenbruk eksisterende knappestil (gear-ikon) eller egen `project-grid__settings`. Minimal CSS, ikke refaktorere viewer-stiler; vurder å gjenbruke samme meny-helper som viewer for konsistent UX.
+  - **🌐 TEST I NETTLESER**: Panelet vises riktig, ikke hindrer søk/kategorier, lukker på klikk utenfor.
+
+### 4.9 Konsistent header for galleri/viewer
+- [ ] **4.9.1** Felles header-base
+  - **Mål**: Introduser en liten felles header-baseklasse (f.eks. `.app-header`) med padding, border-bottom og bakgrunn. Bruk den i galleri-header og viewer-header for ensartet toppfelt uten å flytte logikk.
+  - **🌐 TEST I NETTLESER**: Visuell sjekk: galleri-header (søk/filtre/settings) og viewer-header har likt toppfelt med horisontal linje under.
+- [ ] **4.9.2** Grid-header wrapper
+  - **Mål**: Pakk `project-grid`-kontrollene inn i en header-wrapper (f.eks. `.project-grid__header`) som bruker `.app-header`. Innhold: søk + settings på øverste rad, filterknapper på raden under.
+  - **🌐 TEST I NETTLESER**: Søk øverst med settings på linjen; filterknapper under; header har bunnlinje.
+- [ ] **4.9.3** Viewer-header bruk av base
+  - **Mål**: La `viewer__header` også bruke `.app-header` for grunnstil (padding/border), med eksisterende viewer-spesifikke stiler beholdt.
+  - **🌐 TEST I NETTLESER**: Viewer-header ser lik ut mht. toppfelt/bunnlinje; funksjonalitet uendret.
+- [ ] **4.9.4** Minimal CSS, ingen ny logikk
+  - **Mål**: Begrens endringen til CSS + enkel markup-wrap i grid; ingen flytting av JS-logikk eller nye mønstre. Hold kodeendringer små i store filer (AI_GUIDE).
+  - **🌐 TEST I NETTLESER**: Bekreft at panelene (settings) fortsatt fungerer (åpne/lukke/ESC) og at layout ikke bryter på små skjermer.
+
+#### 🌐 Detaljert test for PWA/offline og gjenopptak
+1) Installer PWA (Add to Home/Install).
+2) Åpne appen (online). Bytt til foreldremodus (voksen-quiz), sett en override i galleri (skru av et prosjekt).
+3) Lukk appen helt. Sett enheten offline. Åpne PWA igjen:
+   - Forvent: modus fortsatt parent, override fortsatt lagret (prosjekt skjult for barnemodus).
+4) Bytt til barnemodus mens offline:
+   - Forvent: galleriet filtrerer bort skjult prosjekt. Toggles og voksen-knapper skjules.
+5) Sett enheten online igjen, minimer PWA, åpne igjen:
+   - Forvent: modus/overrides uendret. Ingen nettkrav for synlighet.
+6) Hvis du bumpet versjon før testen: se at oppdateringsdialog kan dukke opp ved gjenopptak (focus/visibilitychange) når ny SW er waiting.
 
 ## Milepæler
 

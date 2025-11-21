@@ -10,6 +10,7 @@ import { playNavigationSound, isAudioEnabled, setAudioEnabled } from './audio-fe
 import { generateQRCodeForStep } from './qr-code.js';
 import { shareUrl } from './share.js';
 import { consumePrompt, isStandalone } from './pwa-install.js';
+import { getMode, setMode, getOverrides, setOverride, isVisibleForKidsNow, getOverrideKey, getRandomAdultChallenge } from './visibility.js';
 
 /**
  * Oppretter en innstillingsmeny for viewer
@@ -157,11 +158,51 @@ function createSettingsMenu() {
 export function renderViewer(state, callbacks) {
   const container = document.createElement('div');
   container.className = 'viewer';
+  const currentMode = getMode();
+  let overrides = getOverrides();
+  const isParentMode = currentMode === 'parent';
+  const parentOverrideKey = getOverrideKey({ projectId: state.currentProjectMeta?.id || state.currentPath });
+  const defaultParentVisible = state.currentProjectMeta?.approvedByDefault !== false;
+
+  const resolveChecked = (key, defaultVisible) => {
+    const overrideValue = key ? overrides[key] : undefined;
+    return overrideValue === undefined ? defaultVisible : overrideValue === 'visible';
+  };
+
+  const createVisibilityToggleElement = (labelText, key, defaultVisible) => {
+    const wrapper = document.createElement('label');
+    wrapper.className = 'visibility-toggle';
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = resolveChecked(key, defaultVisible);
+    checkbox.addEventListener('change', () => {
+      const newValue = checkbox.checked ? 'visible' : 'hidden';
+      overrides = setOverride(key, newValue);
+    });
+    const label = document.createElement('span');
+    label.textContent = labelText;
+    wrapper.appendChild(checkbox);
+    wrapper.appendChild(label);
+    return wrapper;
+  };
   
   // Header
   const header = document.createElement('div');
-  header.className = 'viewer__header';
+  header.className = 'viewer__header app-header';
   header.textContent = state.currentProjectMeta?.name || '';
+  if (isParentMode) {
+    const modeBadge = document.createElement('span');
+    modeBadge.className = 'mode-indicator';
+    modeBadge.textContent = 'Foreldremodus aktiv';
+    header.appendChild(modeBadge);
+
+    const projectToggle = createVisibilityToggleElement(
+      'Synlig for barn på denne enheten',
+      parentOverrideKey,
+      defaultParentVisible
+    );
+    header.appendChild(projectToggle);
+  }
   
   // Image container
   const imageContainer = document.createElement('div');
@@ -169,8 +210,21 @@ export function renderViewer(state, callbacks) {
   
   // Håndter tom steps-array
   const steps = state.currentProjectMeta?.steps || [];
-  const visibleChildren = (state.currentProjectMeta?.children || [])
-    .filter(c => !c.hidden)
+  const children = state.currentProjectMeta?.children || [];
+  const visibleChildren = children
+    .filter(c => isParentMode ? true : !c.hidden)
+    .filter((child) => {
+      if (isParentMode) return true;
+      return isVisibleForKidsNow(
+        {
+          id: state.currentProjectMeta?.id || state.currentPath,
+          childId: child.id,
+          approvedByDefault: child.approvedByDefault,
+          releaseAt: child.releaseAt
+        },
+        overrides
+      );
+    })
     .sort((a, b) => compareByLeadingNumber(a.name || a.id, b.name || b.id));
   const toggleFullscreen = () => {
     if (document.fullscreenElement) {
@@ -235,6 +289,28 @@ export function renderViewer(state, callbacks) {
   const bottomBar = document.createElement('div');
   bottomBar.className = 'viewer__bottom';
   const settingsMenu = createSettingsMenu();
+
+  const handleModeToggle = () => {
+    if (isParentMode) {
+      setMode('child');
+      window.location.reload();
+      return;
+    }
+    const challenge = getRandomAdultChallenge();
+    const response = window.prompt(challenge.question);
+    if (response !== null && parseInt(response, 10) === challenge.answer) {
+      setMode('parent');
+      window.location.reload();
+    } else {
+      alert('Feil svar. Foreldremodus ikke aktivert.');
+    }
+  };
+
+  settingsMenu.addItem({
+    getIcon: () => (isParentMode ? '👶' : '🔒'),
+    getLabel: () => (isParentMode ? 'Til barnemodus' : 'Foreldremodus'),
+    onClick: handleModeToggle
+  });
   
   // Opp-knapp (ikon: hus for hjem/opp)
   const upButton = document.createElement('button');
@@ -361,6 +437,19 @@ export function renderViewer(state, callbacks) {
         tile.appendChild(img);
         tile.appendChild(name);
         tile.appendChild(progressIndicator);
+
+        if (isParentMode) {
+          const childKey = getOverrideKey({
+            projectId: state.currentProjectMeta?.id || state.currentPath,
+            childId: child.id || child.path
+          });
+          const childDefaultVisible = child.approvedByDefault !== false;
+          const toggle = createVisibilityToggleElement('Synlig for barn på denne enheten', childKey, childDefaultVisible);
+          toggle.addEventListener('click', (event) => {
+            event.stopPropagation();
+          });
+          tile.appendChild(toggle);
+        }
         
         tile.addEventListener('click', () => {
           if (callbacks.onProjectClick) {

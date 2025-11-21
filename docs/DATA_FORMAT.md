@@ -149,6 +149,18 @@ Prosjektet bruker to hovedtyper JSON-filer:
   - Skjulte underprosjekter er fortsatt tilgjengelige via direkte URL
   - Brukes for Ã¥ skjule uferdige eller private underprosjekter
 
+#### `approvedByDefault` (valgfritt, default `true`)
+- **Type**: Boolean
+- **Beskrivelse**: Standard synlighet i barnemodus ved publikasjon.
+- **Regler**:
+  - `true` eller utelatt: vises for barn (med mindre override lokalt skjuler det).
+  - `false`: skjules for barn som standard (vises i foreldremodus, kan åpnes via direkte URL).
+  - Overrider kan settes per enhet via `visibilityOverrides` (localStorage).
+
+#### `releaseAt` (valgfritt, ikke i bruk ennå)
+- **Type**: String (ISO 8601 UTC), f.eks. `"2025-12-24T18:00:00Z"`
+- **Beskrivelse**: Fremtidig tidsstyring. Feltet kan finnes i data, men koden ignorerer det foreløpig (forberedt for senere).
+
 ### Eksempler
 
 #### Prosjekt uten underprosjekter
