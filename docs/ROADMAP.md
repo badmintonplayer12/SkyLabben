@@ -350,6 +350,38 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for Sk
 5. Verifiser at appen fungerer (navigasjon, bilder, progress) og at banneret ikke dukker opp igjen.
 6. Inkognito-test: åpne siden i et nytt inkognito-vindu. Ingen banner skal vises, og både cache-navn og Local Storage skal ha `2024-09-02+test` umiddelbart.
 
+### 4.7 Foreldremodus og synlighet (barn/forelder)
+- [ ] **4.7.1** Ny modul for modus/overstyringer/synlighet
+  - **Mål**: Lag `assets/js/visibility.js` (eller tilsvarende liten fil) med:
+    - `getMode()/setMode()` som leser/lagrer `legoInstructions.mode` (default `child`).
+    - `getOverrides()/setOverride()` for `legoInstructions.visibilityOverrides`, returnerer alltid et objekt ({} hvis tomt).
+    - `isVisibleForKidsNow(project, overrides, now = new Date())` (pure, ingen DOM/sideeffekter) med prioritet: override → `approvedByDefault` (default true) → ignorér `releaseAt` nå, men parse hvis tilstede (for senere bruk).
+  - **🌐 TEST I NETTLESER**: Konsoll/JS-test: isVisibleForKidsNow håndterer manglende `approvedByDefault` som true, og override vinner.
+- [ ] **4.7.2** Matteoppgave-barriere for foreldremodus
+  - **Mål**: Implementer enkel voksen-sjekk (tilfeldig 1 av flere regnestykker hentet fra liten array) når modus byttes `child` → `parent`. Ved riktig svar: setMode('parent') og rerender; feil: vis feilmelding og bli i `child`.
+  - **🌐 TEST I NETTLESER**: Prøv riktig/feil svar; verifiser at mode lagres i localStorage.
+- [ ] **4.7.3** Settings-knapp for modus
+  - **Mål**: I settings-menyen (viewer) legg til knapp “Foreldremodus” (viser matteoppgave) og “Til barnemodus” når aktiv. Ingen egen side. Knappen bruker `getMode()/setMode()` fra visibility-modulen.
+  - **🌐 TEST I NETTLESER**: Bytt begge veier, bekreft at UI endrer seg (toggles vises/forsvinner).
+- [ ] **4.7.4** Filtrering i barnemodus
+  - **Mål**: I prosjektgalleriet filtrer prosjekter med `isVisibleForKidsNow` når mode=`child` (ingen duplikatlogikk). Default `approvedByDefault` true hvis felt mangler.
+  - **🌐 TEST I NETTLESER**: Prosjekt med `approvedByDefault: false` skal skjules i child, vises i parent.
+- [ ] **4.7.5** Toggles i galleri (parent-mode)
+  - **Mål**: I `view-project-grid.js`, vis per-prosjekt toggle “Synlig for barn på denne enheten” når mode=`parent`; lagre til overrides (per id), samme nøkkel som i viewer. Ingen toggles i child-mode; skjul toggle hvis prosjekt mangler id.
+  - **🌐 TEST I NETTLESER**: Slå av/på prosjekt, reload siden, bekreft at override huskes og at barnet ser/ikke ser prosjektet.
+- [ ] **4.7.6** Toggles i viewer (parent-mode)
+  - **Mål**: I `view-viewer.js`, vis toggle for hovedprosjekt + toggles for children i parent-mode; bruk et konsekvent nøkkelformat (f.eks. `project:${projectId}` og `project:${projectId}:child:${childId}`) delt som helper i visibility.js. I child-mode: filtrer children med `isVisibleForKidsNow`.
+  - **🌐 TEST I NETTLESER**: Parent: toggle child av/på, reload, se at det persisterer; Child: barn ser kun tillatte children.
+- [ ] **4.7.7** Indikator for foreldremodus (valgfritt)
+  - **Mål**: Lite merke “Foreldremodus aktiv” når mode=`parent`.
+  - **🌐 TEST I NETTLESER**: Slå av/på og se at merket følger modus.
+- [ ] **4.7.8** Dokumentasjon og datafelt
+  - **Mål**: Oppdater DATA_FORMAT/README med `approvedByDefault` (default true) og `releaseAt` (kan være tilstede, men ignoreres nå; format = ISO UTC). Beskriv overrides-nøkkelvalg.
+  - **📄**: Oppdater ROADMAP/IMPLEMENTATION med ny modul og bruk av `isVisibleForKidsNow`.
+- [ ] **4.7.9** PWA/gjenopptak-test
+  - **Mål**: Verifiser at modusskifter/overrides fungerer i installert PWA, også ved resume fra bakgrunn (focus/visibilitychange). Modus/overrides skal fungere offline (kun localStorage).
+  - **🌐 TEST I NETTLESER**: Installer PWA, sett override i parent-mode, minimer og åpne igjen; barnemodus skal respektere override uten nett.
+
 ## Milepæler
 
 ### M1: MVP (Minimum Viable Product)

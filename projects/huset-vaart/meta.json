@@ -59,6 +59,11 @@
       "id": "11-gang",
       "name": "11-Gang",
       "path": "11-gang"
+    },
+    {
+      "id": "12-tegnerom",
+      "name": "12-Tegnerom",
+      "path": "12-tegnerom"
     }
   ],
   "category": "Hjemmeprosjekt"
