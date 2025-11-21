@@ -8,7 +8,8 @@ import { init as initRouter, parseHash, updateHash, getParentPath } from './rout
 import { loadProjects, loadProjectMeta } from './data-loader.js';
 import { getState, updateState, getLastStepFor, setStepFor, setInstallPromptAvailable } from './state.js';
 import { renderProjectGrid } from './view-project-grid.js';
-import { renderViewer, showCelebration } from './view-viewer.js';
+import { renderViewer } from './view-viewer.js';
+import { showCelebration } from './celebration/index.js';
 import { hasSeenOnboarding, showOnboarding, showOverlayMessage } from './onboarding.js';
 import { initInstallPromptListener } from './pwa-install.js';
 
@@ -121,27 +122,34 @@ async function handleRoute(route) {
         },
         onNextStep: () => {
           const state = getState();
-          const maxIndex = (state.currentProjectMeta?.steps.length || 1) - 1;
+          const steps = state.currentProjectMeta?.steps || [];
+          const maxIndex = steps.length > 0 ? steps.length - 1 : 0;
           const newIndex = Math.min(maxIndex, state.currentStepIndex + 1);
           updateState({ currentStepIndex: newIndex });
           setStepFor(state.currentPath, newIndex);
           updateHash({ type: 'project', path: state.currentPath, stepIndex: newIndex });
 
-          if (newIndex === maxIndex && maxIndex > 0) {
+          if (newIndex === maxIndex && maxIndex >= 0 && steps.length >= 1) {
             setTimeout(() => {
               showCelebration(viewer);
             }, 300);
           }
         },
         onStepChange: (stepIndex) => {
+          const stateBefore = getState();
           updateState({ currentStepIndex: stepIndex });
-          const { currentPath } = getState();
+          const { currentPath, currentProjectMeta } = getState();
           setStepFor(currentPath, stepIndex);
           updateHash({ type: 'project', path: currentPath, stepIndex });
 
-          const state = getState();
-          const maxIndex = (state.currentProjectMeta?.steps.length || 1) - 1;
-          if (stepIndex === maxIndex && maxIndex > 0) {
+          // Bruk currentProjectMeta fra state (kan være undefined hvis ikke satt ennå)
+          // Fallback til stateBefore hvis nødvendig
+          const meta = currentProjectMeta || stateBefore.currentProjectMeta;
+          const steps = meta?.steps || [];
+          const maxIndex = steps.length > 0 ? steps.length - 1 : 0;
+          
+          // Trigger konfetti når vi når siste steg (stepIndex er 0-indeksert)
+          if (stepIndex === maxIndex && maxIndex >= 0 && steps.length >= 1) {
             setTimeout(() => {
               showCelebration(viewer);
             }, 300);

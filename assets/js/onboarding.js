@@ -4,6 +4,8 @@
  * Viser en kort visuell onboarding første gang appen åpnes.
  */
 
+import { openDialog } from './dialog.js';
+
 const STORAGE_KEY = 'legoInstructions.onboardingShown';
 
 /**
@@ -147,21 +149,45 @@ export function showOverlayMessage(container, {
  * @param {function(): void} onDismiss - Callback når onboarding avsluttes
  */
 export function showOnboarding(container, onDismiss) {
-  showOverlayMessage(container, {
-    icon: '🧱',
-    lines: [
-      'Trykk på pilene for å bla',
-      'Trykk på huset for å gå tilbake'
-    ],
-    primaryLabel: 'Start!',
-    onPrimary: () => markOnboardingAsSeen(),
-    allowBackdropDismiss: true,
-    onDismiss: () => {
-      markOnboardingAsSeen();
-      if (typeof onDismiss === 'function') {
-        onDismiss();
-      }
+  let completed = false;
+  const finish = () => {
+    if (completed) return;
+    completed = true;
+    markOnboardingAsSeen();
+    if (typeof onDismiss === 'function') {
+      onDismiss();
     }
+  };
+
+  const content = document.createElement('div');
+  content.className = 'onboarding-dialog';
+  const icon = document.createElement('div');
+  icon.className = 'onboarding-dialog__icon';
+  icon.textContent = '🧱';
+  const list = document.createElement('ul');
+  list.className = 'onboarding-dialog__list';
+  ['Trykk på pilene for å bla', 'Trykk på huset for å gå tilbake'].forEach((line) => {
+    const li = document.createElement('li');
+    li.textContent = line;
+    list.appendChild(li);
+  });
+  content.appendChild(icon);
+  content.appendChild(list);
+
+  openDialog({
+    title: 'Velkommen!',
+    content,
+    size: 'sm',
+    onClose: finish,
+    actions: [
+      {
+        label: 'Start!',
+        variant: 'primary',
+        onClick: () => {
+          finish();
+        }
+      }
+    ]
   });
 }
 

@@ -7,10 +7,12 @@
 import { getImageUrl, getAudioUrl, loadProjectMeta } from './data-loader.js';
 import { getLastStepFor, resetProgressFor, isInstallPromptAvailable } from './state.js';
 import { playNavigationSound, isAudioEnabled, setAudioEnabled } from './audio-feedback.js';
-import { generateQRCodeForStep } from './qr-code.js';
+import { generateQRCodeForStep, generateQRCodeForProject } from './qr-code.js';
 import { shareUrl } from './share.js';
 import { consumePrompt, isStandalone } from './pwa-install.js';
-import { getMode, setMode, getOverrides, setOverride, isVisibleForKidsNow, getOverrideKey, getRandomAdultChallenge } from './visibility.js';
+import { getMode, setMode, getOverrides, setOverride, isVisibleForKidsNow, getOverrideKey } from './visibility.js';
+import { showParentQuizDialog } from './parent-quiz.js';
+import { openDialog } from './dialog.js';
 
 /**
  * Oppretter en innstillingsmeny for viewer
@@ -243,41 +245,26 @@ export function renderViewer(state, callbacks) {
     }
   };
   const openQrModal = async () => {
-    const modal = document.createElement('div');
-    modal.className = 'qr-modal';
-    
-    const modalContent = document.createElement('div');
-    modalContent.className = 'qr-modal__content';
-    
-    const modalHeader = document.createElement('div');
-    modalHeader.className = 'qr-modal__header';
-    modalHeader.textContent = 'QR-kode';
-    
     const qrContainer = document.createElement('div');
     qrContainer.className = 'qr-modal__container';
     
-    const closeButton = document.createElement('button');
-    closeButton.className = 'qr-modal__close';
-    closeButton.innerHTML = '<span class="viewer__icon" aria-hidden="true">✕</span>';
-    closeButton.setAttribute('aria-label', 'Lukk');
-    closeButton.title = 'Lukk';
-    closeButton.addEventListener('click', () => {
-      modal.remove();
-    });
-    
     const baseUrl = window.location.origin;
-    await generateQRCodeForStep(baseUrl, state.currentPath, state.currentStepIndex, qrContainer);
     
-    modalContent.appendChild(modalHeader);
-    modalContent.appendChild(qrContainer);
-    modalContent.appendChild(closeButton);
-    modal.appendChild(modalContent);
-    container.appendChild(modal);
-    
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.remove();
-      }
+    // Hvis prosjektet har steg, generer QR-kode for nåværende steg
+    // Hvis ikke, generer QR-kode for prosjektet (første steg/oversikt)
+    if (steps.length > 0) {
+      await generateQRCodeForStep(baseUrl, state.currentPath, state.currentStepIndex, qrContainer);
+    } else {
+      await generateQRCodeForProject(baseUrl, state.currentPath, qrContainer);
+    }
+
+    openDialog({
+      title: 'QR-kode',
+      content: qrContainer,
+      size: 'sm',
+      actions: [
+        { label: 'Lukk', variant: 'secondary' }
+      ]
     });
   };
   
@@ -299,14 +286,11 @@ export function renderViewer(state, callbacks) {
       window.location.reload();
       return;
     }
-    const challenge = getRandomAdultChallenge();
-    const response = window.prompt(challenge.question);
-    if (response !== null && parseInt(response, 10) === challenge.answer) {
-      setMode('parent');
-      window.location.reload();
-    } else {
-      alert('Feil svar. Foreldremodus ikke aktivert.');
-    }
+    showParentQuizDialog({
+      onSuccess: () => {
+        window.location.reload();
+      }
+    });
   };
 
   settingsMenu.addItem({
@@ -614,15 +598,14 @@ export function renderViewer(state, callbacks) {
     }
   }
   
-  if (steps.length > 0) {
-    settingsMenu.addItem({
-      icon: '📱',
-      label: 'Vis QR-kode',
-      onClick: () => {
-        openQrModal();
-      }
-    });
-  }
+  // Legg til QR-kode-knapp for både prosjekter med steg og hovedprosjekter
+  settingsMenu.addItem({
+    icon: '📱',
+    label: 'Vis QR-kode',
+    onClick: () => {
+      openQrModal();
+    }
+  });
   
   if (steps.length > 0) {
     settingsMenu.addItem({
@@ -830,34 +813,6 @@ export function renderViewer(state, callbacks) {
  * Viser belønning ved fullført prosjekt
  * @param {HTMLElement} container - Container-elementet å legge belønningen i
  */
-export function showCelebration(container) {
-  // Fjern eksisterende belønning hvis den finnes
-  const existing = container.querySelector('.viewer__celebration');
-  if (existing) {
-    existing.remove();
-  }
-  
-  const celebration = document.createElement('div');
-  celebration.className = 'viewer__celebration';
-  
-  // Lag konfetti-partikler
-  const emojis = ['🎉', '⭐', '🎊', '✨', '🏆'];
-  for (let i = 0; i < 20; i++) {
-    const particle = document.createElement('div');
-    particle.className = 'viewer__celebration-particle';
-    particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    particle.style.left = `${Math.random() * 100}%`;
-    particle.style.animationDelay = `${Math.random() * 0.5}s`;
-    celebration.appendChild(particle);
-  }
-  
-  container.appendChild(celebration);
-  
-  // Fjern belønning etter animasjon
-  setTimeout(() => {
-    celebration.remove();
-  }, 2500);
-}
 
 function compareByLeadingNumber(a, b) {
   const extract = (value) => {

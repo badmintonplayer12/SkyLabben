@@ -2,7 +2,7 @@
  * QR-kode-generering
  * 
  * Genererer QR-koder for å dele spesifikke steg eller prosjekter.
- * Bruker qrcode.js fra CDN for å unngå dependencies.
+ * Bruker lokal qrcode.min.js for å unngå nettverksavhengighet.
  */
 
 let qrcodeLibraryLoaded = false;
@@ -22,9 +22,9 @@ async function loadQRCodeLibrary() {
       return;
     }
     
-    // Last qrcode.js fra CDN
+    // Last lokal qrcode.js
     const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js';
+    script.src = '/assets/js/qrcode.min.js';
     script.onload = () => {
       qrcodeLibraryLoaded = true;
       resolve();

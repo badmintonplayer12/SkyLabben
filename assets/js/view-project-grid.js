@@ -8,8 +8,9 @@ import { getImageUrl, loadProjectMeta } from './data-loader.js';
 import { getLastStepFor } from './state.js';
 import { getFavoriteProjects, toggleFavoriteProject } from './favorites.js';
 import { shareUrl } from './share.js';
-import { getMode, getOverrides, setOverride, isVisibleForKidsNow, getOverrideKey, setMode, getRandomAdultChallenge } from './visibility.js';
+import { getMode, getOverrides, setOverride, isVisibleForKidsNow, getOverrideKey, setMode } from './visibility.js';
 import { isInstallAvailable, consumePrompt, isStandalone } from './pwa-install.js';
+import { showParentQuizDialog } from './parent-quiz.js';
 
 const FILTER_STORAGE_KEY = 'legoInstructions.gridFilters';
 
@@ -175,16 +176,13 @@ export function renderProjectGrid(projects, onProjectClick) {
       closeSettingsPanel();
       return;
     }
-    const challenge = getRandomAdultChallenge();
-    const response = window.prompt(challenge.question);
-    if (response !== null && parseInt(response, 10) === challenge.answer) {
-      setMode('parent');
-      mode = getMode();
-      applyFilters();
-      closeSettingsPanel();
-    } else {
-      alert('Feil svar. Foreldremodus ikke aktivert.');
-    }
+    showParentQuizDialog({
+      onSuccess: () => {
+        mode = getMode();
+        applyFilters();
+        closeSettingsPanel();
+      }
+    });
   };
 
   const createPanelButton = (label, onClick, icon) => {
