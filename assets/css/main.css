@@ -51,7 +51,7 @@ html, body {
   font-size: var(--font-size-base);
   line-height: var(--line-height-base);
   color: var(--color-text);
-  background: var(--color-background);
+  background: #f4f9ff;
 }
 
 img {
@@ -89,8 +89,8 @@ button {
 
 .app-header {
   padding: 12px var(--spacing-md);
-  background: var(--color-background);
-  border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(180deg, #e8f4ff 0%, #ffffff 90%);
+  border-bottom: 1px solid #d0d7e2;
   min-height: 72px;
   max-height: 76px;
   display: flex;
@@ -112,10 +112,11 @@ button {
 .project-grid__search {
   width: 100%;
   height: 51px;
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: 6px 10px;
   font-size: var(--font-size-base);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius);
+  border: 1px solid #d0d7e2;
+  border-radius: 8px;
+  background: #ffffff;
 }
 
 .project-grid__category-select {
@@ -123,23 +124,35 @@ button {
   min-width: 160px;
   padding: 0 var(--spacing-sm);
   font-size: var(--font-size-base);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius);
-  background: var(--color-background);
+  border: 1px solid #d0d7e2;
+  border-radius: 8px;
+  background: #ffffff;
 }
 
 .project-grid__favorite-toggle {
   height: 51px;
   width: 51px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius);
-  background: var(--color-background);
+  border: 1px solid #d0d7e2;
+  border-radius: 8px;
+  background: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 20px;
   line-height: 1;
-  color: var(--color-secondary);
+  color: #999;
+  transition: color 0.15s ease;
+}
+
+.project-grid__favorite-toggle[aria-pressed="true"] {
+  color: #f5c000;
+}
+
+.project-grid__category-select:focus,
+.project-grid__search:focus {
+  border-color: #0099ff;
+  box-shadow: 0 0 0 2px rgba(0, 153, 255, 0.25);
+  outline: none;
 }
 
 .project-grid__header {
@@ -222,12 +235,12 @@ button {
 }
 
 .project-tile {
-  border-radius: var(--border-radius);
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  border: 1px solid var(--color-border);
-  background: var(--color-background);
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
@@ -237,8 +250,8 @@ button {
 }
 
 .project-tile:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .project-tile__image {

@@ -1,5 +1,5 @@
 // CACHE_VERSION oppdateres av scripts/update-version.js
-const CACHE_VERSION = '2025-11-21+181504-db09534';
+const CACHE_VERSION = '2025-11-22+005434-4647817';
 
 const PRECACHE_PATHS = [
   './',
