@@ -1,5 +1,5 @@
 // CACHE_VERSION oppdateres av scripts/update-version.js
-const CACHE_VERSION = '2025-11-21+075405-eebbe41';
+const CACHE_VERSION = '2025-11-21+135637-9f71516';
 
 const PRECACHE_PATHS = [
   './',
@@ -17,6 +17,7 @@ const PRECACHE_PATHS = [
   './assets/js/onboarding.js',
   './assets/js/favorites.js',
   './assets/js/pwa-install.js',
+  './assets/js/visibility.js',
   './assets/js/version.js',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png'
