@@ -23,7 +23,7 @@ function createSettingsMenu() {
   const toggleButton = document.createElement('button');
   toggleButton.type = 'button';
   toggleButton.className = 'viewer__button viewer__button--settings';
-  toggleButton.innerHTML = '<span class="viewer__icon" aria-hidden="true">⚙️</span>';
+  toggleButton.innerHTML = '<span aria-hidden="true">⚙️</span>';
   toggleButton.setAttribute('aria-label', 'Vis flere innstillinger');
   toggleButton.title = 'Flere innstillinger';
   toggleButton.disabled = true;
@@ -161,6 +161,7 @@ export function renderViewer(state, callbacks) {
   const currentMode = getMode();
   let overrides = getOverrides();
   const isParentMode = currentMode === 'parent';
+  const settingsMenu = createSettingsMenu();
   const parentOverrideKey = getOverrideKey({ projectId: state.currentProjectMeta?.id || state.currentPath });
   const defaultParentVisible = state.currentProjectMeta?.approvedByDefault !== false;
 
@@ -190,6 +191,8 @@ export function renderViewer(state, callbacks) {
   const header = document.createElement('div');
   header.className = 'viewer__header app-header';
   header.textContent = state.currentProjectMeta?.name || '';
+  const headerActions = document.createElement('div');
+  headerActions.className = 'viewer__header-actions';
   if (isParentMode) {
     const modeBadge = document.createElement('span');
     modeBadge.className = 'mode-indicator';
@@ -203,6 +206,7 @@ export function renderViewer(state, callbacks) {
     );
     header.appendChild(projectToggle);
   }
+  header.appendChild(headerActions);
   
   // Image container
   const imageContainer = document.createElement('div');
@@ -288,7 +292,6 @@ export function renderViewer(state, callbacks) {
   // Bottom bar: Har fast høyde slik at hovedbildet alltid kan bruke resten av høyden
   const bottomBar = document.createElement('div');
   bottomBar.className = 'viewer__bottom';
-  const settingsMenu = createSettingsMenu();
 
   const handleModeToggle = () => {
     if (isParentMode) {
@@ -732,7 +735,7 @@ export function renderViewer(state, callbacks) {
   bottomBar.appendChild(nextButton);
   bottomBar.appendChild(stepIndicator);
   if (settingsMenu.hasItems()) {
-    bottomBar.appendChild(settingsMenu.wrapper);
+    headerActions.appendChild(settingsMenu.wrapper);
   } else {
     settingsMenu.cleanup();
   }

@@ -21,6 +21,11 @@ export function init() {
     handleRoute(route);
   });
 
+  const root = document.getElementById('app');
+  if (root) {
+    root.classList.add('app-container');
+  }
+
   registerServiceWorker();
   initPWAInstall();
   initOfflineIndicator();

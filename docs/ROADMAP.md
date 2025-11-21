@@ -407,14 +407,28 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for Sk
   - **Mål**: Introduser en liten felles header-baseklasse (f.eks. `.app-header`) med padding, border-bottom og bakgrunn. Bruk den i galleri-header og viewer-header for ensartet toppfelt uten å flytte logikk.
   - **🌐 TEST I NETTLESER**: Visuell sjekk: galleri-header (søk/filtre/settings) og viewer-header har likt toppfelt med horisontal linje under.
 - [ ] **4.9.2** Grid-header wrapper
-  - **Mål**: Pakk `project-grid`-kontrollene inn i en header-wrapper (f.eks. `.project-grid__header`) som bruker `.app-header`. Innhold: søk + settings på øverste rad, filterknapper på raden under.
-  - **🌐 TEST I NETTLESER**: Søk øverst med settings på linjen; filterknapper under; header har bunnlinje.
+  - **Mål**: Pakk `project-grid`-kontrollene inn i en header-wrapper (f.eks. `.project-grid__header`) som bruker `.app-header`. Innhold i én rad: søk (flex:1) + kategori-dropdown + favoritt-stjerne (40x40) + settings (40x40). Ingen ekstra filter-rad under.
+  - **🌐 TEST I NETTLESER**: Header beholder stabil høyde; søk øverst med select/stjerne/settings på linjen; ingen wrap på desktop.
 - [ ] **4.9.3** Viewer-header bruk av base
   - **Mål**: La `viewer__header` også bruke `.app-header` for grunnstil (padding/border), med eksisterende viewer-spesifikke stiler beholdt.
   - **🌐 TEST I NETTLESER**: Viewer-header ser lik ut mht. toppfelt/bunnlinje; funksjonalitet uendret.
 - [ ] **4.9.4** Minimal CSS, ingen ny logikk
   - **Mål**: Begrens endringen til CSS + enkel markup-wrap i grid; ingen flytting av JS-logikk eller nye mønstre. Hold kodeendringer små i store filer (AI_GUIDE).
   - **🌐 TEST I NETTLESER**: Bekreft at panelene (settings) fortsatt fungerer (åpne/lukke/ESC) og at layout ikke bryter på små skjermer.
+
+### 4.10 Header-filtrering (kategori-dropdown + favoritt-stjerne)
+- [ ] **4.10.1** Kategori-dropdown
+  - **Mål**: Erstatt kategori-knapper med dropdown (40px høy, min-width ~160px) med “Alle” + kategorier. Sett aria-label eller label.
+  - **🌐 TEST I NETTLESER**: Velg kategori; filtrering oppfører seg som før, ingen wrap; header-høyde stabil.
+- [ ] **4.10.2** Favoritt-stjerne som modus
+  - **Mål**: Favoritt-toggle (40x40, aria-pressed) som når aktiv setter `favoritesOnly = true` og resetter kategori til “Alle” (vis kun favoritter uansett kategori). Når av, styres visning av kategori + søk som normalt.
+  - **🌐 TEST I NETTLESER**: Stjerne på → kun favoritter vises; av → kategori + søk/filter fungerer som normalt; synlighet/overrides/mode respekteres.
+- [ ] **4.10.3** Filtreringsflyt
+  - **Mål**: applyFilters i grid: søk → kategori (hvis stjerne av) → favoritesOnly (hvis stjerne på) → mode/visibility (isVisibleForKidsNow) → render. Ingen duplikatlogikk utenfor denne funksjonen.
+  - **🌐 TEST I NETTLESER**: Verifiser at stjerne og dropdown ikke påvirker hverandre feil; barnemodus/parent-modus filtrerer som før.
+- [ ] **4.10.4** Favorittfilter oppdaterer ved fjerning
+  - **Mål**: Når favoritesOnly er på og en favoritt fjernes via kortet, skal kortet forsvinne umiddelbart (kall applyFilters() etter toggle).
+  - **🌐 TEST I NETTLESER**: Slå på favorittfilter, fjern stjerne på et kort → kortet forsvinner; slå av filter, toggle stjerner uten at lista nødvendigvis re-rendres.
 
 #### 🌐 Detaljert test for PWA/offline og gjenopptak
 1) Installer PWA (Add to Home/Install).

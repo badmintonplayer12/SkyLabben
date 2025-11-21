@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="no"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0066cc">
+  <meta name="description" content="SkyLabben – en barnevennlig instruksjonsapp med galleri og steg-for-steg bilder.">
+  <title>SkyLabben</title>
+  <link rel="stylesheet" href="Filer_for_gallery/main.css">
+  <link rel="manifest" href="http://localhost:5500/manifest.json">
+  <link rel="icon" href="http://localhost:5500/assets/icons/icon-192.png" type="image/png">
+</head>
+<body>
+  <div id="app"><div class="project-grid"><div class="project-grid__header app-header"><div class="project-grid__controls"><div class="project-grid__search-row"><input type="search" class="project-grid__search" placeholder="Søk etter prosjekt..." aria-label="Søk etter prosjekt"><select class="project-grid__category-select" aria-label="Velg kategori"><option value="Alle" selected="selected">Alle</option><option value="Hjemmeprosjekt">Hjemmeprosjekt</option></select><button type="button" class="project-grid__favorite-toggle" aria-pressed="false" aria-label="Vis bare favoritter">☆</button><div class="project-grid__settings"><button type="button" class="viewer__button viewer__button--settings" aria-label="Innstillinger" title="Innstillinger">⚙️</button></div></div></div></div><div class="project-grid__tiles"><div class="project-tile" data-path="huset-vaart"><button type="button" class="project-tile__favorite" aria-label="Merk som favoritt" aria-pressed="false">?</button><img class="project-tile__image" src="Filer_for_gallery/cover.png" alt="Huset Vårt"><div class="project-tile__name">Huset Vårt<div class="project-tile__category">Hjemmeprosjekt</div></div><div class="project-tile__progress" style="display: none;"></div></div></div></div></div>
+  <div id="offline-indicator" class="offline-indicator" aria-hidden="true" role="status">
+    <span class="offline-indicator__icon">📡</span>
+    <span class="offline-indicator__text">Offline modus</span>
+  </div>
+  <script type="module" src="Filer_for_gallery/main.js"></script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+
+
+
+
+</body></html>

@@ -11,6 +11,30 @@ import { shareUrl } from './share.js';
 import { getMode, getOverrides, setOverride, isVisibleForKidsNow, getOverrideKey, setMode, getRandomAdultChallenge } from './visibility.js';
 import { isInstallAvailable, consumePrompt, isStandalone } from './pwa-install.js';
 
+const FILTER_STORAGE_KEY = 'legoInstructions.gridFilters';
+
+function loadFilterState() {
+  try {
+    const stored = localStorage.getItem(FILTER_STORAGE_KEY);
+    if (!stored) return { category: 'Alle', favoritesOnly: false };
+    const parsed = JSON.parse(stored);
+    return {
+      category: parsed?.category || 'Alle',
+      favoritesOnly: Boolean(parsed?.favoritesOnly)
+    };
+  } catch (e) {
+    return { category: 'Alle', favoritesOnly: false };
+  }
+}
+
+function saveFilterState(state) {
+  try {
+    localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    // Ignorer lagringsfeil
+  }
+}
+
 /**
  * Renderer prosjektgalleri
  * @param {Array<{id: string, name: string, path: string, hidden?: boolean, category?: string}>} projects
@@ -27,6 +51,7 @@ export function renderProjectGrid(projects, onProjectClick) {
   const metaCache = new Map();
   let favoriteSet = new Set(getFavoriteProjects());
   let selectedCategory = 'Alle';
+  let favoritesOnly = false;
 
   const categories = Array.from(
     new Set(
@@ -35,6 +60,7 @@ export function renderProjectGrid(projects, onProjectClick) {
         .filter(Boolean)
     )
   ).sort((a, b) => a.localeCompare(b));
+  const storedFilters = loadFilterState();
 
   const controls = document.createElement('div');
   controls.className = 'project-grid__controls';
@@ -47,6 +73,29 @@ export function renderProjectGrid(projects, onProjectClick) {
 
   const categoriesContainer = document.createElement('div');
   categoriesContainer.className = 'project-grid__categories';
+
+  const categorySelect = document.createElement('select');
+  categorySelect.className = 'project-grid__category-select';
+  categorySelect.setAttribute('aria-label', 'Velg kategori');
+  const allOption = document.createElement('option');
+  allOption.value = 'Alle';
+  allOption.textContent = 'Alle';
+  categorySelect.appendChild(allOption);
+  categories.forEach((cat) => {
+    const opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    categorySelect.appendChild(opt);
+  });
+  selectedCategory = categories.includes(storedFilters.category) ? storedFilters.category : 'Alle';
+  categorySelect.value = selectedCategory;
+
+  const favoriteToggle = document.createElement('button');
+  favoriteToggle.type = 'button';
+  favoriteToggle.className = 'project-grid__favorite-toggle';
+  favoriteToggle.setAttribute('aria-pressed', 'false');
+  favoriteToggle.setAttribute('aria-label', 'Vis bare favoritter');
+  favoriteToggle.textContent = '☆';
 
   const settingsContainer = document.createElement('div');
   settingsContainer.className = 'project-grid__settings';
@@ -61,13 +110,10 @@ export function renderProjectGrid(projects, onProjectClick) {
   const searchRow = document.createElement('div');
   searchRow.className = 'project-grid__search-row';
   searchRow.appendChild(searchInput);
+  searchRow.appendChild(categorySelect);
+  searchRow.appendChild(favoriteToggle);
   searchRow.appendChild(settingsContainer);
   controls.appendChild(searchRow);
-
-  const filtersRow = document.createElement('div');
-  filtersRow.className = 'project-grid__filters';
-  filtersRow.appendChild(categoriesContainer);
-  controls.appendChild(filtersRow);
 
   const header = document.createElement('div');
   header.className = 'project-grid__header app-header';
@@ -79,8 +125,6 @@ export function renderProjectGrid(projects, onProjectClick) {
   container.appendChild(header);
   container.appendChild(tilesContainer);
 
-  const FAVORITES_FILTER = '__favorites__';
-  const categoryButtons = new Map();
   let settingsPanel = null;
   const rootUrl = (() => {
     const baseUrl = window.location.origin + window.location.pathname;
@@ -222,36 +266,36 @@ export function renderProjectGrid(projects, onProjectClick) {
     openSettingsPanel();
   });
 
-  function createCategoryButton(label, value) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'project-grid__category-button';
-    button.textContent = label;
-    button.addEventListener('click', () => {
-      selectedCategory = value;
-      updateCategoryButtons();
-      applyFilters();
-    });
-    categoriesContainer.appendChild(button);
-    categoryButtons.set(value, button);
-  }
-
-  function updateCategoryButtons() {
-    categoryButtons.forEach((button, value) => {
-      const isActive = value === selectedCategory;
-      button.classList.toggle('project-grid__category-button--active', isActive);
-      button.setAttribute('aria-pressed', String(isActive));
-    });
-  }
-
-  createCategoryButton('Alle', 'Alle');
-  categories.forEach(category => {
-    createCategoryButton(category, category);
-  });
-  createCategoryButton('Favoritter', FAVORITES_FILTER);
-  updateCategoryButtons();
-
   searchInput.addEventListener('input', () => {
+    applyFilters();
+  });
+
+  categorySelect.addEventListener('change', () => {
+    selectedCategory = categorySelect.value;
+    saveFilterState({ category: selectedCategory, favoritesOnly });
+    applyFilters();
+  });
+
+  const updateFavoriteToggle = () => {
+    favoriteToggle.setAttribute('aria-pressed', String(favoritesOnly));
+    favoriteToggle.textContent = favoritesOnly ? '★' : '☆';
+    favoriteToggle.style.color = favoritesOnly ? '#f5c000' : '';
+    favoriteToggle.setAttribute(
+      'aria-label',
+      favoritesOnly ? 'Vis alle prosjekter' : 'Vis bare favoritter'
+    );
+  };
+  favoritesOnly = storedFilters.favoritesOnly === true;
+  updateFavoriteToggle();
+
+  favoriteToggle.addEventListener('click', () => {
+    favoritesOnly = !favoritesOnly;
+    updateFavoriteToggle();
+    if (favoritesOnly) {
+      selectedCategory = 'Alle';
+      categorySelect.value = 'Alle';
+    }
+    saveFilterState({ category: selectedCategory, favoritesOnly });
     applyFilters();
   });
 
@@ -275,10 +319,12 @@ export function renderProjectGrid(projects, onProjectClick) {
       return (project.name || '').toLowerCase().includes(query);
     });
 
-    if (selectedCategory === FAVORITES_FILTER) {
-      filtered = filtered.filter(project => favoriteSet.has(project.path));
-    } else if (selectedCategory !== 'Alle') {
+    if (!favoritesOnly && selectedCategory !== 'Alle') {
       filtered = filtered.filter(project => (project.category || 'Uten kategori') === selectedCategory);
+    }
+
+    if (favoritesOnly) {
+      filtered = filtered.filter(project => favoriteSet.has(project.path));
     }
 
     if (mode === 'child') {
@@ -329,7 +375,7 @@ export function renderProjectGrid(projects, onProjectClick) {
       const updated = toggleFavoriteProject(project.path);
       favoriteSet = new Set(updated);
       updateFavoriteButton(favoriteButton, favoriteSet.has(project.path));
-      if (selectedCategory === FAVORITES_FILTER) {
+      if (favoritesOnly) {
         applyFilters();
       }
     });
@@ -430,7 +476,8 @@ export function renderProjectGrid(projects, onProjectClick) {
   function updateFavoriteButton(button, isFavorite) {
     button.classList.toggle('project-tile__favorite--active', isFavorite);
     button.setAttribute('aria-pressed', String(isFavorite));
-    button.textContent = isFavorite ? '?' : '?';
+    button.textContent = isFavorite ? '★' : '☆';
+    button.setAttribute('title', isFavorite ? 'Fjern fra favoritter' : 'Legg til favoritter');
   }
 
   applyFilters();
