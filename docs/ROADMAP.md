@@ -482,13 +482,13 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for Sk
 - [x] **4.14.1** Precache i SW
   - **Mål**: Legg animasjons-JSON i egen liste (f.eks. ANIMATION_ASSETS) og sprett inn i `PRECACHE_URLS` i SW; ta også med `assets/js/lottie.min.js` og minst én lyd (`assets/audio/celebration-1.mp3`) for offline feiring. Bruk eksisterende CACHE_VERSION; update-version.js + deploy skal hente nye filer og slette gamle cacher.
   - **🌐 TEST I NETTLESER**: Application → Cache Storage viser animasjon/lyd; Network viser “from ServiceWorker”; fungerer offline.
-- [ ] **4.14.2** Versjon/invalidasjon
+- [x] **4.14.2** Versjon/invalidasjon
   - **Mål**: Primær strategi: bump global CACHE_VERSION ved endring (update-version.js). Lag et lite script (f.eks. generate-animation-list.js) som autolister `assets/animations/*.json` til en modul/konstant som SW importerer, for å unngå manuell dobbel-listing. Filnavn-hashing kan vurderes senere om nødvendig.
   - **🌐 TEST I NETTLESER**: Etter versjonsbump: gamle animasjoner fjernes fra cache, nye lastes inn (Cache Storage oppdatert).
-- [ ] **4.14.3** Session-cache
+- [x] **4.14.3** Session-cache
   - **Mål**: Behold minne-cache i `celebration/lottie.js` (parsed JSON) for rask gjenbruk i samme økt; ingen ekstra endringer.
   - **🌐 TEST I NETTLESER**: Første kall henter; påfølgende kall i samme økt bruker cache (ingen ekstra fetch).
-- [ ] **4.14.4** Dokumentasjon
+- [x] **4.14.4** Dokumentasjon
   - **Mål**: Noter i AI_GUIDE/dokumentasjon: nye feiringer skal registreres i `assets/js/celebration/index.js` og i animasjons-manifestet som SW precacher; runtime bruker .json (evt. .lottie kun som kilde, ikke lastet direkte).
 #### 🌐 Detaljert test for PWA/offline og gjenopptak
 1) Installer PWA (Add to Home/Install).
