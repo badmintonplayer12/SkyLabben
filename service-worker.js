@@ -1,5 +1,5 @@
 // CACHE_VERSION oppdateres av scripts/update-version.js
-const CACHE_VERSION = '2025-11-22+020426-fcad2e9';
+const CACHE_VERSION = '2025-11-22+141620-4a01dce';
 
 const PRECACHE_PATHS = [
   './',
@@ -16,8 +16,11 @@ const PRECACHE_PATHS = [
   './assets/js/qr-code.js',
   './assets/js/onboarding.js',
   './assets/js/favorites.js',
+  './assets/js/dialog.js',
+  './assets/js/share.js',
   './assets/js/pwa-install.js',
   './assets/js/visibility.js',
+  './assets/js/parent-quiz.js',
   './assets/js/version.js',
   './assets/js/celebration/index.js',
   './assets/js/celebration/emoji.js',
@@ -37,7 +40,13 @@ const ANIMATION_ASSETS = [
   './assets/animations/celebrate.json'
 ];
 
-const PRECACHE_URLS = [...PRECACHE_PATHS, ...ANIMATION_ASSETS].map((path) => new URL(path, self.location).href);
+const PROJECT_ASSETS = [
+  './projects.json',
+  './projects/huset-vaart/meta.json',
+  './projects/huset-vaart/cover.png'
+];
+
+const PRECACHE_URLS = [...PRECACHE_PATHS, ...ANIMATION_ASSETS, ...PROJECT_ASSETS].map((path) => new URL(path, self.location).href);
 const PRECACHE_URL_SET = new Set(PRECACHE_URLS);
 const INDEX_URL = new URL('./index.html', self.location).href;
 
