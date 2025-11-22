@@ -1,5 +1,5 @@
 // CACHE_VERSION oppdateres av scripts/update-version.js
-const CACHE_VERSION = '2025-11-22+014341-fcbe1f8';
+const CACHE_VERSION = '2025-11-22+014934-0343e87';
 
 const PRECACHE_PATHS = [
   './',
@@ -58,6 +58,10 @@ function isImageRequest(url) {
 
 function isJsonRequest(url) {
   return /\.json(\?|$)/i.test(url);
+}
+
+function isAnimationRequest(url) {
+  return url.includes('/assets/animations/') && /\.json(\?|$)/i.test(url);
 }
 
 function isAudioRequest(url) {
@@ -168,6 +172,23 @@ self.addEventListener('activate', (event) => {
       clients.forEach((client) => {
         client.postMessage({ type: 'SW_UPDATE_AVAILABLE' });
       });
+      // Prefetch animasjoner i bakgrunnen
+      const staticCache = await caches.open(STATIC_CACHE);
+      await Promise.all(
+        (ANIMATION_ASSETS || []).map(async (path) => {
+          const url = new URL(path, self.location).href;
+          const cached = await staticCache.match(url);
+          if (cached) return;
+          try {
+            const resp = await fetch(url);
+            if (resp.ok) {
+              await staticCache.put(url, resp.clone());
+            }
+          } catch (e) {
+            console.warn('[ServiceWorker] Prefetch animasjon feilet:', url, e);
+          }
+        })
+      );
     })
   );
 });
@@ -210,6 +231,24 @@ self.addEventListener('fetch', (event) => {
             }
             return networkResponse;
           });
+        });
+      })
+    );
+    return;
+  }
+
+  // Animasjoner: Cache First (bruk statisk cache)
+  if (isAnimationRequest(requestUrl.href)) {
+    event.respondWith(
+      caches.open(STATIC_CACHE).then((cache) => {
+        return cache.match(request).then((cached) => {
+          if (cached) return cached;
+          return fetch(request).then((resp) => {
+            if (resp.ok) {
+              cache.put(request, resp.clone());
+            }
+            return resp;
+          }).catch(() => cached || new Response('Animajson ikke tilgjengelig', { status: 404 }));
         });
       })
     );
