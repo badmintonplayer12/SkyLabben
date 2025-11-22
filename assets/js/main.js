@@ -9,6 +9,7 @@ import { loadProjects, loadProjectMeta } from './data-loader.js';
 import { getState, updateState, getLastStepFor, setStepFor, setInstallPromptAvailable } from './state.js';
 import { renderProjectGrid } from './view-project-grid.js';
 import { renderViewer } from './view-viewer.js';
+import { createSlideshowView } from './view-slideshow.js';
 import { showCelebration } from './celebration/index.js';
 import { hasSeenOnboarding, showOnboarding, showOverlayMessage } from './onboarding.js';
 import { initInstallPromptListener } from './pwa-install.js';
@@ -235,6 +236,30 @@ async function handleRoute(route) {
         details: error?.message,
         actionLabel: 'Tilbake til galleri',
         onAction: () => updateHash({ type: 'root' })
+      }));
+    }
+  } else if (route.type === 'slideshow') {
+    const clearStatus = showStatus(root, {
+      type: 'loading',
+      title: 'Laster galleri …',
+      message: 'Et øyeblikk, vi henter bildene.'
+    });
+    try {
+      const view = await createSlideshowView({ nodePath: route.path });
+      clearStatus();
+      root.innerHTML = '';
+      root.appendChild(view);
+    } catch (error) {
+      console.error('Kunne ikke laste slideshow:', error);
+      clearStatus();
+      root.innerHTML = '';
+      root.appendChild(createStatusElement({
+        type: 'error',
+        title: 'Fant ikke galleri',
+        message: 'Det finnes ingen galleri for denne siden.',
+        details: error?.message,
+        actionLabel: 'Tilbake',
+        onAction: () => handleRoute({ type: 'root' })
       }));
     }
   }

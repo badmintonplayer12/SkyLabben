@@ -1,5 +1,5 @@
 // CACHE_VERSION oppdateres av scripts/update-version.js
-const CACHE_VERSION = '2025-11-22+175514-ad5be52';
+const CACHE_VERSION = '2025-11-23+003735-a8f68a3';
 
 const PRECACHE_PATHS = [
   './',
@@ -12,6 +12,7 @@ const PRECACHE_PATHS = [
   './assets/js/state.js',
   './assets/js/view-project-grid.js',
   './assets/js/view-viewer.js',
+  './assets/js/view-slideshow.js',
   './assets/js/audio-feedback.js',
   './assets/js/qr-code.js',
   './assets/js/onboarding.js',

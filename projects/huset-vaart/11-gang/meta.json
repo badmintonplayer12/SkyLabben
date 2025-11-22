@@ -72,6 +72,10 @@
     "258_1x.png",
     "259_1x.png"
   ],
-  "children": []
+  "children": [],
+  "gallery": [
+    "cover.png",
+    "gallery_01.png"
+  ]
 }
 

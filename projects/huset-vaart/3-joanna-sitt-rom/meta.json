@@ -28,5 +28,11 @@
     "55_1x.png",
     "56_1x.png"
   ],
-  "children": []
+  "children": [],
+  "gallery": [
+    "cover.png",
+    "gallery_1.png",
+    "gallery_2.png",
+    "gallery_3.png"
+  ]
 }

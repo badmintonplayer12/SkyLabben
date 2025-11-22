@@ -7,8 +7,8 @@
 /**
  * Route-objekt struktur
  * @typedef {Object} Route
- * @property {"root"|"project"} type - Type rute
- * @property {string} [path] - Prosjektpath (kun for "project")
+ * @property {"root"|"project"|"slideshow"} type - Type rute
+ * @property {string} [path] - Prosjektpath (for "project" og "slideshow")
  * @property {number} [stepIndex] - Steg-indeks (kun for "project")
  */
 
@@ -42,6 +42,15 @@ export function parseHash(hash) {
     return { type: 'root' };
   }
   
+  // Parse slideshow: "/slideshow/..." (kan ha flere nivåer)
+  const slideMatch = path.match(/^\/slideshow\/(.+)$/);
+  if (slideMatch) {
+    return {
+      type: 'slideshow',
+      path: slideMatch[1]
+    };
+  }
+
   // Parse "/p/project1/sub-a?step=3"
   const match = path.match(/^\/p\/(.+?)(?:\?step=(\d+))?$/);
   if (!match) {
@@ -68,6 +77,8 @@ export function updateHash(route) {
       hash += `?step=${route.stepIndex}`;
     }
     window.location.hash = hash;
+  } else if (route.type === 'slideshow') {
+    window.location.hash = `#/slideshow/${route.path}`;
   }
 }
 

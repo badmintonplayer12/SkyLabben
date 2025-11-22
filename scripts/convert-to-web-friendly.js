@@ -75,12 +75,28 @@ function getImageFiles(dirPath) {
   return files
     .filter(file => /\.(png|jpg|jpeg)$/i.test(file))
     .filter(file => file !== 'cover.png') // Exkluder cover.png fra steps
+    .filter(file => !/^gallery/i.test(file)) // Exkluder gallery-filer fra steps
     .sort((a, b) => {
       // Sorter basert på nummer i starten av filnavnet
       const numA = parseInt(a.match(/^(\d+)/)?.[1] || '999999');
       const numB = parseInt(b.match(/^(\d+)/)?.[1] || '999999');
       return numA - numB;
     });
+}
+
+/**
+ * Leser alle gallery-bilder i en mappe
+ * @param {string} dirPath - Sti til mappen
+ * @returns {string[]} Sortert liste over gallery-bilder
+ */
+function getGalleryFiles(dirPath) {
+  if (!fs.existsSync(dirPath)) return [];
+  
+  const files = fs.readdirSync(dirPath);
+  return files
+    .filter(file => /^gallery/i.test(file)) // Starter med "gallery" (case-insensitive)
+    .filter(file => /\.(png|jpg|jpeg|webp)$/i.test(file)) // Bare bildefiler
+    .sort(); // Alfabetisk sortering
 }
 
 /**
@@ -118,6 +134,7 @@ function generateMetaJson(projectInfo) {
   const { id, name, dirPath, isChild = false, childrenList = null, category } = projectInfo;
   
   const images = getImageFiles(dirPath);
+  const galleryFiles = getGalleryFiles(dirPath);
   const children = isChild ? [] : (childrenList || getChildrenDirs(dirPath)).map(child => ({
     id: child.webFriendlyName,
     name: child.originalDisplayName || child.originalName,
@@ -134,6 +151,11 @@ function generateMetaJson(projectInfo) {
 
   if (category) {
     meta.category = category;
+  }
+
+  // Legg til gallery hvis det finnes gallery-filer
+  if (galleryFiles.length > 0) {
+    meta.gallery = galleryFiles;
   }
 
   return meta;

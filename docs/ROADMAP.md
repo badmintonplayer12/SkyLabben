@@ -558,6 +558,35 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for Sk
   - **Mål**: Oppdater AI_GUIDE/ARCHITECTURE/IMPLEMENTATION: USER vs AUTO cache, pinned via postMessage, manifest-script, batch-prefetch, kvote kun på AUTO, JSON i USER.
   - **📄**: Legg inn i ARCHITECTURE og AI_GUIDE.
 
+### 4.18 Presentasjonsmodus (gallery per node)
+- [ ] **4.18.1** Data (gallery i alle noder)
+  - **Mål**: Valgfritt `gallery`-felt i alle meta.json (prosjekt + underprosjekt). Ingen fallbacks; bannene er relative til nodens mappe.
+  - **🌐 TEST I NETTLESER**: meta.json med/uten `gallery` fungerer; feltet er valgfritt.
+- [ ] **4.18.2** Slideshow-view
+  - **Mål**: Ny `view-slideshow.js` som tar en node/node-sti, laster meta, leser kun `gallery` og viser fullscreen slideshow (tittel, lukk, piler, dots; rydder event listeners ved lukk).
+  - **🌐 TEST I NETTLESER**: `#/slideshow/...` viser bilder når gallery finnes; tom-state med lukk hvis ikke.
+- [ ] **4.18.3** Bildekilder (ingen fallbacks)
+  - **Mål**: `buildImageList(node)`: hvis `gallery` finnes og ikke tom → bruk den; ellers tom liste og vis “Ingen galleri”.
+  - **🌐 TEST I NETTLESER**: Noder med gallery viser bilder; noder uten gallery får tom-state, ingen feil.
+- [ ] **4.18.4** Routing (#/slideshow/<nodePath…>)
+  - **Mål**: Ny hash-route `#/slideshow/<nodePath…>` som støtter flere nivåer; router finner node via tre/loader, kaller slideshow; ugyldig node → enkel tom-state/lukk.
+  - **🌐 TEST I NETTLESER**: `#/slideshow/huset-vaart`, `#/slideshow/huset-vaart/6-stue`, `#/slideshow/huset-vaart/6-stue/sofa-hjorne` fungerer; ESC/history.back lukker.
+- [ ] **4.18.5** Innganger i UI
+  - **Mål**: Vis “Slideshow”-knapp kun når node har gallery:
+    - På prosjektkort (galleri).
+    - På underprosjekt-tiles/lister i viewer.
+    - Med aria-label/title (“Åpne galleri”).
+  - **🌐 TEST I NETTLESER**: Knapp vises kun ved gallery; klikker åpner korrekt hash.
+- [ ] **4.18.6** CSS/fullskjerm
+  - **Mål**: Fullscreen overlay (`position: fixed; inset: 0`) med mørk bakgrunn, høy z-index; piler, dots, lukk/tittel; ingen påvirkning av øvrig UI.
+  - **Notat**: Hold CSS i en liten egen blokk/fil (unngå å blåse opp main.css).
+  - **🌐 TEST I NETTLESER**: Fullskjerm-følelse, piler/dots virker; ingen layout-glitch.
+- [ ] **4.18.7** (Valgfritt) Autoplay
+  - **Mål**: Enkel play/pause (2–4s intervall), stopper ved manuell interaksjon.
+  - **🌐 TEST I NETTLESER**: Start/stop fungerer; ingen memory leaks.
+- [ ] **4.18.8** Dokumentasjon
+  - **Mål**: Oppdater AI_GUIDE/IMPLEMENTATION kort: slideshow-route, `gallery`-felt, ingen fallbacks; gallery kan peke til bilder i samme node eller under-mapper.
+
 ## Milepæler
 
 ### M1: MVP (Minimum Viable Product)

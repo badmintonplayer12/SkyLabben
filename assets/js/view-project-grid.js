@@ -590,25 +590,53 @@ export function renderProjectGrid(projects, onProjectClick) {
     const progressIndicator = document.createElement('div');
     progressIndicator.className = 'project-tile__progress';
 
-    getProjectMeta(project.path)
-      .then(meta => {
-        const steps = meta?.steps || [];
-        const totalSteps = steps.length;
-        const lastStep = getLastStepFor(project.path);
+  const metaPromise = getProjectMeta(project.path)
+    .then(meta => {
+      const steps = meta?.steps || [];
+      const totalSteps = steps.length;
+      const lastStep = getLastStepFor(project.path);
 
         if (totalSteps > 0 && lastStep > 0) {
           const progressPercent = ((lastStep + 1) / totalSteps) * 100;
           progressIndicator.style.width = `${progressPercent}%`;
           progressIndicator.setAttribute('aria-label', `${lastStep + 1}/${totalSteps} steg`);
-          progressIndicator.classList.add('project-tile__progress--visible');
-        } else {
-          progressIndicator.style.display = 'none';
-        }
-      })
-      .catch(error => {
-        console.warn(`Kunne ikke laste meta for progresjon: ${project.path}`, error);
+        progressIndicator.classList.add('project-tile__progress--visible');
+      } else {
         progressIndicator.style.display = 'none';
-      });
+      }
+      return meta;
+    })
+    .catch(error => {
+      console.warn(`Kunne ikke laste meta for progresjon: ${project.path}`, error);
+      progressIndicator.style.display = 'none';
+      return null;
+    });
+
+    // Slideshow-knapp hvis gallery finnes
+    metaPromise.then((meta) => {
+      if (Array.isArray(meta?.gallery) && meta.gallery.length > 0) {
+        const slideBtn = document.createElement('button');
+        slideBtn.type = 'button';
+        slideBtn.className = 'project-tile__slideshow';
+        slideBtn.setAttribute('aria-label', 'Åpne galleri');
+        slideBtn.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3.8" y="7.2" width="16.4" height="11.2" rx="2.4" ry="2.4" stroke="#000000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M6.4 7.6L7.6 5.3C7.9 4.8 8.5 4.5 9.1 4.5H11.0C11.6 4.5 12.2 4.8 12.5 5.3L13.7 7.6" stroke="#000000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="12" cy="12.8" r="3.1" stroke="#000000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        `;
+        slideBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          window.location.hash = `#/slideshow/${project.path}`;
+        });
+        if (mode === 'child') {
+          // Flytt under stjerneknapp i barnemodus
+          slideBtn.style.top = 'calc(var(--spacing-md) + 40px)';
+        }
+        tile.appendChild(slideBtn);
+      }
+    }).catch(() => {});
 
     if (mode === 'child') {
       tile.appendChild(favoriteButton);

@@ -497,3 +497,23 @@ Etter konvertering, verifiser:
 - **Behold originalt navn i `name`-feltet** for visning i UI
 - **Test URL-er** etter konvertering for å sikre at de er rene
 - **Dokumenter konverteringer** hvis du har mange prosjekter å konvertere
+- ## Galleri (slideshow) per node
+- Hver mappe som har `meta.json` (prosjekt eller underprosjekt) kan ha et valgfritt felt:
+- 
+- ```json
+- "gallery": [
+-   "cover.png",
+-   "renders/front.png",
+-   "1-spiserom/cover.png"
+- ]
+- ```
+- 
+- * Banene er alltid relative til nodens mappe.
+- * Hvis `gallery` mangler eller er tom → ingen slideshow for denne noden (ingen fallbacks).
+- * For “hele huset”: legg alle ønskede bilder (også fra under-mapper) inn i topp-nivå `gallery`.
+- 
+- ### Automatisk gallery fra filnavn
+- Ved import kan filer som starter med `gallery` (f.eks. `gallery1.png`, `gallery_02.webp`) legges automatisk til `gallery`-feltet for noden.
+- - Stripping skjer på prefikset `gallery` (resten av navnet beholdes).
+- - Bare bildefiler (png/jpg/webp) inkluderes.
+- 
