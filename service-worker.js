@@ -1,5 +1,5 @@
 // CACHE_VERSION oppdateres av scripts/update-version.js
-const CACHE_VERSION = '2025-11-22+005444-22d69ca';
+const CACHE_VERSION = '2025-11-22+012610-f6e6c39';
 
 const PRECACHE_PATHS = [
   './',
@@ -19,11 +19,25 @@ const PRECACHE_PATHS = [
   './assets/js/pwa-install.js',
   './assets/js/visibility.js',
   './assets/js/version.js',
+  './assets/js/celebration/index.js',
+  './assets/js/celebration/emoji.js',
+  './assets/js/celebration/lottie.js',
+  './assets/js/celebration/sound.js',
+  './assets/js/lottie.min.js',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png'
 ];
 
-const PRECACHE_URLS = PRECACHE_PATHS.map((path) => new URL(path, self.location).href);
+const ANIMATION_ASSETS = [
+  './assets/animations/confetti.json',
+  './assets/animations/emoji.json',
+  './assets/animations/stars.json',
+  './assets/animations/stars2.json',
+  './assets/animations/stars3.json',
+  './assets/animations/celebrate.json'
+];
+
+const PRECACHE_URLS = [...PRECACHE_PATHS, ...ANIMATION_ASSETS].map((path) => new URL(path, self.location).href);
 const PRECACHE_URL_SET = new Set(PRECACHE_URLS);
 const INDEX_URL = new URL('./index.html', self.location).href;
 

@@ -1,3 +1,3 @@
 // Felles versjonskilde for service worker og data-cache
 // Oppdateres av scripts/update-version.js (kort hash + dato er nok)
-export const APP_VERSION = '2025-11-22+005444-22d69ca';
+export const APP_VERSION = '2025-11-22+012610-f6e6c39';

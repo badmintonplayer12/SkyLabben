@@ -63,6 +63,12 @@
       "id": "12-tegnerom",
       "name": "12-Tegnerom",
       "path": "12-tegnerom"
+    },
+    {
+      "id": "13-hjemmehjelperen",
+      "name": "13-Hjemmehjelperen",
+      "path": "13-hjemmehjelperen",
+      "approvedByDefault": false
     }
   ],
   "category": "Hjemmeprosjekt"

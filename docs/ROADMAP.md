@@ -451,32 +451,45 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for Sk
   - **🌐 TEST I NETTLESER**: Hover-stater fungerer; ingen funksjonelle endringer.
 
 ### 4.12 Felles dialog-modul
-- [ ] **4.12.1** Modul og API
+- [x] **4.12.1** Modul og API
   - **Mål**: Lag `assets/js/dialog.js` med `openDialog({ title, content (DOM eller HTML), actions: [{ label, variant, onClick }], size, onClose })` (SM/M/L max-width), `closeDialog()`, handle med `close()`, aria-role focus/ESC/backdrop, scroll-lock (body overflow hidden), én dialog om gangen med full opprydding av DOM/listeners.
   - **🌐 TEST I NETTLESER**: Åpne/lukk via knapp, ESC og backdrop; flere kall åpner ikke flere modaler; fokus settes og body slutter å scrolle; handle.close() fungerer.
-- [ ] **4.12.2** Felles stil
+- [x] **4.12.2** Felles stil
   - **Mål**: Flytt modal-stil til `.app-dialog`, `.app-dialog__backdrop`, `.app-dialog__body`, `.app-dialog__actions` + size-klasser (`--sm/~320-360px`, `--md/~480-560px`, `--lg/~640-720px` med max-width: min(90vw, X)). Gjenbruk eksisterende visual (sentrert, skygge, runding, backdrop).
   - **🌐 TEST I NETTLESER**: Dialog vises sentrert med backdrop; størrelsesvarianter fungerer og passer på mobil (90vw begrensning).
-- [ ] **4.12.3** Migrering (minimal)
+- [x] **4.12.3** Migrering (minimal)
   - **Mål**: Bruk dialog-modulen i: onboarding-modal, QR-kode-popup, foreldre-quiz, og ev. SW-oppdatering (behold gjerne banner som inngang). Behold innhold/tekster; kun bytt til felles wrapper.
   - **🌐 TEST I NETTLESER**: Alle caser åpner/lukker riktig; ESC/backdrop lukker; ingen doble event listeners; body scroll-lock oppheves etter lukking.
 
 ### 4.13 Fleksibel feiring (emoji/Lottie + lyd)
-- [ ] **4.13.1** Feiring-modul
+- [x] **4.13.1** Feiring-modul
   - **Mål**: Lag `assets/js/celebration/` med `showCelebration({ type, target=document.body, durationMs, playSound=true, soundId })`, registry-basert (emoji/lottieA/…); random hvis `type` mangler/`random`; ukjent type → emoji. Én aktiv feiring om gangen, auto-rydde, soundId overstyrer registry.
   - **🌐 TEST I NETTLESER**: Kall med `type: 'emoji'`, `type: 'random'`; verifiser at kun én vises og ryddes.
-- [ ] **4.13.2** Renderers og cache
+- [x] **4.13.2** Renderers og cache
   - **Mål**: `emoji`-renderer (avhengighetsfri); `lottie`-renderer som laster lokal JSON fra `assets/animations/` med cache per ID; per-type `durationMs`-default.
   - **🌐 TEST I NETTLESER**: Emoji-konfetti vises/ryddes; Lottie vises uten gjentatt lasting (cache fungerer).
-- [ ] **4.13.3** Lyd (valgfri hook)
+- [x] **4.13.3** Lyd (valgfri hook)
   - **Mål**: Mini-helper `celebration-sound.js` som spiller lokal lyd (`assets/audio/celebration-*.mp3`), enkel cache; `playSound=false` slår av; soundId-param har høyest prioritet, ellers registry-sound. Ingen CDN.
   - **🌐 TEST I NETTLESER**: Lyd spilles én gang når aktivert; lydløs når `playSound=false`.
-- [ ] **4.13.4** Integrasjon
+- [x] **4.13.4** Integrasjon
   - **Mål**: Bytt konfetti-kall i `main.js` til `showCelebration({ type })`; ingen annen logikkflytting. Bruk eksplisitt type ved testing; default (mangler type) = random.
   - **🌐 TEST I NETTLESER**: På siste steg (hoved- og underprosjekt) vises feiring; fallback til emoji hvis noe feiler.
-- [ ] **4.13.5** CSS/Assets
+- [x] **4.13.5** CSS/Assets
   - **Mål**: Samle feiring-stiler i egen seksjon/fil (z-index høy, fixed posisjon); legg Lottie-JSON i `assets/animations/`, lyd i `assets/audio/`; ingen eksterne avhengigheter.
   - **🌐 TEST I NETTLESER**: Effekter synes over innhold; ingen layout-glitch; ingen nettverksfeil offline/PWA.
+
+### 4.14 Robust caching av animasjoner
+- [x] **4.14.1** Precache i SW
+  - **Mål**: Legg animasjons-JSON i egen liste (f.eks. ANIMATION_ASSETS) og sprett inn i `PRECACHE_URLS` i SW; ta også med `assets/js/lottie.min.js` og minst én lyd (`assets/audio/celebration-1.mp3`) for offline feiring. Bruk eksisterende CACHE_VERSION; update-version.js + deploy skal hente nye filer og slette gamle cacher.
+  - **🌐 TEST I NETTLESER**: Application → Cache Storage viser animasjon/lyd; Network viser “from ServiceWorker”; fungerer offline.
+- [ ] **4.14.2** Versjon/invalidasjon
+  - **Mål**: Primær strategi: bump global CACHE_VERSION ved endring (update-version.js). Lag et lite script (f.eks. generate-animation-list.js) som autolister `assets/animations/*.json` til en modul/konstant som SW importerer, for å unngå manuell dobbel-listing. Filnavn-hashing kan vurderes senere om nødvendig.
+  - **🌐 TEST I NETTLESER**: Etter versjonsbump: gamle animasjoner fjernes fra cache, nye lastes inn (Cache Storage oppdatert).
+- [ ] **4.14.3** Session-cache
+  - **Mål**: Behold minne-cache i `celebration/lottie.js` (parsed JSON) for rask gjenbruk i samme økt; ingen ekstra endringer.
+  - **🌐 TEST I NETTLESER**: Første kall henter; påfølgende kall i samme økt bruker cache (ingen ekstra fetch).
+- [ ] **4.14.4** Dokumentasjon
+  - **Mål**: Noter i AI_GUIDE/dokumentasjon: nye feiringer skal registreres i `assets/js/celebration/index.js` og i animasjons-manifestet som SW precacher; runtime bruker .json (evt. .lottie kun som kilde, ikke lastet direkte).
 #### 🌐 Detaljert test for PWA/offline og gjenopptak
 1) Installer PWA (Add to Home/Install).
 2) Åpne appen (online). Bytt til foreldremodus (voksen-quiz), sett en override i galleri (skru av et prosjekt).

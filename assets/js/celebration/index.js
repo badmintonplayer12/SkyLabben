@@ -4,7 +4,6 @@ import { playCelebrationSound } from './sound.js';
 
 const registry = {
   emoji: { renderer: renderEmoji, sound: 'celebration-1', durationMs: 2500 },
-  lottieA: { renderer: renderLottie, sound: null, durationMs: 4000, file: 'ballons_flying_up.json' },
   confetti: { renderer: renderLottie, sound: null, durationMs: 3000, file: 'confetti.json' },
   // fireworks er deaktivert pga. tung animasjon som kan henge nettleseren
   // fireworks: { renderer: renderLottie, sound: null, durationMs: 3500, file: 'fireworks.json' },
