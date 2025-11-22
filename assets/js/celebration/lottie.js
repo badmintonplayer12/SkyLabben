@@ -2,7 +2,8 @@ const lottieCache = new Map();
 
 function loadScriptOnce(src) {
   return new Promise((resolve, reject) => {
-    const existing = document.querySelector(`script[src="${src}"]`);
+    const resolvedSrc = new URL(src, window.location.href).href;
+    const existing = document.querySelector(`script[src="${resolvedSrc}"]`);
     if (existing) {
       existing.addEventListener('load', () => resolve());
       existing.addEventListener('error', reject);
@@ -10,7 +11,7 @@ function loadScriptOnce(src) {
       return;
     }
     const s = document.createElement('script');
-    s.src = src;
+    s.src = resolvedSrc;
     s.async = true;
     s.onload = () => {
       s.dataset.loaded = 'true';
@@ -23,7 +24,7 @@ function loadScriptOnce(src) {
 
 async function ensureLottieLibs() {
   if (!window.lottie) {
-    await loadScriptOnce('/assets/js/lottie.min.js');
+    await loadScriptOnce('assets/js/lottie.min.js');
   }
 }
 
@@ -31,7 +32,8 @@ async function loadAnimationData(file) {
   if (!file) throw new Error('Mangler fil for lottie');
   if (lottieCache.has(file)) return lottieCache.get(file);
 
-  const res = await fetch(`/assets/animations/${file}`);
+  const url = new URL(`assets/animations/${file}`, window.location.href).href;
+  const res = await fetch(url);
   if (!res.ok) throw new Error('Kunne ikke laste lottie');
   const data = await res.json();
   lottieCache.set(file, data);
