@@ -43,6 +43,9 @@ export async function renderLottie(target, { file, durationMs = 2000 } = {}) {
   await ensureLottieLibs();
   const animationData = await loadAnimationData(file);
 
+  // Fjern gamle overlays før ny vises
+  target.querySelectorAll('.viewer__celebration').forEach((el) => el.remove());
+
   const container = document.createElement('div');
   container.className = 'viewer__celebration viewer__celebration--lottie';
   target.appendChild(container);
@@ -58,10 +61,15 @@ export async function renderLottie(target, { file, durationMs = 2000 } = {}) {
     }
   });
 
+  const cleanup = () => {
+    anim.destroy();
+    container.remove();
+  };
+
+  anim.addEventListener('complete', cleanup);
   anim.play();
 
   setTimeout(() => {
-    anim.destroy();
-    container.remove();
+    cleanup();
   }, durationMs);
 }

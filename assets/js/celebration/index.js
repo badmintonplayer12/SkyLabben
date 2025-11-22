@@ -14,6 +14,10 @@ const registry = {
   celebrate: { renderer: renderLottie, sound: null, durationMs: 3000, file: 'celebrate.json' }
 };
 
+function removeExistingCelebrations(target) {
+  target.querySelectorAll('.viewer__celebration').forEach((el) => el.remove());
+}
+
 function pickRandomType() {
   const types = Object.keys(registry).filter((t) => t !== 'emoji');
   if (types.length === 0) return 'emoji';
@@ -39,6 +43,9 @@ export function showCelebration({
   if (entry.file) {
     rendererOpts.file = entry.file;
   }
+
+  // Rydd opp eventuelle hengende overlays før ny start
+  removeExistingCelebrations(target);
 
   try {
     const result = renderer(target, rendererOpts);

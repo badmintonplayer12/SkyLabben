@@ -1,6 +1,6 @@
 export function renderEmoji(target, { durationMs = 2500 } = {}) {
-  const existing = target.querySelector('.viewer__celebration');
-  if (existing) existing.remove();
+  // Fjern alle gamle overlays før ny vises
+  target.querySelectorAll('.viewer__celebration').forEach((el) => el.remove());
 
   const celebration = document.createElement('div');
   celebration.className = 'viewer__celebration';
@@ -17,5 +17,11 @@ export function renderEmoji(target, { durationMs = 2500 } = {}) {
 
   target.appendChild(celebration);
 
-  setTimeout(() => celebration.remove(), durationMs);
+  const cleanup = () => {
+    celebration.remove();
+  };
+
+  setTimeout(cleanup, durationMs);
+  // Fallback i tilfelle timers throttles
+  requestAnimationFrame(() => setTimeout(cleanup, durationMs));
 }
