@@ -5,6 +5,7 @@
  */
 
 import { APP_VERSION } from './version.js';
+import { notifyOffline } from './offline-status.js';
 
 const resolvedBase = window.__APP_BASE_URL__ || window.location.href.split('#')[0];
 const APP_BASE_URL = new URL('./', resolvedBase).href; // bevarer repo-mappen selv uten trailing slash
@@ -94,6 +95,7 @@ export async function loadProjectMeta(path) {
     return data;
   } catch (error) {
     console.error(`Kunne ikke laste meta.json for ${path}:`, error);
+    notifyOffline();
     throw error;
   }
 }

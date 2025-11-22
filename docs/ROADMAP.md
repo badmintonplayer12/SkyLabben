@@ -529,6 +529,35 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for Sk
   - **Mål**: Ved skjult prosjekt dimmes kun bildet (`img.project-tile__image.dimmed`); badge/overlay midt på kortet vises. Ingen global opacity på kortet.
   - **🌐 TEST I NETTLESER**: Skjul prosjekt: kun bilde blir grå/dimmet, tekst/badge lesbar; child-modus filtrerer bort skjulte som før.
 
+### 4.17 Pinned offline vs. kvotestyrt cache
+- [ ] **4.17.1** SW-cache-struktur
+  - **Mål**: Skill bruker-styrt cache fra auto-cache: `IMAGE_CACHE_USER`, `IMAGE_CACHE_AUTO` (med kvote), `JSON_CACHE_USER`. Eviksjon kun på AUTO-cache.
+  - **🌐 TEST I NETTLESER**: Application → Cache Storage viser egne caches; AUTO kan eviktes uten å røre USER.
+- [ ] **4.17.2** Pinned meldinger
+  - **Mål**: Bruk `postMessage` til SW for `PIN_PROJECT` og `PIN_ALL`. Lagre `offlineProjects` og `offlineAll` i localStorage; ingen pinned-manifest i Cache Storage.
+  - **🌐 TEST I NETTLESER**: Slå på/av pin via UI, se SW-meldinger i console, og at pinned-liste består etter reload.
+- [ ] **4.17.3** Full offline-toggle
+  - **Mål**: Ny toggle i parent-settings “Full offline”. Når på: ved SW-activate prefetches alle prosjekter (manifest) til USER-cache. Når av: ingen ny prefetch; eksisterende data beholdes.
+  - **🌐 TEST I NETTLESER**: Slå på online → vent ferdig → DevTools Offline → galleri + prosjekter funker. Slå av → ingen ny prefetch.
+- [ ] **4.17.4** Per-prosjekt pin
+  - **Mål**: Sky-knapp sender `PIN_PROJECT {path}` til SW som laster meta+cover+steg til USER-cache. Ingen kvote-eviksjon. Av/på endrer kun flagg; sletting kan komme senere.
+  - **🌐 TEST I NETTLESER**: Pin prosjekt → offline → åpne hoved+underprosjekt uten 503/404.
+- [ ] **4.17.5** Manifest for full offline
+  - **Mål**: `scripts/generate-offline-manifest.js` lister toppnivå prosjekter (meta+cover). SW importerer via `importScripts`; steg-bilder hentes fra meta.steps.
+  - **🌐 TEST I NETTLESER**: Manifest har riktige stier; SW laster uten feil.
+- [ ] **4.17.6** Batch-prefetch
+  - **Mål**: PIN_ALL/PIN_PROJECT prefetches i små batches (setTimeout/async loop) for å unngå blokkering. JSON for pinned i USER-cache.
+  - **🌐 TEST I NETTLESER**: Full offline fryser ikke; fremdrift i console; offline funker.
+- [ ] **4.17.7** Persist og push offline-flagg ved oppstart
+  - **Mål**: Les `offlineAll` og `offlineProjects` fra localStorage ved app-start og send til SW (postMessage) så ny SW får korrekt pinned-liste uten brukerklikk.
+  - **🌐 TEST I NETTLESER**: Etter reload/ny SW-activate: pinned/full offline fungerer uten at brukeren trenger å trykke noe.
+- [ ] **4.17.8** UI-tilbakemelding
+  - **Mål**: Full offline-status i settings (På/Av + synk-status). Sky-knapp beholder ⏳/☁️. Hint ved offline beholdes.
+  - **🌐 TEST I NETTLESER**: Klar status; ingen overlap; hint vises kort ved offline.
+- [ ] **4.17.9** Dokumentasjon
+  - **Mål**: Oppdater AI_GUIDE/ARCHITECTURE/IMPLEMENTATION: USER vs AUTO cache, pinned via postMessage, manifest-script, batch-prefetch, kvote kun på AUTO, JSON i USER.
+  - **📄**: Legg inn i ARCHITECTURE og AI_GUIDE.
+
 ## Milepæler
 
 ### M1: MVP (Minimum Viable Product)

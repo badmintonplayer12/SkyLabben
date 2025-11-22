@@ -13,6 +13,7 @@ import { consumePrompt, isStandalone } from './pwa-install.js';
 import { getMode, setMode, getOverrides, setOverride, isVisibleForKidsNow, getOverrideKey, createVisibilityToggle } from './visibility.js';
 import { showParentQuizDialog } from './parent-quiz.js';
 import { openDialog } from './dialog.js';
+import { isOffline as isOfflineFlag } from './offline-status.js';
 
 function createOfflineChip() {
   const chip = document.createElement('span');
@@ -35,7 +36,7 @@ function createOfflineChip() {
       <line x1="5" y1="5" x2="19" y2="21" stroke="#9BA4B5" stroke-width="1.6" stroke-linecap="round"/>
     </svg>
   `;
-  if (!navigator.onLine) {
+  if (isOfflineFlag()) {
     chip.classList.add('offline-chip--visible');
     chip.setAttribute('aria-hidden', 'false');
   }

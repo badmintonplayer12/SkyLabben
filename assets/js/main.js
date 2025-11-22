@@ -12,6 +12,7 @@ import { renderViewer } from './view-viewer.js';
 import { showCelebration } from './celebration/index.js';
 import { hasSeenOnboarding, showOnboarding, showOverlayMessage } from './onboarding.js';
 import { initInstallPromptListener } from './pwa-install.js';
+import { notifyOffline, notifyOnline, probeOnline, setOfflineFlag, isOffline as checkOfflineFlag } from './offline-status.js';
 
 /**
  * Initialiserer applikasjonen
@@ -30,6 +31,8 @@ export function init() {
   registerServiceWorker();
   initPWAInstall();
   initOfflineIndicator();
+  pushOfflineStateToSW();
+  syncInitialOfflineStatus();
 }
 
 /**
@@ -47,6 +50,58 @@ function initPWAInstall() {
       const currentHash = window.location.hash;
       updateHash(parseHash(currentHash));
     }
+  });
+}
+
+/**
+ * Sender lagret offline-state (offlineAll/offlineProjects) til SW ved oppstart
+ */
+async function pushOfflineStateToSW() {
+  const offlineProjects = (() => {
+    try {
+      const stored = localStorage.getItem('legoInstructions.offlineProjects');
+      const parsed = stored ? JSON.parse(stored) : {};
+      return parsed && typeof parsed === 'object' ? Object.keys(parsed).filter((k) => parsed[k]) : [];
+    } catch {
+      return [];
+    }
+  })();
+
+  const offlineAll = (() => {
+    try {
+      return localStorage.getItem('legoInstructions.offlineAll') === 'true';
+    } catch {
+      return false;
+    }
+  })();
+
+  // Hent prosjektliste hvis vi skal pinne alle
+  let allProjects = [];
+  if (offlineAll) {
+    try {
+      const resp = await fetch('./projects.json');
+      if (resp.ok) {
+        const data = await resp.json();
+        allProjects = Array.isArray(data) ? data.map((p) => p.path).filter(Boolean) : [];
+      }
+    } catch {
+      // ignorer
+    }
+  }
+
+  const controller = navigator.serviceWorker?.controller;
+  if (!controller) return;
+
+  if (offlineAll && allProjects.length > 0) {
+    controller.postMessage({
+      type: 'SET_OFFLINE_ALL',
+      enabled: true,
+      paths: allProjects
+    });
+  }
+
+  offlineProjects.forEach((path) => {
+    controller.postMessage({ type: 'PIN_PROJECT', path });
   });
 }
 
@@ -347,7 +402,7 @@ function initOfflineIndicator() {
   const hintNodes = () => Array.from(document.querySelectorAll('.offline-hint'));
 
   function updateOfflineStatus() {
-    const isOnline = navigator.onLine;
+    const isOnline = !checkOfflineFlag();
     
     chipNodes().forEach((chip) => {
       if (isOnline) {
@@ -378,12 +433,38 @@ function initOfflineIndicator() {
   // Lytte på online/offline events
   window.addEventListener('online', () => {
     updateOfflineStatus();
+    probeOnline().then((ok) => {
+      if (ok) {
+        setOfflineFlag(false);
+        updateOfflineStatus();
+      } else {
+        notifyOffline();
+      }
+    });
     console.info('Nettverk tilbake online');
   });
 
   window.addEventListener('offline', () => {
+    setOfflineFlag(true);
     updateOfflineStatus();
     console.warn('Nettverk offline');
+  });
+}
+
+function syncInitialOfflineStatus() {
+  if (!navigator.onLine) {
+    setOfflineFlag(true);
+    notifyOffline();
+    return;
+  }
+  probeOnline().then((ok) => {
+    if (ok) {
+      setOfflineFlag(false);
+      notifyOnline();
+    } else {
+      setOfflineFlag(true);
+      notifyOffline();
+    }
   });
 }
 

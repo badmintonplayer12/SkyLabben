@@ -9,11 +9,13 @@ import { getLastStepFor } from './state.js';
 import { getFavoriteProjects, toggleFavoriteProject } from './favorites.js';
 import { shareUrl } from './share.js';
 import { getMode, getOverrides, setOverride, isVisibleForKidsNow, getOverrideKey, setMode, createVisibilityToggle } from './visibility.js';
+import { isOffline as isOfflineFlag } from './offline-status.js';
 import { isInstallAvailable, consumePrompt, isStandalone } from './pwa-install.js';
 import { showParentQuizDialog } from './parent-quiz.js';
 
 const FILTER_STORAGE_KEY = 'legoInstructions.gridFilters';
 const OFFLINE_STORAGE_KEY = 'legoInstructions.offlineProjects';
+const OFFLINE_ALL_KEY = 'legoInstructions.offlineAll';
 
 function loadFilterState() {
   try {
@@ -48,6 +50,22 @@ function saveOfflineState(state) {
   }
 }
 
+function loadOfflineAll() {
+  try {
+    return localStorage.getItem(OFFLINE_ALL_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function saveOfflineAll(enabled) {
+  try {
+    localStorage.setItem(OFFLINE_ALL_KEY, String(enabled));
+  } catch (e) {
+    console.warn('Kunne ikke lagre offlineAll:', e);
+  }
+}
+
 function saveFilterState(state) {
   try {
     localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(state));
@@ -77,7 +95,7 @@ function createOfflineChip() {
       <line x1="5" y1="5" x2="19" y2="21" stroke="#9BA4B5" stroke-width="1.6" stroke-linecap="round"/>
     </svg>
   `;
-  if (!navigator.onLine) {
+  if (isOfflineFlag()) {
     chip.classList.add('offline-chip--visible');
     chip.setAttribute('aria-hidden', 'false');
   }
@@ -137,6 +155,7 @@ export function renderProjectGrid(projects, onProjectClick) {
   const metaCache = new Map();
   let favoriteSet = new Set(getFavoriteProjects());
   let offlineState = loadOfflineState();
+  let offlineAll = loadOfflineAll();
   let selectedCategory = 'Alle';
   let favoritesOnly = false;
 
@@ -337,7 +356,7 @@ export function renderProjectGrid(projects, onProjectClick) {
       offlineIcon.className = 'project-grid__settings-icon';
       offlineIcon.textContent = '☁️';
       const offlineLabel = document.createElement('span');
-      offlineLabel.textContent = 'Gjør alt tilgjengelig offline';
+      offlineLabel.textContent = offlineAll ? 'Full offline: På' : 'Gjør alt tilgjengelig offline';
       offlineAllButton.appendChild(offlineIcon);
       offlineAllButton.appendChild(offlineLabel);
       let offlineAllBusy = false;
@@ -346,21 +365,49 @@ export function renderProjectGrid(projects, onProjectClick) {
         offlineAllBusy = true;
         offlineAllButton.disabled = true;
         const base = getBaseProjects();
-        offlineLabel.textContent = `Laster ned (0/${base.length})`;
-        for (let i = 0; i < base.length; i += 1) {
-          const p = base[i];
-          offlineState[p.path] = true;
-          offlineLabel.textContent = `Laster ned (${i + 1}/${base.length})`;
+        if (offlineAll) {
+          // Skru av
+          offlineAll = false;
+          saveOfflineAll(false);
           try {
-            await prefetchProjectAssets(p.path);
+            navigator.serviceWorker?.controller?.postMessage({
+              type: 'SET_OFFLINE_ALL',
+              enabled: false,
+              paths: []
+            });
           } catch (e) {
-            console.warn('Prefetch feilet for', p.path, e);
+            console.warn('Kunne ikke sende SET_OFFLINE_ALL false til SW:', e);
           }
+          offlineLabel.textContent = 'Full offline: Av';
+        } else {
+          // Skru på og hent alt
+          offlineAll = true;
+          saveOfflineAll(true);
+          offlineLabel.textContent = `Laster ned (0/${base.length})`;
+          try {
+            navigator.serviceWorker?.controller?.postMessage({
+              type: 'SET_OFFLINE_ALL',
+              enabled: true,
+              paths: base.map((p) => p.path)
+            });
+          } catch (e) {
+            console.warn('Kunne ikke sende SET_OFFLINE_ALL til SW:', e);
+          }
+          for (let i = 0; i < base.length; i += 1) {
+            const p = base[i];
+            offlineState[p.path] = true;
+            offlineLabel.textContent = `Laster ned (${i + 1}/${base.length})`;
+            try {
+              await prefetchProjectAssets(p.path);
+            } catch (e) {
+              console.warn('Prefetch feilet for', p.path, e);
+            }
+          }
+          saveOfflineState(offlineState);
+          offlineLabel.textContent = 'Full offline: På';
         }
-        saveOfflineState(offlineState);
-        offlineLabel.textContent = 'Ferdig (offline)';
         setTimeout(() => {
-          offlineLabel.textContent = 'Gjør alt tilgjengelig offline';
+          offlineLabel.textContent = offlineAll ? 'Full offline: På' : 'Gjør alt tilgjengelig offline';
           offlineAllButton.disabled = false;
           offlineAllBusy = false;
         }, 1200);
@@ -641,6 +688,14 @@ export function renderProjectGrid(projects, onProjectClick) {
         offlineState[project.path] = next;
         saveOfflineState(offlineState);
         if (next) {
+          try {
+            navigator.serviceWorker?.controller?.postMessage({
+              type: 'PIN_PROJECT',
+              path: project.path
+            });
+          } catch (e) {
+            console.warn('Kunne ikke sende PIN_PROJECT til SW:', e);
+          }
           offlineBtn.disabled = true;
           offlineBtn.textContent = '⏳';
           offlineBtn.title = 'Laster ned...';

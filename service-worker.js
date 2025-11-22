@@ -1,5 +1,5 @@
 // CACHE_VERSION oppdateres av scripts/update-version.js
-const CACHE_VERSION = '2025-11-22+151352-567b08e';
+const CACHE_VERSION = '2025-11-22+175514-ad5be52';
 
 const PRECACHE_PATHS = [
   './',
@@ -22,6 +22,7 @@ const PRECACHE_PATHS = [
   './assets/js/visibility.js',
   './assets/js/parent-quiz.js',
   './assets/js/version.js',
+  './assets/js/offline-status.js',
   './assets/js/celebration/index.js',
   './assets/js/celebration/emoji.js',
   './assets/js/celebration/lottie.js',
@@ -52,8 +53,10 @@ const INDEX_URL = new URL('./index.html', self.location).href;
 
 // Cache-navn for forskjellige typer ressurser
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
-const IMAGE_CACHE = `${CACHE_VERSION}-images`;
-const JSON_CACHE = `${CACHE_VERSION}-json`;
+const IMAGE_CACHE_AUTO = `${CACHE_VERSION}-images-auto`;
+const IMAGE_CACHE_USER = `${CACHE_VERSION}-images-user`;
+const JSON_CACHE_AUTO = `${CACHE_VERSION}-json-auto`;
+const JSON_CACHE_USER = `${CACHE_VERSION}-json-user`;
 const AUDIO_CACHE = `${CACHE_VERSION}-audio`;
 
 // Cache-quota begrensninger (i bytes)
@@ -149,13 +152,118 @@ async function enforceCacheQuota(cache, maxSize) {
   console.info(`[ServiceWorker] Cache-quota håndtert. Fjernet ${currentSize - await getCacheSize(cache)} bytes`);
 }
 
+const pinnedProjects = new Set();
+let offlineAllEnabled = false;
+
+function normalizeProjectPath(path) {
+  if (!path) return null;
+  // Strip leading ./ and trailing slashes
+  let p = path.replace(/^\.?\/*/, '').replace(/\/+$/, '');
+  if (!p.startsWith('projects/')) {
+    p = `projects/${p}`;
+  }
+  return p;
+}
+
+function extractProjectKey(urlString) {
+  try {
+    const u = new URL(urlString);
+    const parts = u.pathname.split('/');
+    const idx = parts.indexOf('projects');
+    if (idx === -1 || idx + 1 >= parts.length) return null;
+    return `projects/${parts[idx + 1]}`;
+  } catch {
+    return null;
+  }
+}
+
+function isPinned(urlString) {
+  if (offlineAllEnabled) return true;
+  const key = extractProjectKey(urlString);
+  if (!key) return false;
+  return pinnedProjects.has(key);
+}
+
+async function cacheProjectAssets(projectPath, options = {}) {
+  const { cacheImages = true, cacheJson = true } = options;
+  const key = normalizeProjectPath(projectPath);
+  if (!key) return;
+  // Hvis vi allerede er offline: hopp over prefetch nå
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    console.info('[ServiceWorker] Hopper over caching (offline):', key);
+    return;
+  }
+
+  // Fetch parent meta
+  const metaUrl = new URL(`./${key}/meta.json`, self.location).href;
+  let meta = null;
+  if (cacheJson) {
+    try {
+      const resp = await fetch(metaUrl);
+      if (resp.ok) {
+        meta = await resp.clone().json();
+        const jsonCache = await caches.open(JSON_CACHE_USER);
+        await jsonCache.put(metaUrl, resp.clone());
+      }
+    } catch (e) {
+      console.warn('[ServiceWorker] Klarte ikke cache meta', metaUrl, e);
+    }
+  } else {
+    try {
+      const resp = await fetch(metaUrl);
+      if (resp.ok) {
+        meta = await resp.clone().json();
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Cache images for parent
+  if (cacheImages) {
+    const imgCache = await caches.open(IMAGE_CACHE_USER);
+    const cover = meta?.coverImage || 'cover.png';
+    const coverUrl = new URL(`./${key}/${cover}`, self.location).href;
+    try {
+      const resp = await fetch(coverUrl);
+      if (resp.ok) {
+        await imgCache.put(coverUrl, resp.clone());
+      }
+    } catch (e) {
+      console.warn('[ServiceWorker] Klarte ikke cache cover', coverUrl, e);
+    }
+    const steps = meta?.steps || [];
+    for (const step of steps) {
+      const stepUrl = new URL(`./${key}/${step}`, self.location).href;
+      try {
+        const resp = await fetch(stepUrl);
+        if (resp.ok) {
+          await imgCache.put(stepUrl, resp.clone());
+        }
+      } catch (e) {
+        console.warn('[ServiceWorker] Klarte ikke cache steg', stepUrl, e);
+      }
+    }
+  }
+
+  // Cache children recursively
+  const children = meta?.children || [];
+  for (const child of children) {
+    const childPath = child.path || child.id;
+    if (!childPath) continue;
+    await cacheProjectAssets(`${key}/${childPath}`, { cacheImages, cacheJson });
+  }
+}
+
 self.addEventListener('install', (event) => {
   console.info('[ServiceWorker] Install', CACHE_VERSION);
   event.waitUntil(
     Promise.all([
       caches.open(STATIC_CACHE).then((cache) => cache.addAll(PRECACHE_URLS)),
-      caches.open(IMAGE_CACHE),
-      caches.open(JSON_CACHE),
+      caches.open(IMAGE_CACHE_AUTO),
+      caches.open(IMAGE_CACHE_USER),
+      caches.open(JSON_CACHE_AUTO),
+      caches.open(JSON_CACHE_USER),
       caches.open(AUDIO_CACHE)
     ])
   );
@@ -166,7 +274,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       // Slett alle caches som ikke matcher nåværende versjon
-      const validCaches = [STATIC_CACHE, IMAGE_CACHE, JSON_CACHE, AUDIO_CACHE];
+      const validCaches = [STATIC_CACHE, IMAGE_CACHE_AUTO, IMAGE_CACHE_USER, JSON_CACHE_AUTO, JSON_CACHE_USER, AUDIO_CACHE];
       return Promise.all(
         cacheNames
           .filter((cacheName) => !validCaches.includes(cacheName))
@@ -206,6 +314,32 @@ self.addEventListener('message', (event) => {
   if (!event.data) return;
   if (event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
+  }
+  if (event.data.type === 'PIN_PROJECT') {
+    const p = normalizeProjectPath(event.data.path);
+    if (p) {
+      pinnedProjects.add(p);
+      cacheProjectAssets(p).catch(() => {});
+    }
+  }
+  if (event.data.type === 'PIN_ALL') {
+    const list = Array.isArray(event.data.paths) ? event.data.paths : [];
+    list.forEach((p) => {
+      const key = normalizeProjectPath(p);
+      if (key) pinnedProjects.add(key);
+    });
+    list.forEach((p) => cacheProjectAssets(p).catch(() => {}));
+  }
+  if (event.data.type === 'SET_OFFLINE_ALL') {
+    offlineAllEnabled = Boolean(event.data.enabled);
+    const list = Array.isArray(event.data.paths) ? event.data.paths : [];
+    if (offlineAllEnabled) {
+      list.forEach((p) => {
+        const key = normalizeProjectPath(p);
+        if (key) pinnedProjects.add(key);
+      });
+      list.forEach((p) => cacheProjectAssets(p).catch(() => {}));
+    }
   }
 });
 
@@ -264,10 +398,12 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Bilder: Cache First (sjekk cache først, hent fra nettverk hvis ikke funnet)
+  // Bilder: Cache First, men med pinned/auto-splitt
   if (isImageRequest(requestUrl.href) && isProjectResource(requestUrl.href)) {
+    const pinned = isPinned(requestUrl.href);
+    const targetCacheName = pinned ? IMAGE_CACHE_USER : IMAGE_CACHE_AUTO;
     event.respondWith(
-      caches.open(IMAGE_CACHE).then((cache) => {
+      caches.open(targetCacheName).then((cache) => {
         return cache.match(request).then((cachedResponse) => {
           if (cachedResponse) {
             return cachedResponse;
@@ -276,10 +412,11 @@ self.addEventListener('fetch', (event) => {
             // Cache kun hvis responsen er OK
             if (networkResponse.ok) {
               cache.put(request, networkResponse.clone()).then(() => {
-                // Håndter cache-quota etter caching
-                enforceCacheQuota(cache, MAX_IMAGE_CACHE_SIZE).catch(err => {
-                  console.warn('[ServiceWorker] Kunne ikke håndtere cache-quota:', err);
-                });
+                if (!pinned) {
+                  enforceCacheQuota(cache, MAX_IMAGE_CACHE_SIZE).catch(err => {
+                    console.warn('[ServiceWorker] Kunne ikke håndtere cache-quota:', err);
+                  });
+                }
               });
             }
             return networkResponse;
@@ -296,32 +433,49 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // JSON-data: Network First (hent fra nettverk først, fallback til cache)
+  // JSON-data: Pinned → cache-first i USER; ellers auto (network-first med fallback)
   if (isJsonRequest(requestUrl.href) && isProjectResource(requestUrl.href)) {
-    event.respondWith(
-      caches.open(JSON_CACHE).then((cache) => {
-        return fetch(request).then((networkResponse) => {
-          // Cache kun hvis responsen er OK
-          if (networkResponse.ok) {
-            cache.put(request, networkResponse.clone());
-          }
-          return networkResponse;
-        }).catch((error) => {
-          console.warn('[ServiceWorker] Nettverk feilet, prøver cache:', requestUrl.href, error);
-          // Fallback til cache hvis nettverk feiler
-          return cache.match(request).then((cachedResponse) => {
-            if (cachedResponse) {
-              return cachedResponse;
-            }
-            // Hvis ingen cache, returner feil
-            return new Response('JSON-data ikke tilgjengelig', { 
-              status: 503,
-              headers: { 'Content-Type': 'text/plain' }
+    const pinned = isPinned(requestUrl.href);
+    if (pinned) {
+      event.respondWith(
+        caches.open(JSON_CACHE_USER).then((cache) => {
+          return cache.match(request).then((cached) => {
+            if (cached) return cached;
+            return fetch(request).then((resp) => {
+              if (resp.ok) {
+                cache.put(request, resp.clone());
+              }
+              return resp;
+            }).catch((error) => {
+              console.warn('[ServiceWorker] Nettverk feilet (pinned), prøver cache:', requestUrl.href, error);
+              return cache.match(request).then((fallback) => fallback || new Response('JSON-data ikke tilgjengelig', { status: 503 }));
             });
           });
-        });
-      })
-    );
+        })
+      );
+    } else {
+      event.respondWith(
+        caches.open(JSON_CACHE_AUTO).then((cache) => {
+          return fetch(request).then((networkResponse) => {
+            if (networkResponse.ok) {
+              cache.put(request, networkResponse.clone());
+            }
+            return networkResponse;
+          }).catch((error) => {
+            console.warn('[ServiceWorker] Nettverk feilet, prøver cache:', requestUrl.href, error);
+            return cache.match(request).then((cachedResponse) => {
+              if (cachedResponse) {
+                return cachedResponse;
+              }
+              return new Response('JSON-data ikke tilgjengelig', { 
+                status: 503,
+                headers: { 'Content-Type': 'text/plain' }
+              });
+            });
+          });
+        })
+      );
+    }
     return;
   }
 
