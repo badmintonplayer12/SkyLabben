@@ -309,6 +309,10 @@ button {
   justify-content: center;
 }
 
+.project-tile__offline {
+  font-size: 18px;
+}
+
 .project-tile__favorite--active {
   color: #f5c000;
 }
@@ -757,8 +761,8 @@ button {
 
 .project-tile--hidden-for-kids {
   position: relative;
-  opacity: 0.3;
-  filter: grayscale(0.2);
+  opacity: 1;
+  filter: none;
 }
 
 .project-hidden-overlay {
@@ -802,11 +806,15 @@ button {
   line-height: 1.2;
 }
 
+.project-tile__image.dimmed {
+  opacity: 0.5;
+}
+
 /* Toggle switch */
 .toggle-overlay-position {
   position: absolute;
-  top: var(--spacing-md);
-  left: var(--spacing-md);
+  top: 0;
+  left: 0;
   z-index: 10;
 }
 
@@ -814,6 +822,7 @@ button {
   display: flex;
   cursor: pointer;
   user-select: none;
+  padding: var(--spacing-md);
 }
 
 .toggle-overlay-label:hover .toggle-slider::after {

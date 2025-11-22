@@ -501,6 +501,34 @@ Dette dokumentet beskriver implementasjonsplanen og fremtidige funksjoner for Sk
    - Forvent: modus/overrides uendret. Ingen nettkrav for synlighet.
 6) Hvis du bumpet versjon før testen: se at oppdateringsdialog kan dukke opp ved gjenopptak (focus/visibilitychange) når ny SW er waiting.
 
+### 4.15 Av/på-switch for synlighet (uten tekst)
+- [x] **4.15.1** Felles switch-komponent
+  - **Mål**: Lag label-fri helper `createVisibilityToggle({ checked, disabled=false, onChange, ariaLabel='Synlig for barn', title='Synlig for barn', stopPropagation=true })` som returnerer `{ element, setChecked, setDisabled }`. Bruk samme helper i grid og viewer; onChange ignoreres hvis disabled.
+  - **🌐 TEST I NETTLESER**: Fokus/aria fungerer; toggling kaller onChange; disabled stopper endring.
+- [x] **4.15.2** Grid-UI med dim/badge
+  - **Mål**: Parent-modus: pill uten tekst i hjørnet; når effectiveVisibility(parent)==hidden → legg `project-tile--hidden-for-kids` (opacity/grayscale) og liten badge (aria-hidden). Ingen toggles/dimming i barnemodus.
+  - **🌐 TEST I NETTLESER**: Parent: toggle dimmer/undimmer; reload beholder status; barnemodus viser ikke toggles/dimming.
+- [x] **4.15.3** Viewer-UI og parent-trumping
+  - **Mål**: Viewer-header: samme pill; parent hidden → disable child-toggles og legg hidden-klasse på alle child-tiles. Child hidden → bare det child dimmes/disablet. Bruk visibility-modulen (effectiveVisibility) som eneste sannhet.
+  - **🌐 TEST I NETTLESER**: Parent off → alle children dimmes/disablet; parent on → child-toggles virker; reload beholder status.
+- [x] **4.15.4** CSS
+  - **Mål**: Pill 24–28px med modifiers `--on/--off/--disabled`; dim-stil (`opacity:0.6; filter: grayscale(0.2);`), badge-ikon i hjørnet (aria-hidden). Disabled-pill med `cursor: not-allowed` og lavere opacity. Ingen label i UI, kun aria/title.
+  - **🌐 TEST I NETTLESER**: God touchflate; badge vises ved hidden; disabled ser tydelig disabled ut.
+
+### 4.16 Offline-støtte (grunnleggende + per prosjekt)
+- [ ] **4.16.1** Precache kjerne-data
+  - **Mål**: SW precacher `projects.json`, toppnivå `meta.json` og cover for alle prosjekter, i tillegg til animasjoner/Lottie-lib. Unngå hardkoding; bruk generert liste fra script/manifest når tilgjengelig.
+  - **🌐 TEST I NETTLESER**: Application → Cache Storage: kjernefiler ligger i static-cache; galleriet kan åpnes offline (minst forsiden + ett prosjekt uten nett).
+- [ ] **4.16.2** Offline-toggle per prosjekt (parent)
+  - **Mål**: I parent-modus: stjerne skjules; synlighets-toggle (venstre) beholdes; ny sky-knapp (høyre) for “Tilgjengelig offline”. Toggle lagrer til `legoInstructions.offlineProjects`, kaller prefetch av meta + cover + steg-bilder via SW cache-first. Barnemodus beholder stjerne, ingen sky.
+  - **🌐 TEST I NETTLESER**: Parent: trykk sky → fetcher og lagrer; reload bevarer status; child-modus: ingen sky, stjerne fungerer som før.
+- [ ] **4.16.3** Global offline-knapp
+  - **Mål**: I settings-panelet (parent) legg til “Gjør alt tilgjengelig offline” som prefetcher alle prosjekter i listen; oppdater offline-state lokalt.
+  - **🌐 TEST I NETTLESER**: Trykk knappen, se at filer caches (Application → Cache Storage), reload og bekreft at sky-knapper står på for alle.
+- [ ] **4.16.4** Dimming/overlay-justering
+  - **Mål**: Ved skjult prosjekt dimmes kun bildet (`img.project-tile__image.dimmed`); badge/overlay midt på kortet vises. Ingen global opacity på kortet.
+  - **🌐 TEST I NETTLESER**: Skjul prosjekt: kun bilde blir grå/dimmet, tekst/badge lesbar; child-modus filtrerer bort skjulte som før.
+
 ## Milepæler
 
 ### M1: MVP (Minimum Viable Product)

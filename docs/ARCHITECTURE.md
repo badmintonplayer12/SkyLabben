@@ -27,6 +27,7 @@ Prosjektet er bygget som en modulær, komponentbasert applikasjon med ren JavaSc
 - **Modulær struktur**: Hver fil har et klart ansvar
 - **Hash-basert routing**: URL-struktur via hash-fragmenter for enkel hosting
 - **localStorage**: Klient-side lagring av progresjon
+- **Statisk hosting + SW**: Service Worker brukes for caching; ingen ESM i importScripts, bruk relative stier for GitHub Pages
 
 ## Komponentoversikt
 
@@ -136,6 +137,7 @@ Dette er ikke en del av `AppState`, men et separat objekt som lagrer siste steg 
 - Håndterer klikk på prosjekter
 - Viser progresjonsindikator (hvis implementert)
 - Kan presentere underprosjekter inline (flatt galleri) før man navigerer videre, slik at barn slipper å forstå “opp ett nivå”
+- Viser synlighetstoggles i parent-modus (label-fri pill) og dimmer kort som er skjult for barn (parent/override)
 
 **DOM-struktur**:
 - Container med grid-layout
@@ -156,6 +158,7 @@ Dette er ikke en del av `AppState`, men et separat objekt som lagrer siste steg 
 - Viser vennlig loading-indikator (f.eks. LEGO-kloss-animajson) mens neste bilde lastes
 - Feirer ferdigstillelse (konfetti/lyd) og markerer progresjon når siste steg fullføres
 - Tilbyr lyd/haptikk-bryter og eventuelt steg-vis lydhint når `audioSteps` er definert
+- Viser synlighetstoggles for parent/child i parent-modus (label-fri pill), med parent-trumping (parent hidden → child-toggles disabled/dimmet)
 
 **DOM-struktur**:
 - Header (valgfritt)
@@ -309,6 +312,9 @@ const stepIndex = stepMatch ? parseInt(stepMatch[1]) : undefined;
 ### Ingen build tools
 **Hvorfor**: Enklere setup, raskere utvikling, og direkte debugging i nettleseren.
 
+### Service Worker (SW) og hosting
+**Hvorfor**: Raskere/offline opplevelse og kontroll på animasjons-/static-assets. Unngå ESM i SW (importScripts), bruk relative stier (GH Pages subpath), og bump CACHE_VERSION før deploy.
+
 ## Skalerbarhet og vedlikehold
 
 ### Retningslinjer for filstørrelse
@@ -399,6 +405,7 @@ Utility-moduler skal:
 - Ha klare, beskrivende funksjonsnavn
 - Være testbare isolert
 - Ikke ha sideeffekter (unntatt nødvendig)
+- Felles UI-helpers (f.eks. dialog, feiring, synlighetstoggle) bør brukes på tvers av views for å unngå duplisering.
 
 ### Code Review Checklist
 

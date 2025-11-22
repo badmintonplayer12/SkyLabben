@@ -6,67 +6,67 @@
   "children": [
     {
       "id": "1-spiserom",
-      "name": "1-Spiserom",
+      "name": "1 - Spiserom",
       "path": "1-spiserom"
     },
     {
       "id": "2-alma-sitt-rom",
-      "name": "2-Alma sitt Rom",
+      "name": "2 - Alma sitt Rom",
       "path": "2-alma-sitt-rom"
     },
     {
       "id": "3-joanna-sitt-rom",
-      "name": "3-Joanna sitt Rom",
+      "name": "3 - Joanna sitt Rom",
       "path": "3-joanna-sitt-rom"
     },
     {
       "id": "4-lekerom",
-      "name": "4-Lekerom",
+      "name": "4 - Lekerom",
       "path": "4-lekerom"
     },
     {
       "id": "5-lea-sitt-rom",
-      "name": "5-Lea sitt rom",
+      "name": "5 - Lea sitt rom",
       "path": "5-lea-sitt-rom"
     },
     {
       "id": "6-stue",
-      "name": "6-Stue",
+      "name": "6 - Stue",
       "path": "6-stue"
     },
     {
       "id": "7-kjokken",
-      "name": "7-Kjøkken",
+      "name": "7 - Kjøkken",
       "path": "7-kjokken"
     },
     {
       "id": "8-bad",
-      "name": "8-Bad",
+      "name": "8 - Bad",
       "path": "8-bad"
     },
     {
       "id": "9-peis",
-      "name": "9-Peis",
+      "name": "9 - Peis",
       "path": "9-peis"
     },
     {
       "id": "10-simon-sitt-rom",
-      "name": "10-Simon sitt rom",
+      "name": "10 - Simon sitt rom",
       "path": "10-simon-sitt-rom"
     },
     {
       "id": "11-gang",
-      "name": "11-Gang",
+      "name": "11 - Gang",
       "path": "11-gang"
     },
     {
       "id": "12-tegnerom",
-      "name": "12-Tegnerom",
+      "name": "12 - Tegnerom",
       "path": "12-tegnerom"
     },
     {
       "id": "13-hjemmehjelperen",
-      "name": "13-Hjemmehjelperen",
+      "name": "13 - Hjemmehjelperen",
       "path": "13-hjemmehjelperen",
       "approvedByDefault": false
     }

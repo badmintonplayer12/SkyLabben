@@ -2,6 +2,66 @@ const MODE_KEY = 'legoInstructions.mode';
 const OVERRIDES_KEY = 'legoInstructions.visibilityOverrides';
 
 /**
+ * Lager en label-fri toggle (pill) med aria/title. Returnerer element og controllere.
+ * @param {Object} params
+ * @param {boolean} params.checked
+ * @param {boolean} [params.disabled=false]
+ * @param {Function} [params.onChange]
+ * @param {string} [params.ariaLabel='Synlig for barn']
+ * @param {string} [params.title='Synlig for barn']
+ * @param {boolean} [params.stopPropagation=true]
+ * @returns {{ element: HTMLElement, setChecked: (checked:boolean) => void, setDisabled: (disabled:boolean)=>void }}
+ */
+export function createVisibilityToggle({
+  checked,
+  disabled = false,
+  onChange,
+  ariaLabel = 'Synlig for barn',
+  title = 'Synlig for barn',
+  stopPropagation = true
+} = {}) {
+  const container = document.createElement('label');
+  container.className = 'toggle-overlay-label';
+  container.title = title;
+
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.className = 'toggle-input';
+  checkbox.checked = !!checked;
+  checkbox.disabled = !!disabled;
+  checkbox.setAttribute('aria-label', ariaLabel);
+  checkbox.title = title;
+
+  if (stopPropagation) {
+    checkbox.addEventListener('click', (e) => e.stopPropagation());
+    container.addEventListener('click', (e) => e.stopPropagation());
+  }
+
+  const slider = document.createElement('div');
+  slider.className = 'toggle-slider toggle-overlay';
+
+  checkbox.addEventListener('change', () => {
+    if (checkbox.disabled) return;
+    if (typeof onChange === 'function') {
+      onChange(checkbox.checked);
+    }
+  });
+
+  container.appendChild(checkbox);
+  container.appendChild(slider);
+
+  const setChecked = (value) => {
+    checkbox.checked = !!value;
+  };
+
+  const setDisabled = (value) => {
+    checkbox.disabled = !!value;
+  };
+
+  return { element: container, setChecked, setDisabled };
+}
+
+/**
  * Henter modus (child|parent) fra localStorage, default child
  * @returns {'child'|'parent'}
  */

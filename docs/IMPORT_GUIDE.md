@@ -91,14 +91,32 @@ Mapper med mellomrom og spesialtegn (f.eks. `"Huset Vårt"`) kan gi problemer:
    - Behold kun bokstaver, tall og bindestreker
    - Eksempel: `"1-Spiserom"` → `"1-spiserom"` (tall er OK)
 
+### Formatering av visningsnavn (name-feltet)
+
+Når prosjekter eller underprosjekter starter med et tall etterfulgt av bindestrek (f.eks. `1-kjokken`, `7-kjokken`), skal visningsnavnet (`name`-feltet) ha mellomrom før og etter bindestreken som kommer etter tallet.
+
+**Regel:**
+- Hvis mappenavnet starter med tall etterfulgt av bindestrek: legg til mellomrom før og etter bindestreken i visningsnavnet
+- Eksempel: `"7-kjokken"` → `"name": "7 - Kjøkken"` (med mellomrom og stor forbokstav)
+
+**Eksempler:**
+- Mappe: `1-spiserom` → `"name": "1 - Spiserom"`
+- Mappe: `7-kjokken` → `"name": "7 - Kjøkken"`
+- Mappe: `10-simon-sitt-rom` → `"name": "10 - Simon sitt rom"`
+
+**Hvor dette skal settes:**
+- I `meta.json`-filen for prosjektet/underprosjektet: `"name": "7 - Kjøkken"`
+- I `children`-arrayen i parent `meta.json`: `"name": "7 - Kjøkken"`
+
 ### Eksempler
 
 | Originalt navn | Web-vennlig mappe | `id` i JSON | `name` i JSON | `path` i JSON |
 |----------------|-------------------|-------------|---------------|---------------|
 | `Huset Vårt` | `huset-vaart` | `huset-vaart` | `"Huset Vårt"` | `huset-vaart` |
 | `Alma sitt Rom` | `alma-sitt-rom` | `alma-sitt-rom` | `"Alma sitt Rom"` | `alma-sitt-rom` |
-| `1-Spiserom` | `1-spiserom` | `1-spiserom` | `"1-Spiserom"` | `1-spiserom` |
-| `10-Simon sitt rom` | `10-simon-sitt-rom` | `10-simon-sitt-rom` | `"10-Simon sitt rom"` | `10-simon-sitt-rom` |
+| `1-Spiserom` | `1-spiserom` | `1-spiserom` | `"1 - Spiserom"` | `1-spiserom` |
+| `7-Kjøkken` | `7-kjokken` | `7-kjokken` | `"7 - Kjøkken"` | `7-kjokken` |
+| `10-Simon sitt rom` | `10-simon-sitt-rom` | `10-simon-sitt-rom` | `"10 - Simon sitt rom"` | `10-simon-sitt-rom` |
 
 ## Steg-for-steg konvertering
 

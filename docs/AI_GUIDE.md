@@ -96,6 +96,21 @@ Et statisk nettsted for å vise LEGO-byggeinstruksjoner som PNG-bilder. Bygget m
 
 ## 🔍 Rask referanse
 
+**Service Worker og assets**
+- Unngå ESM i `importScripts` (SW støtter ikke `export/import`). Hold manifest/konstanter i vanlige JS-filer uten `export`.
+- Bruk relative stier for GitHub Pages (f.eks. `assets/js/lottie.min.js`, ikke `/assets/...`).
+- Precache animasjons-JSON og nødvendige libs (f.eks. lottie.min.js), bump CACHE_VERSION via `update-version.js` før deploy. Ikke precache filer som ikke finnes (unngå 404).
+- Random-pool for feiring: bruk lette animasjoner; hold tunge filer ute av random/fallback. Emoji som fallback.
+
+**Feiring/Lottie**
+- Rydd bort gamle overlays før ny effekt. Lottie/anim-JSON caches via SW + in-memory.
+
+**Synlighet-toggles (parent/child)**
+- Bruk én helper `createVisibilityToggle({ checked, disabled=false, onChange, ariaLabel='Synlig for barn', title='Synlig for barn', stopPropagation=true })` (uten synlig label, pill-størrelse ca. 24–28px). Returner gjerne `{ element, setChecked, setDisabled }`.
+- Parent hidden → disable/dimm alle children i viewer; child hidden → bare det child dimmes. Bruk visibility-modulen (effectiveVisibility) som sannhet.
+- Grid: parent-modus viser pill uten tekst; hidden = `project-tile--hidden-for-kids` (opacity/grayscale) + badge (aria-hidden). Barnemodus: ingen toggles/dimming.
+- CSS: modifiers `--on/--off/--disabled`; badge-ikon; disabled = `cursor: not-allowed`; aria-label/title for a11y.
+
 ### Hvor finner jeg...?
 
 **Hvordan sortere bilder?**
@@ -144,4 +159,3 @@ Et statisk nettsted for å vise LEGO-byggeinstruksjoner som PNG-bilder. Bygget m
 ---
 
 **Start med [ROADMAP.md](./ROADMAP.md) og følg oppgavene i rekkefølge!**
-

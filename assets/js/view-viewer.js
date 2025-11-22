@@ -10,7 +10,7 @@ import { playNavigationSound, isAudioEnabled, setAudioEnabled } from './audio-fe
 import { generateQRCodeForStep, generateQRCodeForProject } from './qr-code.js';
 import { shareUrl } from './share.js';
 import { consumePrompt, isStandalone } from './pwa-install.js';
-import { getMode, setMode, getOverrides, setOverride, isVisibleForKidsNow, getOverrideKey } from './visibility.js';
+import { getMode, setMode, getOverrides, setOverride, isVisibleForKidsNow, getOverrideKey, createVisibilityToggle } from './visibility.js';
 import { showParentQuizDialog } from './parent-quiz.js';
 import { openDialog } from './dialog.js';
 
@@ -166,27 +166,48 @@ export function renderViewer(state, callbacks) {
   const settingsMenu = createSettingsMenu();
   const parentOverrideKey = getOverrideKey({ projectId: state.currentProjectMeta?.id || state.currentPath });
   const defaultParentVisible = state.currentProjectMeta?.approvedByDefault !== false;
+  let projectToggleController = null;
+  const childTileControllers = [];
 
+  const isVisibleEffective = (projectId, childId, defaultVisible) => {
+    return isVisibleForKidsNow(
+      {
+        id: projectId,
+        childId,
+        approvedByDefault: defaultVisible
+      },
+      overrides
+    );
+  };
+
+  const applyChildVisibility = () => {
+    const parentVisible = isVisibleEffective(state.currentProjectMeta?.id || state.currentPath, null, defaultParentVisible);
+    if (projectToggleController) {
+      projectToggleController.setChecked(parentVisible);
+    }
+    childTileControllers.forEach(({ tile, toggle, key, defaultVisible }) => {
+      const childVisible = isVisibleEffective(state.currentProjectMeta?.id || state.currentPath, key.childId, defaultVisible);
+      const effectiveVisible = parentVisible && childVisible;
+      toggle.setDisabled(!parentVisible);
+      toggle.setChecked(parentVisible ? childVisible : false);
+      if (effectiveVisible) {
+        tile.classList.remove('project-tile--hidden-for-kids');
+        const badge = tile.querySelector('.project-hidden-overlay');
+        if (badge) badge.classList.remove('visible');
+        const img = tile.querySelector('img');
+        if (img) img.classList.remove('dimmed');
+      } else {
+        tile.classList.add('project-tile--hidden-for-kids');
+        const badge = tile.querySelector('.project-hidden-overlay');
+        if (badge) badge.classList.add('visible');
+        const img = tile.querySelector('img');
+        if (img) img.classList.add('dimmed');
+      }
+    });
+  };
   const resolveChecked = (key, defaultVisible) => {
     const overrideValue = key ? overrides[key] : undefined;
     return overrideValue === undefined ? defaultVisible : overrideValue === 'visible';
-  };
-
-  const createVisibilityToggleElement = (labelText, key, defaultVisible) => {
-    const wrapper = document.createElement('label');
-    wrapper.className = 'visibility-toggle';
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.checked = resolveChecked(key, defaultVisible);
-    checkbox.addEventListener('change', () => {
-      const newValue = checkbox.checked ? 'visible' : 'hidden';
-      overrides = setOverride(key, newValue);
-    });
-    const label = document.createElement('span');
-    label.textContent = labelText;
-    wrapper.appendChild(checkbox);
-    wrapper.appendChild(label);
-    return wrapper;
   };
   
   // Header
@@ -201,12 +222,18 @@ export function renderViewer(state, callbacks) {
     modeBadge.textContent = 'Foreldremodus aktiv';
     header.appendChild(modeBadge);
 
-    const projectToggle = createVisibilityToggleElement(
-      'Synlig for barn på denne enheten',
-      parentOverrideKey,
-      defaultParentVisible
-    );
-    header.appendChild(projectToggle);
+    if (parentOverrideKey) {
+      const { element: projectToggle, setDisabled, setChecked } = createVisibilityToggle({
+        checked: resolveChecked(parentOverrideKey, defaultParentVisible),
+        onChange: (checked) => {
+          overrides = setOverride(parentOverrideKey, checked ? 'visible' : 'hidden');
+          applyChildVisibility();
+        }
+      });
+      projectToggle.style.marginLeft = 'var(--spacing-sm)';
+      header.appendChild(projectToggle);
+      projectToggleController = { setDisabled, setChecked };
+    }
   }
   header.appendChild(headerActions);
   
@@ -217,13 +244,14 @@ export function renderViewer(state, callbacks) {
   // Håndter tom steps-array
   const steps = state.currentProjectMeta?.steps || [];
   const children = state.currentProjectMeta?.children || [];
+  const parentId = state.currentProjectMeta?.id || state.currentPath;
   const visibleChildren = children
     .filter(c => isParentMode ? true : !c.hidden)
     .filter((child) => {
       if (isParentMode) return true;
       return isVisibleForKidsNow(
         {
-          id: state.currentProjectMeta?.id || state.currentPath,
+          id: parentId,
           childId: child.id,
           approvedByDefault: child.approvedByDefault,
           releaseAt: child.releaseAt
@@ -427,15 +455,38 @@ export function renderViewer(state, callbacks) {
 
         if (isParentMode) {
           const childKey = getOverrideKey({
-            projectId: state.currentProjectMeta?.id || state.currentPath,
+            projectId: parentId,
             childId: child.id || child.path
           });
           const childDefaultVisible = child.approvedByDefault !== false;
-          const toggle = createVisibilityToggleElement('Synlig for barn på denne enheten', childKey, childDefaultVisible);
-          toggle.addEventListener('click', (event) => {
-            event.stopPropagation();
+          const { element: toggleEl, setDisabled, setChecked } = createVisibilityToggle({
+            checked: resolveChecked(childKey, childDefaultVisible),
+            disabled: false,
+            onChange: (checked) => {
+              overrides = setOverride(childKey, checked ? 'visible' : 'hidden');
+              applyChildVisibility();
+            }
           });
-          tile.appendChild(toggle);
+          toggleEl.addEventListener('click', (event) => event.stopPropagation());
+          const togglePos = document.createElement('div');
+          togglePos.className = 'toggle-overlay-position';
+          togglePos.appendChild(toggleEl);
+          tile.appendChild(togglePos);
+
+          const hiddenOverlay = document.createElement('div');
+          hiddenOverlay.className = 'project-hidden-overlay';
+          const badge = document.createElement('div');
+          badge.className = 'project-hidden-badge';
+          badge.innerHTML = '<span aria-hidden="true">🚫</span><span>Skjult for barn</span>';
+          hiddenOverlay.appendChild(badge);
+          tile.appendChild(hiddenOverlay);
+
+          childTileControllers.push({
+            tile,
+            toggle: { setDisabled, setChecked },
+            key: { childId: child.id || child.path },
+            defaultVisible: childDefaultVisible
+          });
         }
         
         tile.addEventListener('click', () => {
@@ -448,6 +499,9 @@ export function renderViewer(state, callbacks) {
       });
       
       imageContainer.appendChild(childrenGrid);
+      if (isParentMode) {
+        applyChildVisibility();
+      }
     } else {
       // Vis melding
       const message = document.createElement('div');

@@ -8,11 +8,12 @@ import { getImageUrl, loadProjectMeta } from './data-loader.js';
 import { getLastStepFor } from './state.js';
 import { getFavoriteProjects, toggleFavoriteProject } from './favorites.js';
 import { shareUrl } from './share.js';
-import { getMode, getOverrides, setOverride, isVisibleForKidsNow, getOverrideKey, setMode } from './visibility.js';
+import { getMode, getOverrides, setOverride, isVisibleForKidsNow, getOverrideKey, setMode, createVisibilityToggle } from './visibility.js';
 import { isInstallAvailable, consumePrompt, isStandalone } from './pwa-install.js';
 import { showParentQuizDialog } from './parent-quiz.js';
 
 const FILTER_STORAGE_KEY = 'legoInstructions.gridFilters';
+const OFFLINE_STORAGE_KEY = 'legoInstructions.offlineProjects';
 
 function loadFilterState() {
   try {
@@ -28,11 +29,67 @@ function loadFilterState() {
   }
 }
 
+function loadOfflineState() {
+  try {
+    const stored = localStorage.getItem(OFFLINE_STORAGE_KEY);
+    if (!stored) return {};
+    const parsed = JSON.parse(stored);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveOfflineState(state) {
+  try {
+    localStorage.setItem(OFFLINE_STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.warn('Kunne ikke lagre offline-state:', e);
+  }
+}
+
 function saveFilterState(state) {
   try {
     localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(state));
   } catch (e) {
     // Ignorer lagringsfeil
+  }
+}
+
+async function prefetchProjectAssets(projectPath) {
+  try {
+    const meta = await loadProjectMeta(projectPath);
+    const steps = meta?.steps || [];
+    const children = meta?.children || [];
+    const urls = [
+      getImageUrl(projectPath, meta?.coverImage || 'cover.png'),
+      ...steps.map((step) => getImageUrl(projectPath, step))
+    ];
+
+    await Promise.all(
+      children.map(async (child) => {
+        const childPath = `${projectPath}/${child.path || child.id}`;
+        try {
+          const childMeta = await loadProjectMeta(childPath);
+          urls.push(getImageUrl(childPath, childMeta?.coverImage || 'cover.png'));
+          (childMeta?.steps || []).forEach((step) => {
+            urls.push(getImageUrl(childPath, step));
+          });
+        } catch (e) {
+          console.warn('Prefetch child-meta feilet for', childPath, e);
+        }
+      })
+    );
+
+    await Promise.all(
+      urls.map((url) =>
+        fetch(url).catch((err) => {
+          console.warn('Prefetch feilet for', url, err);
+        })
+      )
+    );
+  } catch (e) {
+    console.warn('Prefetch av prosjekt feilet:', projectPath, e);
   }
 }
 
@@ -51,6 +108,7 @@ export function renderProjectGrid(projects, onProjectClick) {
   const getBaseProjects = () => (mode === 'parent' ? projects : projects.filter(project => !project.hidden));
   const metaCache = new Map();
   let favoriteSet = new Set(getFavoriteProjects());
+  let offlineState = loadOfflineState();
   let selectedCategory = 'Alle';
   let favoritesOnly = false;
 
@@ -236,6 +294,45 @@ export function renderProjectGrid(projects, onProjectClick) {
       '⛶'
     );
     settingsPanel.appendChild(fullscreenButton);
+
+    if (mode === 'parent') {
+      const offlineAllButton = document.createElement('button');
+      offlineAllButton.type = 'button';
+      offlineAllButton.className = 'project-grid__settings-item';
+      const offlineIcon = document.createElement('span');
+      offlineIcon.className = 'project-grid__settings-icon';
+      offlineIcon.textContent = '☁️';
+      const offlineLabel = document.createElement('span');
+      offlineLabel.textContent = 'Gjør alt tilgjengelig offline';
+      offlineAllButton.appendChild(offlineIcon);
+      offlineAllButton.appendChild(offlineLabel);
+      let offlineAllBusy = false;
+      offlineAllButton.addEventListener('click', async () => {
+        if (offlineAllBusy) return;
+        offlineAllBusy = true;
+        offlineAllButton.disabled = true;
+        const base = getBaseProjects();
+        offlineLabel.textContent = `Laster ned (0/${base.length})`;
+        for (let i = 0; i < base.length; i += 1) {
+          const p = base[i];
+          offlineState[p.path] = true;
+          offlineLabel.textContent = `Laster ned (${i + 1}/${base.length})`;
+          try {
+            await prefetchProjectAssets(p.path);
+          } catch (e) {
+            console.warn('Prefetch feilet for', p.path, e);
+          }
+        }
+        saveOfflineState(offlineState);
+        offlineLabel.textContent = 'Ferdig (offline)';
+        setTimeout(() => {
+          offlineLabel.textContent = 'Gjør alt tilgjengelig offline';
+          offlineAllButton.disabled = false;
+          offlineAllBusy = false;
+        }, 1200);
+      });
+      settingsPanel.appendChild(offlineAllButton);
+    }
 
     if (isInstallAvailable() && !isStandalone()) {
       const installButton = createPanelButton('Installer app', async () => {
@@ -432,36 +529,105 @@ export function renderProjectGrid(projects, onProjectClick) {
         progressIndicator.style.display = 'none';
       });
 
-    tile.appendChild(favoriteButton);
+    if (mode === 'child') {
+      tile.appendChild(favoriteButton);
+    }
     tile.appendChild(img);
     tile.appendChild(name);
     tile.appendChild(progressIndicator);
 
+    const key = getOverrideKey({ projectId: project.id || project.path });
+    const defaultVisible = project.approvedByDefault !== false;
+    const currentOverride = key ? overrides[key] : undefined;
+    const effectiveVisible = currentOverride === undefined ? defaultVisible : currentOverride === 'visible';
+
+    if (mode === 'parent' && key) {
+      const togglePos = document.createElement('div');
+      togglePos.className = 'toggle-overlay-position';
+      const { element: toggleEl } = createVisibilityToggle({
+        checked: effectiveVisible,
+        onChange: (checked) => {
+          overrides = setOverride(key, checked ? 'visible' : 'hidden');
+          applyFilters();
+        }
+      });
+      togglePos.appendChild(toggleEl);
+      tile.appendChild(togglePos);
+    }
+
+    // Overlay for hidden state
+    const hiddenOverlay = document.createElement('div');
+    hiddenOverlay.className = 'project-hidden-overlay';
+    const hiddenBadge = document.createElement('div');
+    hiddenBadge.className = 'project-hidden-badge';
+    hiddenBadge.innerHTML = '<span aria-hidden="true">🚫</span><span>Skjult for barn</span>';
+    hiddenOverlay.appendChild(hiddenBadge);
+    tile.appendChild(hiddenOverlay);
+
+    const setHiddenState = (isVisible) => {
+      if (isVisible) {
+        img.classList.remove('dimmed');
+        tile.classList.remove('project-tile--hidden-for-kids');
+        hiddenOverlay.classList.remove('visible');
+      } else {
+        img.classList.add('dimmed');
+        tile.classList.add('project-tile--hidden-for-kids');
+        hiddenOverlay.classList.add('visible');
+      }
+    };
+
     if (mode === 'parent') {
-      const toggleWrapper = document.createElement('label');
-      toggleWrapper.className = 'visibility-toggle';
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.addEventListener('click', (event) => {
+      setHiddenState(effectiveVisible);
+    }
+
+    if (mode !== 'parent') {
+      // Barnemodus: ingen overlays/toggles/dimming
+      hiddenOverlay.remove();
+    }
+
+    if (mode === 'parent') {
+      const offlineBtn = document.createElement('button');
+      offlineBtn.type = 'button';
+      offlineBtn.className = 'project-tile__favorite project-tile__offline';
+      offlineBtn.textContent = offlineState[project.path] ? '☁️' : '☁';
+      offlineBtn.setAttribute('aria-pressed', String(Boolean(offlineState[project.path])));
+      offlineBtn.setAttribute('aria-label', 'Tilgjengelig offline');
+      offlineBtn.title = offlineState[project.path] ? 'Fjernet fra offline' : 'Gjør tilgjengelig offline';
+
+      const updateOfflineButton = (enabled) => {
+        offlineBtn.textContent = enabled ? '☁️' : '☁';
+        offlineBtn.setAttribute('aria-pressed', String(enabled));
+        offlineBtn.title = enabled ? 'Fjernet fra offline' : 'Gjør tilgjengelig offline';
+      };
+
+      offlineBtn.addEventListener('click', async (event) => {
         event.stopPropagation();
+        if (offlineBtn.disabled) return;
+        const next = !offlineState[project.path];
+        offlineState[project.path] = next;
+        saveOfflineState(offlineState);
+        if (next) {
+          offlineBtn.disabled = true;
+          offlineBtn.textContent = '⏳';
+          offlineBtn.title = 'Laster ned...';
+          offlineBtn.setAttribute('aria-label', 'Laster ned for offline');
+          try {
+            await prefetchProjectAssets(project.path);
+            updateOfflineButton(true);
+          } catch (e) {
+            console.warn('Prefetch feilet for', project.path, e);
+            offlineBtn.textContent = '⚠️';
+            offlineBtn.title = 'Kunne ikke laste ned';
+            offlineBtn.setAttribute('aria-label', 'Kunne ikke laste ned');
+          } finally {
+            offlineBtn.disabled = false;
+          }
+        } else {
+          updateOfflineButton(false);
+        }
       });
-      const label = document.createElement('span');
-      label.textContent = 'Synlig for barn på denne enheten';
 
-      const key = getOverrideKey({ projectId: project.id || project.path });
-      const currentOverride = key ? overrides[key] : undefined;
-      const defaultVisible = project.approvedByDefault !== false;
-      checkbox.checked = currentOverride === undefined ? defaultVisible : currentOverride === 'visible';
-
-      checkbox.addEventListener('change', () => {
-        const newValue = checkbox.checked ? 'visible' : 'hidden';
-        overrides = setOverride(key, newValue);
-        applyFilters();
-      });
-
-      toggleWrapper.appendChild(checkbox);
-      toggleWrapper.appendChild(label);
-      tile.appendChild(toggleWrapper);
+      tile.appendChild(offlineBtn);
     }
 
     tile.addEventListener('click', () => {
