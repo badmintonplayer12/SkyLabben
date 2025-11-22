@@ -11,8 +11,54 @@ Denne guiden hjelper deg med å konvertere eksisterende prosjekter med mellomrom
 
 Standard er at prosjekter vises for barn. Hvis et nytt prosjekt skal være skjult i barnemodus til forelder aktiverer det:
 - I `projects.json`: sett `approvedByDefault: false` på prosjektet.
-- I prosjektets `meta.json`: sett `approvedByDefault: false` (og på ev. children som også skal skjules).
-- Forelder kan senere slå prosjektet på via togglen i foreldremodus (lagres lokalt i `legoInstructions.visibilityOverrides`).
+- I prosjektets `meta.json`: sett `approvedByDefault: false` på child-objektet i `children`-arrayen.
+
+**Eksempel - skjule et child (underprosjekt) for barn:**
+
+I `projects/huset-vaart/meta.json`:
+```json
+{
+  "id": "huset-vaart",
+  "name": "Huset Vårt",
+  "children": [
+    {
+      "id": "13-hjemmehjelperen",
+      "name": "13-Hjemmehjelperen",
+      "path": "13-hjemmehjelperen",
+      "approvedByDefault": false
+    }
+  ]
+}
+```
+
+**Eksempel - skjule et toppnivå-prosjekt for barn:**
+
+I `projects.json`:
+```json
+[
+  {
+    "id": "mitt-prosjekt",
+    "name": "Mitt Prosjekt",
+    "path": "mitt-prosjekt",
+    "approvedByDefault": false
+  }
+]
+```
+
+I `projects/mitt-prosjekt/meta.json`:
+```json
+{
+  "id": "mitt-prosjekt",
+  "name": "Mitt Prosjekt",
+  "approvedByDefault": false
+}
+```
+
+**Hva dette betyr:**
+- `approvedByDefault: false`: Prosjektet/child-en skjules for barn som standard (vises ikke i barnemodus).
+- Prosjektet vises fortsatt i foreldremodus.
+- Prosjektet kan fortsatt åpnes via direkte URL også i barnemodus.
+- Forelder kan slå prosjektet på via toggle i foreldremodus (lagres lokalt i `legoInstructions.visibilityOverrides`).
 
 Se seksjoner "Automatisk konvertering med Node.js-script" og "Cover-bilder" nedenfor.
 
