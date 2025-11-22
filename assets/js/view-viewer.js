@@ -14,6 +14,34 @@ import { getMode, setMode, getOverrides, setOverride, isVisibleForKidsNow, getOv
 import { showParentQuizDialog } from './parent-quiz.js';
 import { openDialog } from './dialog.js';
 
+function createOfflineChip() {
+  const chip = document.createElement('span');
+  chip.className = 'offline-chip';
+  chip.setAttribute('aria-hidden', 'true');
+  chip.innerHTML = `
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M21 13
+         C21 10.8 19.2 9 17 9
+         C16.7 9 16.4 9 16.1 9.1
+         C15.3 6.7 13.3 5 11 5
+         C8.2 5 6 7.2 6 10
+         C6 10.1 6 10.3 6 10.4
+         C3.8 11 2 12.9 2 15
+         C2 17.2 3.8 19 6 19H14
+         C18 19 21 16.5 21 13" 
+      stroke="#9BA4B5"
+      stroke-width="1.6"
+      stroke-linecap="round"/>
+      <line x1="5" y1="5" x2="19" y2="21" stroke="#9BA4B5" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  `;
+  if (!navigator.onLine) {
+    chip.classList.add('offline-chip--visible');
+    chip.setAttribute('aria-hidden', 'false');
+  }
+  return chip;
+}
+
 /**
  * Oppretter en innstillingsmeny for viewer
  * @returns {Object} Meny-objekt med wrapper, addItem, hasItems og cleanup-metoder
@@ -216,6 +244,12 @@ export function renderViewer(state, callbacks) {
   header.textContent = state.currentProjectMeta?.name || '';
   const headerActions = document.createElement('div');
   headerActions.className = 'viewer__header-actions';
+  const offlineChip = createOfflineChip();
+  const offlineHint = document.createElement('span');
+  offlineHint.className = 'offline-hint';
+  offlineHint.textContent = 'Offline';
+  headerActions.appendChild(offlineChip);
+  headerActions.appendChild(offlineHint);
   if (isParentMode) {
     const modeBadge = document.createElement('span');
     modeBadge.className = 'mode-indicator';

@@ -12,10 +12,7 @@
 </head>
 <body>
   <div id="app"><div class="project-grid"><div class="project-grid__header app-header"><div class="project-grid__controls"><div class="project-grid__search-row"><input type="search" class="project-grid__search" placeholder="Søk etter prosjekt..." aria-label="Søk etter prosjekt"><select class="project-grid__category-select" aria-label="Velg kategori"><option value="Alle" selected="selected">Alle</option><option value="Hjemmeprosjekt">Hjemmeprosjekt</option></select><button type="button" class="project-grid__favorite-toggle" aria-pressed="false" aria-label="Vis bare favoritter">☆</button><div class="project-grid__settings"><button type="button" class="viewer__button viewer__button--settings" aria-label="Innstillinger" title="Innstillinger">⚙️</button></div></div></div></div><div class="project-grid__tiles"><div class="project-tile" data-path="huset-vaart"><button type="button" class="project-tile__favorite" aria-label="Merk som favoritt" aria-pressed="false">?</button><img class="project-tile__image" src="Filer_for_gallery/cover.png" alt="Huset Vårt"><div class="project-tile__name">Huset Vårt<div class="project-tile__category">Hjemmeprosjekt</div></div><div class="project-tile__progress" style="display: none;"></div></div></div></div></div>
-  <div id="offline-indicator" class="offline-indicator" aria-hidden="true" role="status">
-    <span class="offline-indicator__icon">📡</span>
-    <span class="offline-indicator__text">Offline modus</span>
-  </div>
+  <!-- Offline-indikator fjernet; status vises som små chips ved gear -->
   <script type="module" src="Filer_for_gallery/main.js"></script>
 <!-- Code injected by live-server -->
 <script>

@@ -343,20 +343,32 @@ function registerServiceWorker() {
  * Viser/skjuler indikator basert på nettverksstatus
  */
 function initOfflineIndicator() {
-  const indicator = document.getElementById('offline-indicator');
-  if (!indicator) {
-    return;
-  }
+  const chipNodes = () => Array.from(document.querySelectorAll('.offline-chip'));
+  const hintNodes = () => Array.from(document.querySelectorAll('.offline-hint'));
 
   function updateOfflineStatus() {
     const isOnline = navigator.onLine;
     
-    if (isOnline) {
-      indicator.classList.remove('offline-indicator--visible');
-      indicator.setAttribute('aria-hidden', 'true');
+    chipNodes().forEach((chip) => {
+      if (isOnline) {
+        chip.classList.remove('offline-chip--visible');
+        chip.setAttribute('aria-hidden', 'true');
+        chip.classList.remove('offline-chip--animate');
+      } else {
+        chip.classList.add('offline-chip--visible');
+        chip.setAttribute('aria-hidden', 'false');
+        chip.classList.add('offline-chip--animate');
+        setTimeout(() => chip.classList.remove('offline-chip--animate'), 1800);
+      }
+    });
+
+    if (!isOnline) {
+      hintNodes().forEach((hint) => {
+        hint.classList.add('offline-hint--visible');
+        setTimeout(() => hint.classList.remove('offline-hint--visible'), 2200);
+      });
     } else {
-      indicator.classList.add('offline-indicator--visible');
-      indicator.setAttribute('aria-hidden', 'false');
+      hintNodes().forEach((hint) => hint.classList.remove('offline-hint--visible'));
     }
   }
 
