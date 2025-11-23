@@ -331,6 +331,9 @@ button {
   justify-content: center;
   box-shadow: var(--shadow);
   cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, fill 0.2s ease;
 }
 
 .project-tile__slideshow svg {
@@ -342,7 +345,24 @@ button {
 }
 
 .project-tile__slideshow:hover svg {
-  fill: #0099ff2c;
+  fill: #0099ff;
+}
+
+.project-tile:hover .project-tile__slideshow,
+.project-tile:focus-within .project-tile__slideshow {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (pointer: coarse) {
+  .project-tile__slideshow {
+    opacity: 0.6;
+    pointer-events: auto;
+  }
+  .project-tile__slideshow:hover,
+  .project-tile__slideshow:focus {
+    opacity: 1;
+  }
 }
 
 
@@ -528,6 +548,10 @@ button {
   justify-content: center;
   font-size: 20px;
   line-height: 1;
+  border: 1px solid #d0d7e2;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: var(--shadow);
 }
 
 .viewer__button--settings {
@@ -541,6 +565,41 @@ button {
   justify-content: center;
   font-size: 20px;
   line-height: 1;
+  border: 1px solid #d0d7e2;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+.viewer__button--slideshow {
+  min-width: 51px;
+  min-height: 51px;
+  width: 51px;
+  height: 51px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  line-height: 1;
+  border: 1px solid #d0d7e2;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.viewer__button--settings svg {
+  width: 20px;
+  height: 20px;
+}
+.viewer__button--slideshow svg {
+  width: 20px;
+  height: 20px;
+  stroke: #000;
+  fill: none;
+  transition: fill 0.2s ease;
+}
+.viewer__button--slideshow:hover svg {
+  fill: #0099ff;
 }
 
 .viewer__settings-menu {

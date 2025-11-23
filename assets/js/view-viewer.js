@@ -254,9 +254,15 @@ export function renderViewer(state, callbacks) {
   if (Array.isArray(state.currentProjectMeta?.gallery) && state.currentProjectMeta.gallery.length > 0) {
     const slideBtn = document.createElement('button');
     slideBtn.type = 'button';
-    slideBtn.className = 'viewer__button viewer__button--ghost';
-    slideBtn.textContent = 'Slideshow';
+    slideBtn.className = 'viewer__button--slideshow';
     slideBtn.setAttribute('aria-label', 'Åpne galleri');
+    slideBtn.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3.8" y="7.2" width="16.4" height="11.2" rx="2.4" ry="2.4" stroke="#000000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M6.4 7.6L7.6 5.3C7.9 4.8 8.5 4.5 9.1 4.5H11.0C11.6 4.5 12.2 4.8 12.5 5.3L13.7 7.6" stroke="#000000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="12" cy="12.8" r="3.1" stroke="#000000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    `;
     slideBtn.addEventListener('click', () => {
       window.location.hash = `#/slideshow/${state.currentPath}`;
     });
