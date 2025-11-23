@@ -30,7 +30,9 @@
     "12-tegnerom/gallery_03.png",
     "13-hjemmehjelperen/cover.png",
     "13-hjemmehjelperen/gallery_1.png",
-    "13-hjemmehjelperen/gallery_2.png"
+    "13-hjemmehjelperen/gallery_2.png",
+    "14-silas-sitt-rom/cover.png",
+    "15-mamma-og-pappa-sitt-rom/cover.png"
   ],
   "children": [
     {
@@ -97,6 +99,18 @@
       "id": "13-hjemmehjelperen",
       "name": "13 - Hjemmehjelperen",
       "path": "13-hjemmehjelperen",
+      "approvedByDefault": false
+    },
+    {
+      "id": "14-silas-sitt-rom",
+      "name": "14 - Silas sitt Rom",
+      "path": "14-silas-sitt-rom",
+      "approvedByDefault": false
+    },
+    {
+      "id": "15-mamma-og-pappa-sitt-rom",
+      "name": "15 - Mamma og Pappa sitt rom",
+      "path": "15-mamma-og-pappa-sitt-rom",
       "approvedByDefault": false
     }
   ],
