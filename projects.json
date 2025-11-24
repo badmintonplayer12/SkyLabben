@@ -4,5 +4,11 @@
     "name": "Huset Vårt",
     "path": "huset-vaart",
     "category": "Hjemmeprosjekt"
+  },
+  {
+    "id": "7-seteren",
+    "name": "7 - Seteren",
+    "path": "7-seteren",
+    "approvedByDefault": false
   }
 ]
