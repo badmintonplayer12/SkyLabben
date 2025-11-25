@@ -1,0 +1,25 @@
+{
+  "id": "6-bakluke",
+  "name": "6 - Bakluke",
+  "coverImage": "cover.png",
+  "steps": [
+    "183_1x.png",
+    "184_1x.png",
+    "185_1x.png",
+    "186_1x.png",
+    "187_1x.png",
+    "188_1x.png",
+    "189_1x.png",
+    "190_1x.png",
+    "191_1x.png",
+    "192_1x.png",
+    "193_1x.png",
+    "194_1x.png"
+  ],
+  "children": [],
+  "gallery": [
+    "cover.png"
+  ],
+  "approvedByDefault": false
+}
+

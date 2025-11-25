@@ -1,0 +1,27 @@
+{
+  "id": "2-panser",
+  "name": "2 - Panser",
+  "coverImage": "cover.png",
+  "steps": [
+    "68_1x.png",
+    "69_1x.png",
+    "70_1x.png",
+    "71_1x.png",
+    "72_1x.png",
+    "73_1x.png",
+    "74_1x.png",
+    "75_1x.png",
+    "76_1x.png",
+    "77_1x.png",
+    "78_1x.png",
+    "79_1x.png",
+    "80_1x.png",
+    "81_1x.png"
+  ],
+  "children": [],
+  "gallery": [
+    "cover.png"
+  ],
+  "approvedByDefault": false
+}
+

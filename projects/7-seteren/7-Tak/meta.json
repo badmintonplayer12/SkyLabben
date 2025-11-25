@@ -1,0 +1,30 @@
+{
+  "id": "7-tak",
+  "name": "7 - Tak",
+  "coverImage": "cover.png",
+  "steps": [
+    "195_1x.png",
+    "196_1x.png",
+    "197_1x.png",
+    "198_1x.png",
+    "199_1x.png",
+    "200_1x.png",
+    "201_1x.png",
+    "202_1x.png",
+    "203_1x.png",
+    "204_1x.png",
+    "205_1x.png",
+    "206_1x.png",
+    "207_1x.png",
+    "208_1x.png",
+    "209_1x.png",
+    "210_1x.png",
+    "211_1x.png"
+  ],
+  "children": [],
+  "gallery": [
+    "cover.png"
+  ],
+  "approvedByDefault": false
+}
+
