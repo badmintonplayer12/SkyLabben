@@ -1,0 +1,22 @@
+{
+  "id": "5-mal",
+  "name": "5 - Mål",
+  "coverImage": "cover.png",
+  "steps": [
+    "36_1x.png",
+    "37_1x.png",
+    "38_1x.png",
+    "39_1x.png",
+    "40_1x.png",
+    "41_1x.png",
+    "42_1x.png",
+    "43_1x.png",
+    "44_1x.png"
+  ],
+  "children": [],
+  "gallery": [
+    "cover.png"
+  ],
+  "approvedByDefault": false
+}
+

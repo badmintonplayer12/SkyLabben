@@ -1,0 +1,16 @@
+{
+  "id": "4-sklie",
+  "name": "4 - Sklie",
+  "coverImage": "cover.png",
+  "steps": [
+    "33_1x.png",
+    "34_1x.png",
+    "35_1x.png"
+  ],
+  "children": [],
+  "gallery": [
+    "cover.png"
+  ],
+  "approvedByDefault": false
+}
+

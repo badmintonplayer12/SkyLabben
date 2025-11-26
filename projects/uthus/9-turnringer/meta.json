@@ -1,0 +1,17 @@
+{
+  "id": "9-turnringer",
+  "name": "9 - Turnringer",
+  "coverImage": "cover.png",
+  "steps": [
+    "89_1x.png",
+    "90_1x.png",
+    "91_1x.png",
+    "92_1x.png"
+  ],
+  "children": [],
+  "gallery": [
+    "cover.png"
+  ],
+  "approvedByDefault": false
+}
+

@@ -1,0 +1,15 @@
+{
+  "id": "6-benk",
+  "name": "6 - Benk",
+  "coverImage": "cover.png",
+  "steps": [
+    "45_1x.png",
+    "46_1x.png"
+  ],
+  "children": [],
+  "gallery": [
+    "cover.png"
+  ],
+  "approvedByDefault": false
+}
+

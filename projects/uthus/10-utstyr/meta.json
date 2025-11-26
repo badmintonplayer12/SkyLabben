@@ -1,0 +1,16 @@
+{
+  "id": "10-utstyr",
+  "name": "10 - Utstyr",
+  "coverImage": "cover.png",
+  "steps": [
+    "93_1x.png",
+    "94_1x.png",
+    "95_1x.png"
+  ],
+  "children": [],
+  "gallery": [
+    "cover.png"
+  ],
+  "approvedByDefault": false
+}
+

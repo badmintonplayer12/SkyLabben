@@ -1,0 +1,16 @@
+{
+  "id": "1-gulv",
+  "name": "1 - Gulv",
+  "coverImage": "cover.png",
+  "steps": [
+    "1_1x.png",
+    "2_1x.png",
+    "3_1x.png"
+  ],
+  "children": [],
+  "gallery": [
+    "cover.png"
+  ],
+  "approvedByDefault": false
+}
+

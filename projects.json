@@ -10,5 +10,11 @@
     "name": "7 - Seteren",
     "path": "7-seteren",
     "approvedByDefault": false
+  },
+  {
+    "id": "uthus",
+    "name": "Uthus",
+    "path": "uthus",
+    "approvedByDefault": false
   }
 ]
