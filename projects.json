@@ -8,19 +8,16 @@
   {
     "id": "7-seteren",
     "name": "7 - Seteren",
-    "path": "7-seteren",
-    "approvedByDefault": false
+    "path": "7-seteren"
   },
   {
     "id": "gymsal",
     "name": "Gymsal",
-    "path": "gymsal",
-    "approvedByDefault": false
+    "path": "gymsal"
   },
   {
     "id": "garasje",
     "name": "Garasje",
-    "path": "garasje",
-    "approvedByDefault": false
+    "path": "garasje"
   }
 ]

@@ -15,27 +15,22 @@
       "id": "1-gulv",
       "name": "1 - Gulv",
       "path": "1-gulv",
-      "approvedByDefault": false
     },
     {
       "id": "2-vegger",
       "name": "2 - Vegger",
-      "path": "2-vegger",
-      "approvedByDefault": false
+      "path": "2-vegger"
     },
     {
       "id": "3-stolper-og-tak",
       "name": "3 - Stolper og tak",
-      "path": "3-stolper-og-tak",
-      "approvedByDefault": false
+      "path": "3-stolper-og-tak"
     },
     {
       "id": "4-utstyr",
       "name": "4 - Utstyr",
-      "path": "4-utstyr",
-      "approvedByDefault": false
+      "path": "4-utstyr"
     }
-  ],
-  "approvedByDefault": false
+  ]
 }
 

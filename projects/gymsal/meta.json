@@ -20,64 +20,53 @@
     {
       "id": "1-gulv",
       "name": "1 - Gulv",
-      "path": "1-gulv",
-      "approvedByDefault": false
+      "path": "1-gulv"
     },
     {
       "id": "2-airtrack",
       "name": "2 - Airtrack",
-      "path": "2-airtrack",
-      "approvedByDefault": false
+      "path": "2-airtrack"
     },
     {
       "id": "3-trampoline",
       "name": "3 - Trampoline",
-      "path": "3-trampoline",
-      "approvedByDefault": false
+      "path": "3-trampoline"
     },
     {
       "id": "4-sklie",
       "name": "4 - Sklie",
-      "path": "4-sklie",
-      "approvedByDefault": false
+      "path": "4-sklie"
     },
     {
       "id": "5-mal",
       "name": "5 - Mål",
-      "path": "5-mal",
-      "approvedByDefault": false
+      "path": "5-mal"
     },
     {
       "id": "6-benk",
       "name": "6 - Benk",
-      "path": "6-benk",
-      "approvedByDefault": false
+      "path": "6-benk"
     },
     {
       "id": "7-hinderloype",
       "name": "7 - Hinderløype",
-      "path": "7-hinderloype",
-      "approvedByDefault": false
+      "path": "7-hinderloype"
     },
     {
       "id": "8-klatrevegg",
       "name": "8 - Klatrevegg",
-      "path": "8-klatrevegg",
-      "approvedByDefault": false
+      "path": "8-klatrevegg"
     },
     {
       "id": "9-turnringer",
       "name": "9 - Turnringer",
-      "path": "9-turnringer",
-      "approvedByDefault": false
+      "path": "9-turnringer"
     },
     {
       "id": "10-utstyr",
       "name": "10 - Utstyr",
-      "path": "10-utstyr",
-      "approvedByDefault": false
+      "path": "10-utstyr"
     }
-  ],
-  "approvedByDefault": false
+  ]
 }
 

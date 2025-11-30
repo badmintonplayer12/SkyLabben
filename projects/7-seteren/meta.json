@@ -18,45 +18,37 @@
       "id": "1-understell",
       "name": "1 - Understell",
       "path": "1-Understell",
-      "approvedByDefault": false
     },
     {
       "id": "2-panser",
       "name": "2 - Panser",
-      "path": "2-Panser",
-      "approvedByDefault": false
+      "path": "2-Panser"
     },
     {
       "id": "3-grill",
       "name": "3 - Grill",
-      "path": "3-Grill",
-      "approvedByDefault": false
+      "path": "3-Grill"
     },
     {
       "id": "4-fremre-del",
       "name": "4 - Fremre del",
-      "path": "4-Fremre-del",
-      "approvedByDefault": false
+      "path": "4-Fremre-del"
     },
     {
       "id": "5-bakre-del",
       "name": "5 - Bakre del",
-      "path": "5-Bakre-del",
-      "approvedByDefault": false
+      "path": "5-Bakre-del"
     },
     {
       "id": "6-bakluke",
       "name": "6 - Bakluke",
-      "path": "6-Bakluke",
-      "approvedByDefault": false
+      "path": "6-Bakluke"
     },
     {
       "id": "7-tak",
       "name": "7 - Tak",
-      "path": "7-Tak",
-      "approvedByDefault": false
+      "path": "7-Tak"
     }
-  ],
-  "approvedByDefault": false
+  ]
 }
 

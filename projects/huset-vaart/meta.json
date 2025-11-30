@@ -98,20 +98,17 @@
     {
       "id": "13-hjemmehjelperen",
       "name": "13 - Hjemmehjelperen",
-      "path": "13-hjemmehjelperen",
-      "approvedByDefault": false
+      "path": "13-hjemmehjelperen"
     },
     {
       "id": "14-silas-sitt-rom",
       "name": "14 - Silas sitt Rom",
-      "path": "14-silas-sitt-rom",
-      "approvedByDefault": false
+      "path": "14-silas-sitt-rom"
     },
     {
       "id": "15-mamma-og-pappa-sitt-rom",
       "name": "15 - Mamma og Pappa sitt rom",
-      "path": "15-mamma-og-pappa-sitt-rom",
-      "approvedByDefault": false
+      "path": "15-mamma-og-pappa-sitt-rom"
     }
   ],
   "category": "Hjemmeprosjekt"
