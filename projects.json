@@ -12,9 +12,15 @@
     "approvedByDefault": false
   },
   {
-    "id": "uthus",
-    "name": "Uthus",
-    "path": "uthus",
+    "id": "gymsal",
+    "name": "Gymsal",
+    "path": "gymsal",
+    "approvedByDefault": false
+  },
+  {
+    "id": "garasje",
+    "name": "Garasje",
+    "path": "garasje",
     "approvedByDefault": false
   }
 ]

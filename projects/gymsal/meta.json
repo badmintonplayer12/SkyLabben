@@ -1,12 +1,12 @@
 {
-  "id": "uthus",
-  "name": "Uthus",
+  "id": "gymsal",
+  "name": "Gymsal",
   "coverImage": "cover.png",
   "steps": [],
   "gallery": [
     "cover.png",
     "1-gulv/cover.png",
-    "2-tjukkas/cover.png",
+    "2-airtrack/cover.png",
     "3-trampoline/cover.png",
     "4-sklie/cover.png",
     "5-mal/cover.png",
@@ -24,9 +24,9 @@
       "approvedByDefault": false
     },
     {
-      "id": "2-tjukkas",
-      "name": "2 - Tjukkas",
-      "path": "2-tjukkas",
+      "id": "2-airtrack",
+      "name": "2 - Airtrack",
+      "path": "2-airtrack",
       "approvedByDefault": false
     },
     {

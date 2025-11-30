@@ -1,0 +1,41 @@
+{
+  "id": "3-stolper-og-tak",
+  "name": "3 - Stolper og tak",
+  "coverImage": "cover.png",
+  "steps": [
+    "61_1x.png",
+    "62_1x.png",
+    "63_1x.png",
+    "64_1x.png",
+    "65_1x.png",
+    "66_1x.png",
+    "67_1x.png",
+    "68_1x.png",
+    "69_1x.png",
+    "70_1x.png",
+    "71_1x.png",
+    "72_1x.png",
+    "73_1x.png",
+    "74_1x.png",
+    "75_1x.png",
+    "76_1x.png",
+    "77_1x.png",
+    "78_1x.png",
+    "79_1x.png",
+    "80_1x.png",
+    "81_1x.png",
+    "82_1x.png",
+    "83_1x.png",
+    "84_1x.png",
+    "85_1x.png",
+    "86_1x.png",
+    "87_1x.png",
+    "88_1x.png"
+  ],
+  "children": [],
+  "gallery": [
+    "cover.png"
+  ],
+  "approvedByDefault": false
+}
+

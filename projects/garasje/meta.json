@@ -1,0 +1,41 @@
+{
+  "id": "garasje",
+  "name": "Garasje",
+  "coverImage": "cover.png",
+  "steps": [],
+  "gallery": [
+    "cover.png",
+    "1-gulv/cover.png",
+    "2-vegger/cover.png",
+    "3-stolper-og-tak/cover.png",
+    "4-utstyr/cover.png"
+  ],
+  "children": [
+    {
+      "id": "1-gulv",
+      "name": "1 - Gulv",
+      "path": "1-gulv",
+      "approvedByDefault": false
+    },
+    {
+      "id": "2-vegger",
+      "name": "2 - Vegger",
+      "path": "2-vegger",
+      "approvedByDefault": false
+    },
+    {
+      "id": "3-stolper-og-tak",
+      "name": "3 - Stolper og tak",
+      "path": "3-stolper-og-tak",
+      "approvedByDefault": false
+    },
+    {
+      "id": "4-utstyr",
+      "name": "4 - Utstyr",
+      "path": "4-utstyr",
+      "approvedByDefault": false
+    }
+  ],
+  "approvedByDefault": false
+}
+
