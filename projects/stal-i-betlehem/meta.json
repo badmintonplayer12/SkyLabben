@@ -1,0 +1,48 @@
+{
+  "id": "stal-i-betlehem",
+  "name": "Stal i Betlehem",
+  "coverImage": "cover.png",
+  "steps": [],
+  "gallery": [
+    "cover.png",
+    "1-stjerne/cover.png",
+    "2-maria/cover.png",
+    "3-josef/cover.png",
+    "4-krybbe/cover.png",
+    "5-visemann1/cover.png",
+    "6-visemann2/cover.png"
+  ],
+  "children": [
+    {
+      "id": "1-stjerne",
+      "name": "1 - Stjerne",
+      "path": "1-stjerne"
+    },
+    {
+      "id": "2-maria",
+      "name": "2 - Maria",
+      "path": "2-maria"
+    },
+    {
+      "id": "3-josef",
+      "name": "3 - Josef",
+      "path": "3-josef"
+    },
+    {
+      "id": "4-krybbe",
+      "name": "4 - Krybbe",
+      "path": "4-krybbe"
+    },
+    {
+      "id": "5-visemann1",
+      "name": "5 - Visemann 1",
+      "path": "5-visemann1"
+    },
+    {
+      "id": "6-visemann2",
+      "name": "6 - Visemann 2",
+      "path": "6-visemann2"
+    }
+  ]
+}
+

@@ -1,0 +1,13 @@
+{
+  "id": "4-krybbe",
+  "name": "4 - Krybbe",
+  "coverImage": "cover.png",
+  "steps": [
+    "30_1x.png",
+    "31_1x.png",
+    "32_1x.png",
+    "33_1x.png"
+  ],
+  "children": []
+}
+

@@ -1,0 +1,21 @@
+{
+  "id": "2-maria",
+  "name": "2 - Maria",
+  "coverImage": "cover.png",
+  "steps": [
+    "8_1x.png",
+    "9_1x.png",
+    "10_1x.png",
+    "11_1x.png",
+    "12_1x.png",
+    "13_1x.png",
+    "14_1x.png",
+    "15_1x.png",
+    "16_1x.png",
+    "17_1x.png",
+    "18_1x.png",
+    "19_1x.png"
+  ],
+  "children": []
+}
+

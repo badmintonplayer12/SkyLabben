@@ -19,5 +19,10 @@
     "id": "garasje",
     "name": "Garasje",
     "path": "garasje"
+  },
+  {
+    "id": "stal-i-betlehem",
+    "name": "Stal i Betlehem",
+    "path": "stal-i-betlehem"
   }
 ]
